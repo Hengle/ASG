@@ -8,6 +8,15 @@ using UnityEngine;
 
 public class ChunkController : ChunkControllerBase {
     
-    public override void InitializeChunk(ChunkViewModel chunk) {
+    public override void InitializeChunk(ChunkViewModel chunk) 
+    {
+        GenerateChunk(chunk);
     }
+
+    public override ChunkViewModel CreateChunk()
+    {
+        return base.CreateChunk();
+        
+    }
+
 }

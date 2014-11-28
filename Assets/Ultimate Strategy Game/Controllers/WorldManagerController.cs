@@ -19,20 +19,79 @@ public class WorldManagerController : WorldManagerControllerBase
         
         int timeStart = System.Environment.TickCount;
 
-        int terrainWidth = worldManager.terrainWidth;
+        SetHexProperties(worldManager);
+        GenerateTerrainData(worldManager);
+        GenerateChunks(worldManager);
+
+        Debug.Log("Terrain generated: " + ((System.Environment.TickCount - timeStart) / 100f) + "ms");
+
+    }
+
+    public override void GenerateChunks(WorldManagerViewModel worldManager)
+    {
+        Debug.Log("Generating chunk");
+
+        base.GenerateChunks(worldManager);
         
-        worldManager.terrainData = new float[terrainWidth + 1, terrainWidth + 1];
+
+        int chunkHexCountX = (int)(worldManager.ChunkSize / worldManager.HexProperties.width);
+        int chunkHexCountY = (int)(worldManager.ChunkSize / (worldManager.HexProperties.tileH + worldManager.HexProperties.side));
+
+        int chunkCountX = Mathf.CeilToInt(worldManager.TerrainWidth * worldManager.HexProperties.width / (float)worldManager.ChunkSize);
+        int chunkCountY = Mathf.CeilToInt(worldManager.TerrainHeight * (worldManager.HexProperties.tileH + worldManager.HexProperties.side) / (float)worldManager.ChunkSize);
+
+        Debug.Log("chunkHexCount X " + chunkHexCountX);
+        Debug.Log("ChunkHexCount Y " + chunkHexCountY);
+        Debug.Log("Chunk count X " + chunkCountX);
+        Debug.Log("Chunk count Y " + chunkCountY);
+        
+
+        worldManager.Chunks.Clear();
+        ChunkViewModel newChunk;
+        for (int x = 0, v = 0; x < chunkCountX; x++)
+        {
+            for (int y = 0; y < chunkCountY; y++, v++)
+            {
+
+                newChunk = ChunkController.CreateChunk();
+                newChunk.ChunkX = x;
+                newChunk.ChunkY = y;
+                newChunk.TerrainDataX = x * chunkHexCountX;
+                newChunk.TerrainDataY = y * chunkHexCountY;
+
+                worldManager.Chunks.Add(newChunk);
+            }
+        }
+    }
 
 
+    private void SetHexProperties(WorldManagerViewModel worldManager)
+    {
+        worldManager.HexProperties = new HexProperties();
+        worldManager.HexProperties.side = worldManager.HexagonSide;
+        worldManager.HexProperties.tileH = Mathf.Sin((30f * Mathf.PI) / 180f) * worldManager.HexProperties.side;
+        worldManager.HexProperties.tileR = Mathf.Cos((30f * Mathf.PI) / 180f) * worldManager.HexProperties.side;
+
+        worldManager.HexProperties.width = Mathf.RoundToInt(2f * worldManager.HexProperties.tileR);
+        worldManager.HexProperties.height = Mathf.RoundToInt(worldManager.HexProperties.side + 2f * worldManager.HexProperties.tileH);
+    }
+
+
+    private void GenerateTerrainData(WorldManagerViewModel worldManager)
+    {
+        int TerrainWidth = worldManager.TerrainWidth;
+
+        worldManager.terrainData = new float[TerrainWidth + 1, TerrainWidth + 1];
+
+        // Setup the values of the four coreners of the world
+        // Later to some logic to get terrian settings from the menu
+        // The have custom code for different map types such as donut mirrored and so on.
         worldManager.terrainData[0, 0] = UnityEngine.Random.Range(0.1995f, 0.8005f);
-        worldManager.terrainData[terrainWidth, 0] = UnityEngine.Random.Range(0.2995f, 0.9005f);
-        worldManager.terrainData[0, terrainWidth] = UnityEngine.Random.Range(0.2995f, 1.005f);
-        worldManager.terrainData[terrainWidth, terrainWidth] = UnityEngine.Random.Range(0.1995f, 0.6005f);
+        worldManager.terrainData[TerrainWidth, 0] = UnityEngine.Random.Range(0.2995f, 0.9005f);
+        worldManager.terrainData[0, TerrainWidth] = UnityEngine.Random.Range(0.2995f, 1.005f);
+        worldManager.terrainData[TerrainWidth, TerrainWidth] = UnityEngine.Random.Range(0.1995f, 0.6005f);
 
-        DiamondSquare(worldManager.terrainData, 0, 0, terrainWidth, terrainWidth, worldManager.altitudeVariation, worldManager.detail);
-
-        Debug.Log("Terrain generated: " + (System.Environment.TickCount - timeStart) + "ms");
-
+        DiamondSquare(worldManager.terrainData, 0, 0, TerrainWidth, TerrainWidth, worldManager.AltitudeVariation, worldManager.Detail);
     }
 
 

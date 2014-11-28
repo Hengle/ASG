@@ -222,7 +222,7 @@ public class HexChunk : MonoBehaviour
     {
         texture = new Texture2D(chunkSize, chunkSize);
         texture.wrapMode = TextureWrapMode.Clamp;
-        //texture.filterMode = FilterMode.Point;
+        //texture.filterMode = FilterMode.Point;  
         for (int x = 0; x < chunkSize; x++)
             for (int y = 0; y < chunkSize; y++)
                 texture.SetPixel(x, y, terrainManager.terrainAltitudeColors.Evaluate(terrainManager.hexTerrainData[x + terrainDataX, y + terrainDataY]));

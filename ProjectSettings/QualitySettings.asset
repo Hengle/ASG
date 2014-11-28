@@ -111,8 +111,8 @@ QualitySettings:
     shadowDistance: 150
     blendWeights: 4
     textureQuality: 0
-    anisotropicTextures: 2
-    antiAliasing: 2
+    anisotropicTextures: 0
+    antiAliasing: 8
     softParticles: 1
     softVegetation: 1
     vSyncCount: 0

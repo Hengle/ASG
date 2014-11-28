@@ -21,11 +21,23 @@ public abstract class ChunkViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Vector2 _hexGridPos;
+    public Int32 _ChunkX;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _chunkSize;
+    public Int32 _ChunkY;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _TerrainDataX;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _TerrainDataY;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Vector3 _WorldPos;
     
     public override System.Type ViewModelType {
         get {
@@ -48,8 +60,15 @@ public abstract class ChunkViewBase : ViewBase {
     
     protected override void InitializeViewModel(ViewModel viewModel) {
         ChunkViewModel chunk = ((ChunkViewModel)(viewModel));
-        chunk.hexGridPos = this._hexGridPos;
-        chunk.chunkSize = this._chunkSize;
+        chunk.ChunkX = this._ChunkX;
+        chunk.ChunkY = this._ChunkY;
+        chunk.TerrainDataX = this._TerrainDataX;
+        chunk.TerrainDataY = this._TerrainDataY;
+        chunk.WorldPos = this._WorldPos;
+    }
+    
+    public virtual void ExecuteGenerateChunk() {
+        this.ExecuteCommand(Chunk.GenerateChunk);
     }
 }
 
@@ -58,51 +77,55 @@ public abstract class WorldManagerViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _terrainSeed;
+    public Int32 _TerrainSeed;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Boolean _randomizeSeed;
+    public Boolean _RandomizeSeed;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _pixelsPerUnit;
+    public Int32 _PixelsPerUnit;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _pixelToHeight;
+    public Int32 _PixelToHeight;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _altitudes;
+    public Single _Altitudes;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _chunkSize;
+    public Int32 _ChunkSize;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _chunkResolution;
+    public Int32 _ChunkResolution;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _chunkCollisionResolution;
+    public Int32 _ChunkCollisionResolution;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _terrainWidth;
+    public Int32 _TerrainWidth;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public String _terrainHeight;
+    public Int32 _TerrainHeight;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Single _detail;
+    public Single _Detail;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Single _altitudeVariation;
+    public Single _AltitudeVariation;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Single _HexagonSide;
     
     public override System.Type ViewModelType {
         get {
@@ -125,18 +148,19 @@ public abstract class WorldManagerViewBase : ViewBase {
     
     protected override void InitializeViewModel(ViewModel viewModel) {
         WorldManagerViewModel worldManager = ((WorldManagerViewModel)(viewModel));
-        worldManager.terrainSeed = this._terrainSeed;
-        worldManager.randomizeSeed = this._randomizeSeed;
-        worldManager.pixelsPerUnit = this._pixelsPerUnit;
-        worldManager.pixelToHeight = this._pixelToHeight;
-        worldManager.altitudes = this._altitudes;
-        worldManager.chunkSize = this._chunkSize;
-        worldManager.chunkResolution = this._chunkResolution;
-        worldManager.chunkCollisionResolution = this._chunkCollisionResolution;
-        worldManager.terrainWidth = this._terrainWidth;
-        worldManager.terrainHeight = this._terrainHeight;
-        worldManager.detail = this._detail;
-        worldManager.altitudeVariation = this._altitudeVariation;
+        worldManager.TerrainSeed = this._TerrainSeed;
+        worldManager.RandomizeSeed = this._RandomizeSeed;
+        worldManager.PixelsPerUnit = this._PixelsPerUnit;
+        worldManager.PixelToHeight = this._PixelToHeight;
+        worldManager.Altitudes = this._Altitudes;
+        worldManager.ChunkSize = this._ChunkSize;
+        worldManager.ChunkResolution = this._ChunkResolution;
+        worldManager.ChunkCollisionResolution = this._ChunkCollisionResolution;
+        worldManager.TerrainWidth = this._TerrainWidth;
+        worldManager.TerrainHeight = this._TerrainHeight;
+        worldManager.Detail = this._Detail;
+        worldManager.AltitudeVariation = this._AltitudeVariation;
+        worldManager.HexagonSide = this._HexagonSide;
     }
     
     public virtual void ExecuteGenerateMap() {
@@ -146,14 +170,6 @@ public abstract class WorldManagerViewBase : ViewBase {
     public virtual void ExecuteGenerateChunks() {
         this.ExecuteCommand(WorldManager.GenerateChunks);
     }
-    
-    public virtual void ExecuteGenerateMapDataTexture() {
-        this.ExecuteCommand(WorldManager.GenerateMapDataTexture);
-    }
-    
-    public virtual void ExecuteGenerateMapHexTexture() {
-        this.ExecuteCommand(WorldManager.GenerateMapHexTexture);
-    }
 }
 
 public class WorldManagerViewViewBase : WorldManagerViewBase {
@@ -162,9 +178,21 @@ public class WorldManagerViewViewBase : WorldManagerViewBase {
     [UnityEngine.HideInInspector()]
     public bool _BindGenerateMap = true;
     
-    [UFToggleGroup("hexGrid")]
+    [UFToggleGroup("GenerateChunks")]
     [UnityEngine.HideInInspector()]
-    public bool _BindhexGrid = true;
+    public bool _BindGenerateChunks = true;
+    
+    [UFToggleGroup("Chunks")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindChunks = true;
+    
+    [UFGroup("Chunks")]
+    [UnityEngine.HideInInspector()]
+    public bool _ChunksSceneFirst;
+    
+    [UFGroup("Chunks")]
+    [UnityEngine.HideInInspector()]
+    public UnityEngine.Transform _ChunksContainer;
     
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<WorldManagerController>());
@@ -174,12 +202,21 @@ public class WorldManagerViewViewBase : WorldManagerViewBase {
     public virtual void GenerateMapExecuted() {
     }
     
-    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public virtual void hexGridAdded(Hex item) {
+    /// Invokes GenerateChunksExecuted when the GenerateChunks command is executed.
+    public virtual void GenerateChunksExecuted() {
     }
     
-    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public virtual void hexGridRemoved(Hex item) {
+    /// This binding will add or remove views based on an element/viewmodel collection.
+    public virtual ViewBase CreateChunksView(ChunkViewModel item) {
+        return this.InstantiateView(item);
+    }
+    
+    /// This binding will add or remove views based on an element/viewmodel collection.
+    public virtual void ChunksAdded(ViewBase item) {
+    }
+    
+    /// This binding will add or remove views based on an element/viewmodel collection.
+    public virtual void ChunksRemoved(ViewBase item) {
     }
     
     public override void Bind() {
@@ -187,11 +224,39 @@ public class WorldManagerViewViewBase : WorldManagerViewBase {
         if (this._BindGenerateMap) {
             this.BindCommandExecuted(WorldManager.GenerateMap, GenerateMapExecuted);
         }
-        if (this._BindhexGrid) {
-            this.BindCollection(WorldManager._hexGridProperty, hexGridAdded, hexGridRemoved);
+        if (this._BindGenerateChunks) {
+            this.BindCommandExecuted(WorldManager.GenerateChunks, GenerateChunksExecuted);
+        }
+        if (this._BindChunks) {
+            this.BindToViewCollection( WorldManager._ChunksProperty, viewModel=>{ return CreateChunksView(viewModel as ChunkViewModel); }, ChunksAdded, ChunksRemoved, _ChunksContainer, _ChunksSceneFirst);
         }
     }
 }
 
 public partial class WorldManagerView : WorldManagerViewViewBase {
+}
+
+public class ChunkViewViewBase : ChunkViewBase {
+    
+    [UFToggleGroup("GenerateChunk")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindGenerateChunk = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<ChunkController>());
+    }
+    
+    /// Invokes GenerateChunkExecuted when the GenerateChunk command is executed.
+    public virtual void GenerateChunkExecuted() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        if (this._BindGenerateChunk) {
+            this.BindCommandExecuted(Chunk.GenerateChunk, GenerateChunkExecuted);
+        }
+    }
+}
+
+public partial class ChunkView : ChunkViewViewBase {
 }

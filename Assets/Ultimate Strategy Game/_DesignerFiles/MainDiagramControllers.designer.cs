@@ -32,6 +32,9 @@ public abstract class ChunkControllerBase : Controller {
     public override void Initialize(ViewModel viewModel) {
         this.InitializeChunk(((ChunkViewModel)(viewModel)));
     }
+    
+    public virtual void GenerateChunk(ChunkViewModel chunk) {
+    }
 }
 
 public abstract class WorldManagerControllerBase : Controller {
@@ -55,11 +58,5 @@ public abstract class WorldManagerControllerBase : Controller {
     }
     
     public virtual void GenerateChunks(WorldManagerViewModel worldManager) {
-    }
-    
-    public virtual void GenerateMapDataTexture(WorldManagerViewModel worldManager) {
-    }
-    
-    public virtual void GenerateMapHexTexture(WorldManagerViewModel worldManager) {
     }
 }

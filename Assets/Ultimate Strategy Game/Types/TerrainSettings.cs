@@ -6,6 +6,6 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using UnityEngine;
 
-
+[System.Serializable]
 public partial class TerrainSettings {
 }
