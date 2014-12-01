@@ -42,6 +42,8 @@ public partial class ChunkView
         hexHeightmap = DrawChunkHeightmap(Chunk.TerrainDataX, Chunk.TerrainDataY);
 
 
+        // The issue is here -----------------------------------------------------
+
         ProceduralMaterial s = renderer.sharedMaterial as ProceduralMaterial;
         s.isReadable = true;
         substance = renderer.material as ProceduralMaterial;
@@ -57,6 +59,10 @@ public partial class ChunkView
         substanceTexture2D.wrapMode = TextureWrapMode.Clamp;
         substanceTexture2D.SetPixels32(substanceTexture.GetPixels32(0, 0, substanceTexture.width, substanceTexture.height));
         substanceTexture2D.Apply();
+
+        //------------------------------------------------------------------------
+
+
 
 
         //substance.SetProceduralTexture("Hexagon_Heights", hexHeightmap);
@@ -198,8 +204,11 @@ public partial class ChunkView
                 {
                     terrainVal = Mathf.Clamp(Mathf.Round(Chunk.ParentTerrainManager.terrainData[x, y] / Chunk.ParentTerrainManager.Altitudes) * Chunk.ParentTerrainManager.Altitudes / Chunk.ParentTerrainManager.Altitudes - 1, 0, 5);
                     //Debug.Log(Mathf.FloorToInt(terrainVal / Chunk.ParentTerrainManager.Altitudes) - 2);
-                    DrawHex(texture, posX, posY, altitudes[(int)terrainVal]);
-                    
+                    if (Chunk.ParentTerrainManager.hexGrid[x, y].RiverStrength <= 0)
+                        DrawHex(texture, posX, posY, altitudes[(int)terrainVal]);
+                    else
+                        DrawHex(texture, posX, posY, Color.cyan);
+
                 }
             }
         }

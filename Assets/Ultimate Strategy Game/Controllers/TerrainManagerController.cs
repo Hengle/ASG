@@ -25,6 +25,12 @@ public class TerrainManagerController : TerrainManagerControllerBase
         GenerateTerrainData(terrainManager);
         TerrainDataToHexagonGrid(terrainManager);
         SetupHexagonGridNeighbors(terrainManager);
+        GenerateRivers(terrainManager);
+        CalculateMoisture(terrainManager);
+        CalculateTemperature(terrainManager);
+        CalculateBiomes(terrainManager);
+        
+
         GenerateChunks(terrainManager);
 
 
@@ -32,7 +38,6 @@ public class TerrainManagerController : TerrainManagerControllerBase
         Debug.Log("Terrain generated: " + (System.Environment.TickCount - timeStart) + "ms");
 
     }
-
     public override void GenerateChunks(TerrainManagerViewModel terrainManager)
     {
         int timeStart = System.Environment.TickCount;
@@ -96,18 +101,20 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
     public void TerrainDataToHexagonGrid(TerrainManagerViewModel terrainManager)
     {
+        Vector3 worldPos = new Vector3();
+        int gameHeight;
         terrainManager.hexGrid = new Hex[terrainManager.TerrainWidth, terrainManager.TerrainHeight];
         for (int x=0; x < terrainManager.TerrainWidth; x++)
         {
             for (int y=0; y < terrainManager.TerrainHeight; y++)
             {
- 
-                Vector3 worldPos = new Vector3();
+
                 worldPos.x = Mathf.RoundToInt(x * 2 * HexProperties.tileR + (y % 2 == 0 ? 0 : 1) * HexProperties.tileR + HexProperties.tileR) / (float)terrainManager.PixelsPerUnit;
                 worldPos.y = terrainManager.terrainData[x, y] * terrainManager.PixelToHeight;
                 worldPos.z = Mathf.RoundToInt(y * (HexProperties.tileH + HexProperties.side) + HexProperties.side) / (float)terrainManager.PixelsPerUnit;
+                gameHeight = (int)(Mathf.Round(terrainManager.terrainData[x, y] / terrainManager.Altitudes) * terrainManager.Altitudes / terrainManager.terrainData[x, y] / terrainManager.Altitudes - 1);
 
-                terrainManager.hexGrid[x, y] = new Hex(new Vector2(x, y), terrainManager.terrainData[x, y], worldPos);
+                terrainManager.hexGrid[x, y] = new Hex(new Vector2(x, y), gameHeight, terrainManager.terrainData[x, y], worldPos);
             }
         }
     }
@@ -135,6 +142,80 @@ public class TerrainManagerController : TerrainManagerControllerBase
         }
         Debug.Log("Setting up hex neighbors: " + (System.Environment.TickCount - timeStart) + "ms");
     }
+
+    public void GenerateRivers(TerrainManagerViewModel terrainManager)
+    {
+        int totalRivers = 0;
+        int riverStrength = 0;
+        int randomX, randomY;
+        Hex nextHex = null;
+        int iterations = 0;
+
+        // Keep creating rivers unit we are done
+        while (totalRivers < terrainManager.RiverCount && iterations <= 100)
+        {
+            // Get a new hex of the minimum height
+            while (nextHex == null && iterations <= 100)
+            {
+                iterations++;
+                randomX = (int)UnityEngine.Random.Range(0, terrainManager.TerrainWidth);
+                randomY = (int)UnityEngine.Random.Range(0, terrainManager.TerrainHeight);
+                if (terrainManager.hexGrid[randomX, randomY].height >= terrainManager.MinRiverHeight)
+                {
+                    nextHex = terrainManager.hexGrid[randomX, randomY];
+
+                    riverStrength = (int)UnityEngine.Random.Range(terrainManager.MinRiverStrength, terrainManager.MaxRiverStrength);
+                    nextHex.RiverStrength = riverStrength;
+                    totalRivers++;
+                    Debug.Log("Started river " + nextHex.arrayCoord);
+                    
+                }               
+            }
+
+            while (riverStrength > 0)
+            {
+                // Got down the path fo the lowest neighbor height
+                for (int n = 0; n < 6; n++)
+                {
+                    if (nextHex.neighbors[n] != null && nextHex.neighbors[n].heightmapHeight <= nextHex.heightmapHeight)
+                    {
+                        nextHex = nextHex.neighbors[n];
+                        break;
+                    }else{
+                        //if (n == 5)
+                         //   nextHex
+                    }
+                    
+                }
+
+                nextHex.RiverStrength = riverStrength;
+                Debug.Log("Flowing " + nextHex.arrayCoord);
+
+                riverStrength--;
+            }
+
+            nextHex = null;
+        }
+
+        Debug.Log("River iterations " + iterations);
+
+    }
+
+    public void CalculateMoisture(TerrainManagerViewModel terrainManager)
+    {
+
+    }
+
+    public void CalculateTemperature(TerrainManagerViewModel terrainManager)
+    {
+
+    }
+
+    public void CalculateBiomes(TerrainManagerViewModel terrainManager)
+    {
+
+    }
+
 
 
     private void DiamondSquare(float[,] terrainData, int xbegin, int ybegin, int xend, int yend, float randomRange, float randomDiminish)

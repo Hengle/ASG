@@ -21,13 +21,14 @@ public partial class Hex
                                                        new Vector3(-2, +1, +1), new Vector3(-1, -1, +2), new Vector3(+1, -2, +1) };
 
 
-    public Hex(Vector2 arrayCoord, float height, Vector3 worldPos)
+    public Hex(Vector2 arrayCoord, int height, float heightmapHeight, Vector3 worldPos)
     {
         this.arrayCoord = arrayCoord;
         this.cubeCoord = OffsetToCubeOddQ(arrayCoord);
 
         this.worldPos = worldPos;
-        this.height   = height;
+        this.height = height;
+        this.heightmapHeight = heightmapHeight;
         this.neighbors = new Hex[6];
     }
 

@@ -135,6 +135,22 @@ public abstract class TerrainManagerViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public Int32 _HexagonSide;
     
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _RiverCount;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Single _MinRiverHeight;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _MinRiverStrength;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _MaxRiverStrength;
+    
     public override System.Type ViewModelType {
         get {
             return typeof(TerrainManagerViewModel);
@@ -169,6 +185,10 @@ public abstract class TerrainManagerViewBase : ViewBase {
         terrainManager.Detail = this._Detail;
         terrainManager.AltitudeVariation = this._AltitudeVariation;
         terrainManager.HexagonSide = this._HexagonSide;
+        terrainManager.RiverCount = this._RiverCount;
+        terrainManager.MinRiverHeight = this._MinRiverHeight;
+        terrainManager.MinRiverStrength = this._MinRiverStrength;
+        terrainManager.MaxRiverStrength = this._MaxRiverStrength;
     }
     
     public virtual void ExecuteGenerateMap() {

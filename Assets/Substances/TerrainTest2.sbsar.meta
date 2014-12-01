@@ -45,7 +45,7 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: Normal_Intensity
       value:
-        scalar[0]: 1
+        scalar[0]: .779999971
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0

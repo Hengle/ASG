@@ -25,13 +25,21 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
     
     private Vector3 _worldPos;
     
-    private Single _height;
+    private Int32 _height;
     
     private TerrainType _terrainType;
     
     private Int32 _pathParent;
     
     private Int32 _pathScore;
+    
+    private Int32 _Moisture;
+    
+    private Int32 _Temperature;
+    
+    private Int32 _RiverStrength;
+    
+    private Single _heightmapHeight;
     
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName){ PropertyChangedEventHandler handler = PropertyChanged; if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName)); }
@@ -65,7 +73,7 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
         }
     }
     
-    public virtual Single height {
+    public virtual Int32 height {
         get {
             return this._height;
         }
@@ -102,6 +110,46 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
         set {
             _pathScore = value;
             OnPropertyChanged("pathScore");
+        }
+    }
+    
+    public virtual Int32 Moisture {
+        get {
+            return this._Moisture;
+        }
+        set {
+            _Moisture = value;
+            OnPropertyChanged("Moisture");
+        }
+    }
+    
+    public virtual Int32 Temperature {
+        get {
+            return this._Temperature;
+        }
+        set {
+            _Temperature = value;
+            OnPropertyChanged("Temperature");
+        }
+    }
+    
+    public virtual Int32 RiverStrength {
+        get {
+            return this._RiverStrength;
+        }
+        set {
+            _RiverStrength = value;
+            OnPropertyChanged("RiverStrength");
+        }
+    }
+    
+    public virtual Single heightmapHeight {
+        get {
+            return this._heightmapHeight;
+        }
+        set {
+            _heightmapHeight = value;
+            OnPropertyChanged("heightmapHeight");
         }
     }
 }

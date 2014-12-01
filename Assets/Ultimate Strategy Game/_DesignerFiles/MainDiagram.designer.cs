@@ -242,6 +242,14 @@ public class TerrainManagerViewModelBase : ViewModel {
     
     public P<Int32> _HexagonSideProperty;
     
+    public P<Int32> _RiverCountProperty;
+    
+    public P<Single> _MinRiverHeightProperty;
+    
+    public P<Int32> _MinRiverStrengthProperty;
+    
+    public P<Int32> _MaxRiverStrengthProperty;
+    
     public ModelCollection<ChunkViewModel> _ChunksProperty;
     
     protected CommandWithSender<TerrainManagerViewModel> _GenerateMap;
@@ -272,6 +280,10 @@ public class TerrainManagerViewModelBase : ViewModel {
         _DetailProperty = new P<Single>(this, "Detail");
         _AltitudeVariationProperty = new P<Single>(this, "AltitudeVariation");
         _HexagonSideProperty = new P<Int32>(this, "HexagonSide");
+        _RiverCountProperty = new P<Int32>(this, "RiverCount");
+        _MinRiverHeightProperty = new P<Single>(this, "MinRiverHeight");
+        _MinRiverStrengthProperty = new P<Int32>(this, "MinRiverStrength");
+        _MaxRiverStrengthProperty = new P<Int32>(this, "MaxRiverStrength");
         _ChunksProperty = new ModelCollection<ChunkViewModel>(this, "Chunks");
         _ChunksProperty.CollectionChanged += ChunksCollectionChanged;
     }
@@ -502,6 +514,66 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         }
     }
     
+    public virtual P<Int32> RiverCountProperty {
+        get {
+            return this._RiverCountProperty;
+        }
+    }
+    
+    public virtual Int32 RiverCount {
+        get {
+            return _RiverCountProperty.Value;
+        }
+        set {
+            _RiverCountProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Single> MinRiverHeightProperty {
+        get {
+            return this._MinRiverHeightProperty;
+        }
+    }
+    
+    public virtual Single MinRiverHeight {
+        get {
+            return _MinRiverHeightProperty.Value;
+        }
+        set {
+            _MinRiverHeightProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Int32> MinRiverStrengthProperty {
+        get {
+            return this._MinRiverStrengthProperty;
+        }
+    }
+    
+    public virtual Int32 MinRiverStrength {
+        get {
+            return _MinRiverStrengthProperty.Value;
+        }
+        set {
+            _MinRiverStrengthProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Int32> MaxRiverStrengthProperty {
+        get {
+            return this._MaxRiverStrengthProperty;
+        }
+    }
+    
+    public virtual Int32 MaxRiverStrength {
+        get {
+            return _MaxRiverStrengthProperty.Value;
+        }
+        set {
+            _MaxRiverStrengthProperty.Value = value;
+        }
+    }
+    
     public virtual ModelCollection<ChunkViewModel> Chunks {
         get {
             return this._ChunksProperty;
@@ -556,6 +628,10 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         stream.SerializeFloat("Detail", this.Detail);
         stream.SerializeFloat("AltitudeVariation", this.AltitudeVariation);
         stream.SerializeInt("HexagonSide", this.HexagonSide);
+        stream.SerializeInt("RiverCount", this.RiverCount);
+        stream.SerializeFloat("MinRiverHeight", this.MinRiverHeight);
+        stream.SerializeInt("MinRiverStrength", this.MinRiverStrength);
+        stream.SerializeInt("MaxRiverStrength", this.MaxRiverStrength);
         if (stream.DeepSerialize) stream.SerializeArray("Chunks", this.Chunks);
     }
     
@@ -574,6 +650,10 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         		this.Detail = stream.DeserializeFloat("Detail");;
         		this.AltitudeVariation = stream.DeserializeFloat("AltitudeVariation");;
         		this.HexagonSide = stream.DeserializeInt("HexagonSide");;
+        		this.RiverCount = stream.DeserializeInt("RiverCount");;
+        		this.MinRiverHeight = stream.DeserializeFloat("MinRiverHeight");;
+        		this.MinRiverStrength = stream.DeserializeInt("MinRiverStrength");;
+        		this.MaxRiverStrength = stream.DeserializeInt("MaxRiverStrength");;
 if (stream.DeepSerialize) {
         this.Chunks.Clear();
         this.Chunks.AddRange(stream.DeserializeObjectArray<ChunkViewModel>("Chunks"));
@@ -601,6 +681,10 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelPropertyInfo(_DetailProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_AltitudeVariationProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_HexagonSideProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_RiverCountProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_MinRiverHeightProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_MinRiverStrengthProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_MaxRiverStrengthProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_ChunksProperty, true, true, false));
     }
     
