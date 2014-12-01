@@ -21,11 +21,11 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
     
     private Vector2 _arrayCoord;
     
-    private Vector2 _cubeCoord;
+    private Vector3 _cubeCoord;
     
     private Vector3 _worldPos;
     
-    private Int32 _height;
+    private Single _height;
     
     private TerrainType _terrainType;
     
@@ -45,7 +45,7 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
         }
     }
     
-    public virtual Vector2 cubeCoord {
+    public virtual Vector3 cubeCoord {
         get {
             return this._cubeCoord;
         }
@@ -65,7 +65,7 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
         }
     }
     
-    public virtual Int32 height {
+    public virtual Single height {
         get {
             return this._height;
         }
@@ -102,71 +102,6 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
         set {
             _pathScore = value;
             OnPropertyChanged("pathScore");
-        }
-    }
-}
-
-public partial class HexProperties : System.ComponentModel.INotifyPropertyChanged {
-    
-    private Single _side;
-    
-    private Single _height;
-    
-    private Single _width;
-    
-    private Single _tileR;
-    
-    private Single _tileH;
-    
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual void OnPropertyChanged(string propertyName){ PropertyChangedEventHandler handler = PropertyChanged; if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName)); }
-    public virtual Single side {
-        get {
-            return this._side;
-        }
-        set {
-            _side = value;
-            OnPropertyChanged("side");
-        }
-    }
-    
-    public virtual Single height {
-        get {
-            return this._height;
-        }
-        set {
-            _height = value;
-            OnPropertyChanged("height");
-        }
-    }
-    
-    public virtual Single width {
-        get {
-            return this._width;
-        }
-        set {
-            _width = value;
-            OnPropertyChanged("width");
-        }
-    }
-    
-    public virtual Single tileR {
-        get {
-            return this._tileR;
-        }
-        set {
-            _tileR = value;
-            OnPropertyChanged("tileR");
-        }
-    }
-    
-    public virtual Single tileH {
-        get {
-            return this._tileH;
-        }
-        set {
-            _tileH = value;
-            OnPropertyChanged("tileH");
         }
     }
 }

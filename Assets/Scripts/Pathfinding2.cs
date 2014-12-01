@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class Pathfinding : MonoBehaviour
 {
 
-    public TerrainManager terrainManager;
+    public TerrainManager2 terrainManager;
 
 
     /*

@@ -7,7 +7,7 @@ using System.Collections;
 public class HexChunk : MonoBehaviour 
 {
 
-    private TerrainManager terrainManager;
+    private TerrainManager2 terrainManager2;
 
     private int terrainDataX, terrainDataY, chunkSize, chunkResolution, collisionResolution;
 
@@ -19,14 +19,14 @@ public class HexChunk : MonoBehaviour
     public Texture2D texture;
 
 
-    public void Initialize(int terrainDataX, int terrainDataY, int chunkSize, int chunkResolution, int collisionResolution, TerrainManager terrainManager)
+    public void Initialize(int terrainDataX, int terrainDataY, int chunkSize, int chunkResolution, int collisionResolution, TerrainManager2 terrainManager2)
     {
         this.terrainDataX = terrainDataX;
         this.terrainDataY = terrainDataY;
         this.chunkSize = chunkSize;
         this.chunkResolution = chunkResolution;
         this.collisionResolution = collisionResolution;
-        this.terrainManager = terrainManager;
+        this.terrainManager2 = terrainManager2;
 
         GenerateChunk();
     }
@@ -59,9 +59,9 @@ public class HexChunk : MonoBehaviour
             for (int x = 0; x <= chunkResolution; x++, v++) 
             {
 
-                vertices[v] = new Vector3(x * resStep / terrainManager.pixelsPerUnit,
-                                          terrainManager.hexTerrainData[Mathf.RoundToInt(x * (chunkSize / chunkResolution) + terrainDataX), Mathf.RoundToInt(z * (chunkSize / chunkResolution) + terrainDataY)] * terrainManager.resolutionHeight,
-                                          z * resStep / terrainManager.pixelsPerUnit
+                vertices[v] = new Vector3(x * resStep / terrainManager2.pixelsPerUnit,
+                                          terrainManager2.hexTerrainData[Mathf.RoundToInt(x * (chunkSize / chunkResolution) + terrainDataX), Mathf.RoundToInt(z * (chunkSize / chunkResolution) + terrainDataY)] * terrainManager2.resolutionHeight,
+                                          z * resStep / terrainManager2.pixelsPerUnit
                                           );
 
 
@@ -102,25 +102,25 @@ public class HexChunk : MonoBehaviour
     {
 
         Mesh meshCollider = new Mesh();
-        Vector3[] colVertices = new Vector3[(terrainManager.chunkCollisionResolution + 1) * (terrainManager.chunkCollisionResolution + 1)];
+        Vector3[] colVertices = new Vector3[(terrainManager2.chunkCollisionResolution + 1) * (terrainManager2.chunkCollisionResolution + 1)];
 
-        float quadSize = terrainManager.chunkCollisionResolution / chunkSize;
-
-
-        float terrainSizeInUnits = terrainManager.terrainWidth / terrainManager.pixelsPerUnit;
-        float unitsPerChunk = terrainSizeInUnits / (terrainManager.terrainWidth / terrainManager.chunkSize);
-        float unitsPerRes = unitsPerChunk / terrainManager.chunkCollisionResolution; 
-
-        float stepSize = 1f / terrainManager.terrainWidth;
-        float resScale = chunkSize / terrainManager.chunkCollisionResolution;
+        float quadSize = terrainManager2.chunkCollisionResolution / chunkSize;
 
 
-        for (int v = 0, z = 0; z <= terrainManager.chunkCollisionResolution; z++) 
+        float terrainSizeInUnits = terrainManager2.terrainWidth / terrainManager2.pixelsPerUnit;
+        float unitsPerChunk = terrainSizeInUnits / (terrainManager2.terrainWidth / terrainManager2.chunkSize);
+        float unitsPerRes = unitsPerChunk / terrainManager2.chunkCollisionResolution; 
+
+        float stepSize = 1f / terrainManager2.terrainWidth;
+        float resScale = chunkSize / terrainManager2.chunkCollisionResolution;
+
+
+        for (int v = 0, z = 0; z <= terrainManager2.chunkCollisionResolution; z++) 
         {
-            for (int x = 0; x <= terrainManager.chunkCollisionResolution; x++, v++)
+            for (int x = 0; x <= terrainManager2.chunkCollisionResolution; x++, v++)
             {
                 colVertices[v] = new Vector3(x * unitsPerRes,
-                                             terrainManager.hexTerrainData[Mathf.RoundToInt(x * (chunkSize / terrainManager.chunkCollisionResolution) + terrainDataX), Mathf.RoundToInt(z * (chunkSize / terrainManager.chunkCollisionResolution) + terrainDataY)] * terrainManager.resolutionHeight,
+                                             terrainManager2.hexTerrainData[Mathf.RoundToInt(x * (chunkSize / terrainManager2.chunkCollisionResolution) + terrainDataX), Mathf.RoundToInt(z * (chunkSize / terrainManager2.chunkCollisionResolution) + terrainDataY)] * terrainManager2.resolutionHeight,
                                              z * unitsPerRes
                                              );
             }
@@ -128,17 +128,17 @@ public class HexChunk : MonoBehaviour
 
         meshCollider.vertices = colVertices;
 
-        int[] triangles = new int[terrainManager.chunkCollisionResolution * terrainManager.chunkCollisionResolution * 6];
-        for (int t = 0, v = 0, y = 0; y < terrainManager.chunkCollisionResolution; y++, v++)
+        int[] triangles = new int[terrainManager2.chunkCollisionResolution * terrainManager2.chunkCollisionResolution * 6];
+        for (int t = 0, v = 0, y = 0; y < terrainManager2.chunkCollisionResolution; y++, v++)
         {
-            for (int x = 0; x < terrainManager.chunkCollisionResolution; x++, v++, t += 6)
+            for (int x = 0; x < terrainManager2.chunkCollisionResolution; x++, v++, t += 6)
             {
                 triangles[t] = v;
-                triangles[t + 1] = v + terrainManager.chunkCollisionResolution + 1;
+                triangles[t + 1] = v + terrainManager2.chunkCollisionResolution + 1;
                 triangles[t + 2] = v + 1;
                 triangles[t + 3] = v + 1;
-                triangles[t + 4] = v + terrainManager.chunkCollisionResolution + 1;
-                triangles[t + 5] = v + terrainManager.chunkCollisionResolution + 2;
+                triangles[t + 4] = v + terrainManager2.chunkCollisionResolution + 1;
+                triangles[t + 5] = v + terrainManager2.chunkCollisionResolution + 2;
             }
         }
         meshCollider.triangles = triangles;
@@ -225,7 +225,7 @@ public class HexChunk : MonoBehaviour
         //texture.filterMode = FilterMode.Point;  
         for (int x = 0; x < chunkSize; x++)
             for (int y = 0; y < chunkSize; y++)
-                texture.SetPixel(x, y, terrainManager.terrainAltitudeColors.Evaluate(terrainManager.hexTerrainData[x + terrainDataX, y + terrainDataY]));
+                texture.SetPixel(x, y, terrainManager2.terrainAltitudeColors.Evaluate(terrainManager2.hexTerrainData[x + terrainDataX, y + terrainDataY]));
 
         texture.Apply();
         GetComponent<Renderer>().material.mainTexture = texture;

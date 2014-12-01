@@ -60,7 +60,7 @@ public class CameraManager : MonoBehaviour
         zoomDistance = Mathf.Clamp(zoomDistance, minZoom, maxZoom);
 
 
-        focusPos += Quaternion.Euler(0, x, 0) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")) * moveSpeed * Time.fixedDeltaTime;
+        focusPos += Quaternion.Euler(0, x, 0) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")) * moveSpeed * Time.deltaTime;
         transform.position = focusPos + Quaternion.Euler(y, x, 0) * new Vector3(0.0f, 0.0f, -zoomDistance);
 
 

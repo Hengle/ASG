@@ -4,48 +4,86 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UniRx;
+using System.IO;
 
 
 public partial class ChunkView 
-{
+{ 
+
 
     private int chunkSize, chunkResolution, collisionResolution, pixelsPerUnit;
 
-    public Texture2D hexTexture;
+    public Texture2D hexBiomeMap;
+    public Texture2D hexHeightmap;
 
 
     private Vector3[] vertices;
     private Vector3[] normals;
 
 
-    public ProceduralMaterial material;
+    public ProceduralMaterial substance;
+    public ProceduralTexture proceduralTexture;
+    public ProceduralTexture substanceTexture;
+    public Texture2D substanceTexture2D;
+
+
+    public Color[] altitudes;
 
 
     void Start ()
     {
-        chunkSize = Chunk.ParentWorldManager.ChunkSize;
-        chunkResolution = Chunk.ParentWorldManager.ChunkResolution;
-        collisionResolution = Chunk.ParentWorldManager.ChunkCollisionResolution;
-        pixelsPerUnit = Chunk.ParentWorldManager.PixelsPerUnit;
+        chunkSize = Chunk.ParentTerrainManager.ChunkSize;
+        chunkResolution = Chunk.ParentTerrainManager.ChunkResolution;
+        collisionResolution = Chunk.ParentTerrainManager.ChunkCollisionResolution;
+        pixelsPerUnit = Chunk.ParentTerrainManager.PixelsPerUnit;
 
 
-        material = renderer.material as ProceduralMaterial;
+        hexBiomeMap = DrawHexBiomeMap(Chunk.TerrainDataX, Chunk.TerrainDataY);
+        hexHeightmap = DrawChunkHeightmap(Chunk.TerrainDataX, Chunk.TerrainDataY);
 
-        hexTexture = GenerateChunkHexes(Chunk.TerrainDataX, Chunk.TerrainDataY);
 
-        material.SetProceduralTexture("Hexagon_Heights", hexTexture);
-        material.RebuildTextures();
+        ProceduralMaterial s = renderer.sharedMaterial as ProceduralMaterial;
+        s.isReadable = true;
+        substance = renderer.material as ProceduralMaterial;
+        substance.isReadable = true;
+       
+        substanceTexture = substance.GetGeneratedTexture(substance.GetGeneratedTextures()[0].name);
+        substanceTexture2D = new Texture2D(substanceTexture.width, substanceTexture.height, TextureFormat.ARGB32, false);
+        substance.SetProceduralTexture("Hexagon_Heights", hexBiomeMap);
 
+        substance.RebuildTexturesImmediately();
+        
+
+        substanceTexture2D.wrapMode = TextureWrapMode.Clamp;
+        substanceTexture2D.SetPixels32(substanceTexture.GetPixels32(0, 0, substanceTexture.width, substanceTexture.height));
+        substanceTexture2D.Apply();
+
+
+        //substance.SetProceduralTexture("Hexagon_Heights", hexHeightmap);
+        //substance.RebuildTexturesImmediately();
+
+        //proceduralTexture = substance.GetGeneratedTexture("TerrainTest2_diffuse"); //substance.GetProceduralTexture("TerrainTest2_diffuse");
+        
+
+        //temp = new Texture2D(proceduralTexture.width, proceduralTexture.height, TextureFormat.ARGB32, false);
+        //var pixels = proceduralTexture.GetPixels32(0, 0, proceduralTexture.width, proceduralTexture.height);
+        //temp.SetPixels32(pixels);
+        //temp.Apply();
+
+        //substanceTexture = renderer.substance.mainTexture;
+        //substanceTextur2D = substanceTexture as Texture2D;
+
+
+
+        //substanceTexture2D = new Texture2D(proceduralTexture.width, proceduralTexture.height, TextureFormat.RGB24, false);
+        //substanceTexture2D.SetPixels32(proceduralTexture.GetPixels32(0, 0, proceduralTexture.width, proceduralTexture.height));
+        //substanceTexture2D.Apply();
+        
 
         GenerateMesh();
-        //GenerateCollisionMesh();
+        GenerateCollisionMesh();
         //GenerateTexture();
        
-
-
-        //material.
-        //renderer.material.mainTexture = hexTexture;
-
     }
 
 
@@ -53,57 +91,119 @@ public partial class ChunkView
     public override void GenerateChunkExecuted() {
         base.GenerateChunkExecuted();
 
-        chunkSize = Chunk.ParentWorldManager.ChunkSize;
-        chunkResolution = Chunk.ParentWorldManager.ChunkResolution;
-        collisionResolution = Chunk.ParentWorldManager.ChunkCollisionResolution;
-        pixelsPerUnit = Chunk.ParentWorldManager.PixelsPerUnit;
+        chunkSize = Chunk.ParentTerrainManager.ChunkSize;
+        chunkResolution = Chunk.ParentTerrainManager.ChunkResolution;
+        collisionResolution = Chunk.ParentTerrainManager.ChunkCollisionResolution;
+        pixelsPerUnit = Chunk.ParentTerrainManager.PixelsPerUnit;
 
-        //GenerateChunkHexes(hexTexture, Chunk.terrainDataX, Chunk.terrainDataY);
+        //DrawChunkHeightmap(hexHeightmap, Chunk.terrainDataX, Chunk.terrainDataY);
         //GenerateMesh();
         //GenerateCollisionMesh();
         //GenerateTexture();
     }
 
+    /// Invokes UpdateChunkExecuted when the UpdateChunk command is executed.
+    public override void UpdateChunkExecuted()
+    {
+        base.UpdateChunkExecuted();
+    }
 
-    public Texture2D GenerateChunkHexes(int dataX, int dataY)
+
+    public Texture2D DrawChunkHeightmap(int dataX, int dataY)
     {
 
-        Texture2D texture = new Texture2D(chunkSize, chunkSize, TextureFormat.RGBA32, true);
+        Texture2D texture = new Texture2D(chunkSize, chunkSize); //TextureFormat.RGBA32, true 
         texture.wrapMode = TextureWrapMode.Clamp;
-        texture.filterMode = FilterMode.Trilinear;
+        //texture.filterMode = FilterMode.Trilinear;
         //texture.EncodeToJPG();// = TextureFormat.RGBA32;
-        //texture.alphaIsTransparency = false;
+        texture.alphaIsTransparency = false;
 
         float terrainVal = 0;
         int posX;
         int posY;
-        HexProperties hexProperties = Chunk.ParentWorldManager.HexProperties;
 
-        int chunkHexCountX = (int)(chunkSize / hexProperties.width);
-        int chunkHexCountY = (int)(chunkSize / (hexProperties.tileH + hexProperties.side));
-
-
-        //int initPosX = Mathf.RoundToInt(dataX * 2 * hexProperties.tileR + (dataY % 2 == 0 ? 0 : 1) * hexProperties.tileR);
-        //int initPosY = Mathf.RoundToInt(dataY * (hexProperties.tileH + hexProperties.side));
-
-        int initPosX = Chunk.ChunkX * chunkSize;
-        int initPosY = Chunk.ChunkY * chunkSize;
+        int chunkHexCountX = (int)(chunkSize / HexProperties.width);
+        int chunkHexCountY = (int)(chunkSize / (HexProperties.tileH + HexProperties.side));
 
 
-        for (int x = dataX; x <= dataX + chunkHexCountX + Chunk.ChunkX && x < Chunk.ParentWorldManager.TerrainWidth; x++)
+        int chunkTextureOffsetX = Chunk.ChunkX * chunkSize;
+        int chunkTextureOffsetY = Chunk.ChunkY * chunkSize;
+
+
+        for (int x = dataX; x <= dataX + chunkHexCountX + Chunk.ChunkX && x < Chunk.ParentTerrainManager.TerrainWidth; x++)
         {
-            for (int y = dataY; y <= dataY + chunkHexCountY + Chunk.ChunkY && y < Chunk.ParentWorldManager.TerrainHeight; y++)
+            for (int y = dataY; y <= dataY + chunkHexCountY + Chunk.ChunkY && y < Chunk.ParentTerrainManager.TerrainHeight; y++)
             {
-                posX = Mathf.RoundToInt(x * 2 * hexProperties.tileR + (y % 2 == 0 ? 0 : 1) * hexProperties.tileR + hexProperties.tileR) - initPosX;
-                posY = Mathf.RoundToInt(y * (hexProperties.tileH + hexProperties.side)) - initPosY;
+                posX = Mathf.RoundToInt(x * 2 * HexProperties.tileR + (y % 2 == 0 ? 0 : 1) * HexProperties.tileR + HexProperties.tileR) - chunkTextureOffsetX;
+                posY = Mathf.RoundToInt(y * (HexProperties.tileH + HexProperties.side)) - chunkTextureOffsetY;
 
                 if (x >= 0 && y >= 0)
                 {
-                    terrainVal = Mathf.Round(Chunk.ParentWorldManager.terrainData[x, y] / Chunk.ParentWorldManager.Altitudes) * Chunk.ParentWorldManager.Altitudes;
-                    DrawHex(texture, posX, posY, new Color(terrainVal, terrainVal, terrainVal, 1));
+                    terrainVal = Mathf.Round(Chunk.ParentTerrainManager.terrainData[x, y] / Chunk.ParentTerrainManager.Altitudes) * Chunk.ParentTerrainManager.Altitudes;
+                    DrawHex(texture, posX, posY, new Color(terrainVal, terrainVal, terrainVal));
                 }
             }
         }
+
+        // SEt edges
+        Color col;
+        Color col2;
+        for (int x = 0; x <= chunkSize; x++)
+        {
+            col = texture.GetPixel(x, 0);
+            texture.SetPixel(x, 0, new Color(col.r, col.g, col.b, 0));
+            col2 = texture.GetPixel(x, chunkSize);
+            texture.SetPixel(x, chunkSize, new Color(col2.r, col2.g, col2.b, 0));
+        }
+
+        for (int y = 0; y <= chunkSize; y++)
+        {
+            col = texture.GetPixel(0, y);
+            texture.SetPixel(0, y, new Color(col.r, col.g, col.b, 0));
+            col2 = texture.GetPixel(chunkSize, y);
+            texture.SetPixel(chunkSize, y, new Color(col2.r, col2.g, col2.b, 0));
+
+        }
+
+        texture.Apply();
+        return texture;
+    }
+
+    public Texture2D DrawHexBiomeMap(int dataX, int dataY)
+    {
+
+        Texture2D texture = new Texture2D(chunkSize, chunkSize); 
+        texture.wrapMode = TextureWrapMode.Clamp;
+
+        float terrainVal = 0;
+        int posX;
+        int posY;
+
+        int chunkHexCountX = (int)(chunkSize / HexProperties.width);
+        int chunkHexCountY = (int)(chunkSize / (HexProperties.tileH + HexProperties.side));
+
+
+        int chunkTextureOffsetX = Chunk.ChunkX * chunkSize;
+        int chunkTextureOffsetY = Chunk.ChunkY * chunkSize;
+
+
+        for (int x = dataX; x <= dataX + chunkHexCountX + Chunk.ChunkX && x < Chunk.ParentTerrainManager.TerrainWidth; x++)
+        {
+            for (int y = dataY; y <= dataY + chunkHexCountY + Chunk.ChunkY && y < Chunk.ParentTerrainManager.TerrainHeight; y++)
+            {
+                posX = Mathf.RoundToInt(x * 2 * HexProperties.tileR + (y % 2 == 0 ? 0 : 1) * HexProperties.tileR + HexProperties.tileR) - chunkTextureOffsetX;
+                posY = Mathf.RoundToInt(y * (HexProperties.tileH + HexProperties.side)) - chunkTextureOffsetY;
+
+                if (x >= 0 && y >= 0)
+                {
+                    terrainVal = Mathf.Clamp(Mathf.Round(Chunk.ParentTerrainManager.terrainData[x, y] / Chunk.ParentTerrainManager.Altitudes) * Chunk.ParentTerrainManager.Altitudes / Chunk.ParentTerrainManager.Altitudes - 1, 0, 5);
+                    //Debug.Log(Mathf.FloorToInt(terrainVal / Chunk.ParentTerrainManager.Altitudes) - 2);
+                    DrawHex(texture, posX, posY, altitudes[(int)terrainVal]);
+                    
+                }
+            }
+        }
+
         texture.Apply();
         return texture;
     }
@@ -113,35 +213,34 @@ public partial class ChunkView
     {
         int startX = 0, endX = 0;
 
-        HexProperties hexProperties = Chunk.ParentWorldManager.HexProperties;
 
-        for (int y = (int)hexProperties.height; y > 0; y--)
+        for (int y = (int)HexProperties.height; y > 0; y--)
         {
 
-            if (y < hexProperties.tileH) // TOP
+            if (y < HexProperties.tileH) // TOP
             {
-                startX = Mathf.FloorToInt(-(y / hexProperties.tileH * hexProperties.tileR));
-                endX = Mathf.CeilToInt(y / hexProperties.tileH * hexProperties.tileR);
+                startX = Mathf.FloorToInt(-(y / HexProperties.tileH * HexProperties.tileR));
+                endX = Mathf.CeilToInt(y / HexProperties.tileH * HexProperties.tileR);
             }
-            else if (y >= hexProperties.tileH && y <= hexProperties.side + hexProperties.tileH) // MIDDLE
+            else if (y >= HexProperties.tileH && y <= HexProperties.side + HexProperties.tileH) // MIDDLE
             {
-                startX = Mathf.FloorToInt(-hexProperties.tileR);
-                endX = Mathf.CeilToInt(hexProperties.tileR);
+                startX = Mathf.FloorToInt(-HexProperties.tileR);
+                endX = Mathf.CeilToInt(HexProperties.tileR);
             }
             else // BOTTOM
             {
-                startX = Mathf.FloorToInt(-((hexProperties.height - y) / hexProperties.tileH * hexProperties.tileR));
-                endX = Mathf.CeilToInt(((hexProperties.height - y) / hexProperties.tileH * hexProperties.tileR));
+                startX = Mathf.FloorToInt(-((HexProperties.height - y) / HexProperties.tileH * HexProperties.tileR));
+                endX = Mathf.CeilToInt(((HexProperties.height - y) / HexProperties.tileH * HexProperties.tileR));
             }
 
             for (int x = startX; x < endX; x++)
             {
-                if (x + centerX >= 0 && x + centerX <= chunkSize + 1 && y + centerY >= 0 && y + centerY <= chunkSize + 1)
+                if (x + centerX >= 0 && x + centerX <= chunkSize && y + centerY >= 0 && y + centerY <= chunkSize)
                 {
-                    //if (x == 0 || y == 0 || x + centerX == chunkSize || y + centerY == chunkSize)
+                    //if (x <= 0 || y <= 0 || x + centerX >= chunkSize || y + centerY >= chunkSize)
                     //    texture.SetPixel(x + centerX, y + centerY, new Color(color.r, color.g, color.b, 0));
-                   // else
-                        texture.SetPixel(x + centerX, y + centerY, color);
+                    //else
+                        texture.SetPixel(x + centerX, y + centerY, new Color(color.r, color.g, color.b, 1));
                 }
             }
         }
@@ -160,19 +259,16 @@ public partial class ChunkView
         vertices = new Vector3[(chunkResolution + 1) * (chunkResolution + 1)];
         normals = new Vector3[vertices.Length];
         Vector2[] uv = new Vector2[vertices.Length];
-        
-        Texture2D matTexture = material.GetProceduralTexture("Hexagon_Heights");
+
 
         for (int v = 0, z = 0; z <= chunkResolution; z++)
         {
             for (int x = 0; x <= chunkResolution; x++, v++)
             {
-
                 vertices[v] = new Vector3(x * resStep / pixelsPerUnit,
-                                          matTexture.GetPixel((int)(x * resStep), (int)(z * resStep)).grayscale * Chunk.ParentWorldManager.PixelToHeight, //Chunk.ParentWorldManager.terrainData[x + Chunk.TerrainDataX, z + Chunk.TerrainDataY] * Chunk.ParentWorldManager.PixelToHeight
+                                          hexHeightmap.GetPixel((int)(x * resStep), (int)(z * resStep)).grayscale * Chunk.ParentTerrainManager.PixelToHeight, //, //Chunk.ParentTerrainManager.terrainData[x + Chunk.TerrainDataX, z + Chunk.TerrainDataY] * Chunk.ParentTerrainManager.PixelToHeight
                                           z * resStep / pixelsPerUnit
                                           );
-
 
                 normals[v] = Vector3.up;
                 uv[v] = new Vector2(x * resStep * uvStep, z * resStep * uvStep);
@@ -202,52 +298,45 @@ public partial class ChunkView
         mesh.RecalculateBounds();
         TangentSolver.Solve(mesh);
 
-
-
     }
 
-    /*
+    
     private void GenerateCollisionMesh()
     {
 
         Mesh meshCollider = new Mesh();
-        Vector3[] colVertices = new Vector3[(terrainManager.chunkCollisionResolution + 1) * (terrainManager.chunkCollisionResolution + 1)];
+        Vector3[] colVertices = new Vector3[(collisionResolution + 1) * (collisionResolution + 1)];
 
-        float quadSize = terrainManager.chunkCollisionResolution / chunkSize;
+        Mesh mesh = GetComponent<MeshCollider>().sharedMesh;
 
-
-        float terrainSizeInUnits = terrainManager.terrainWidth / terrainManager.pixelsPerUnit;
-        float unitsPerChunk = terrainSizeInUnits / (terrainManager.terrainWidth / terrainManager.chunkSize);
-        float unitsPerRes = unitsPerChunk / terrainManager.chunkCollisionResolution;
-
-        float stepSize = 1f / terrainManager.terrainWidth;
-        float resScale = chunkSize / terrainManager.chunkCollisionResolution;
+        // Pixels per vetex point
+        float resStep = chunkSize / collisionResolution;
 
 
-        for (int v = 0, z = 0; z <= terrainManager.chunkCollisionResolution; z++)
+        for (int v = 0, z = 0; z <= collisionResolution; z++)
         {
-            for (int x = 0; x <= terrainManager.chunkCollisionResolution; x++, v++)
+            for (int x = 0; x <= collisionResolution; x++, v++)
             {
-                colVertices[v] = new Vector3(x * unitsPerRes,
-                                             terrainManager.hexTerrainData[Mathf.RoundToInt(x * (chunkSize / terrainManager.chunkCollisionResolution) + terrainDataX), Mathf.RoundToInt(z * (chunkSize / terrainManager.chunkCollisionResolution) + terrainDataY)] * terrainManager.resolutionHeight,
-                                             z * unitsPerRes
+                colVertices[v] = new Vector3(x * resStep / pixelsPerUnit,
+                                             hexHeightmap.GetPixel((int)(x * resStep), (int)(z * resStep)).grayscale * Chunk.ParentTerrainManager.PixelToHeight,
+                                             z * resStep / pixelsPerUnit
                                              );
             }
         }
 
         meshCollider.vertices = colVertices;
 
-        int[] triangles = new int[terrainManager.chunkCollisionResolution * terrainManager.chunkCollisionResolution * 6];
-        for (int t = 0, v = 0, y = 0; y < terrainManager.chunkCollisionResolution; y++, v++)
+        int[] triangles = new int[collisionResolution * collisionResolution * 6];
+        for (int t = 0, v = 0, y = 0; y < collisionResolution; y++, v++)
         {
-            for (int x = 0; x < terrainManager.chunkCollisionResolution; x++, v++, t += 6)
+            for (int x = 0; x < collisionResolution; x++, v++, t += 6)
             {
                 triangles[t] = v;
-                triangles[t + 1] = v + terrainManager.chunkCollisionResolution + 1;
+                triangles[t + 1] = v + collisionResolution + 1;
                 triangles[t + 2] = v + 1;
                 triangles[t + 3] = v + 1;
-                triangles[t + 4] = v + terrainManager.chunkCollisionResolution + 1;
-                triangles[t + 5] = v + terrainManager.chunkCollisionResolution + 2;
+                triangles[t + 4] = v + collisionResolution + 1;
+                triangles[t + 5] = v + collisionResolution + 2;
             }
         }
         meshCollider.triangles = triangles;
@@ -257,7 +346,7 @@ public partial class ChunkView
 
 
     }
-    */
+    
 
     private float GetXDerivative(int x, int z)
     {
@@ -324,5 +413,12 @@ public partial class ChunkView
         }
     }
 
+    /// Invokes SaveChunkhexHeightmapExecuted when the SaveChunkhexHeightmap command is executed.
+    public override void ExecuteSaveChunkHexTexture()
+    {
+        base.ExecuteSaveChunkHexTexture();
+        byte[] data = hexHeightmap.EncodeToPNG();
+        File.WriteAllBytes(Application.dataPath + "/chunk.png", data);
+    }
 
 }

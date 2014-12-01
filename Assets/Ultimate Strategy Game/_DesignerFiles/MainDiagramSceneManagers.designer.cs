@@ -28,7 +28,23 @@ public class MainTerrainBase : SceneManager {
     
     private ChunkController _ChunkController;
     
+    private TerrainManagerController _TerrainManagerController;
+    
     private WorldManagerController _WorldManagerController;
+    
+    private AStarController _AStarController;
+    
+    private GameLogicController _GameLogicController;
+    
+    private PlayerController _PlayerController;
+    
+    private UnitController _UnitController;
+    
+    private FactionController _FactionController;
+    
+    private CityController _CityController;
+    
+    private BuildingController _BuildingController;
     
     public MainTerrainSettings _MainTerrainSettings = new MainTerrainSettings();
     
@@ -46,6 +62,19 @@ public class MainTerrainBase : SceneManager {
     }
     
     [Inject()]
+    public virtual TerrainManagerController TerrainManagerController {
+        get {
+            if ((this._TerrainManagerController == null)) {
+                this._TerrainManagerController = new TerrainManagerController() { Container = Container };
+            }
+            return this._TerrainManagerController;
+        }
+        set {
+            _TerrainManagerController = value;
+        }
+    }
+    
+    [Inject()]
     public virtual WorldManagerController WorldManagerController {
         get {
             if ((this._WorldManagerController == null)) {
@@ -58,6 +87,97 @@ public class MainTerrainBase : SceneManager {
         }
     }
     
+    [Inject()]
+    public virtual AStarController AStarController {
+        get {
+            if ((this._AStarController == null)) {
+                this._AStarController = new AStarController() { Container = Container };
+            }
+            return this._AStarController;
+        }
+        set {
+            _AStarController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual GameLogicController GameLogicController {
+        get {
+            if ((this._GameLogicController == null)) {
+                this._GameLogicController = new GameLogicController() { Container = Container };
+            }
+            return this._GameLogicController;
+        }
+        set {
+            _GameLogicController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual PlayerController PlayerController {
+        get {
+            if ((this._PlayerController == null)) {
+                this._PlayerController = new PlayerController() { Container = Container };
+            }
+            return this._PlayerController;
+        }
+        set {
+            _PlayerController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual UnitController UnitController {
+        get {
+            if ((this._UnitController == null)) {
+                this._UnitController = new UnitController() { Container = Container };
+            }
+            return this._UnitController;
+        }
+        set {
+            _UnitController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual FactionController FactionController {
+        get {
+            if ((this._FactionController == null)) {
+                this._FactionController = new FactionController() { Container = Container };
+            }
+            return this._FactionController;
+        }
+        set {
+            _FactionController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual CityController CityController {
+        get {
+            if ((this._CityController == null)) {
+                this._CityController = new CityController() { Container = Container };
+            }
+            return this._CityController;
+        }
+        set {
+            _CityController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual BuildingController BuildingController {
+        get {
+            if ((this._BuildingController == null)) {
+                this._BuildingController = new BuildingController() { Container = Container };
+            }
+            return this._BuildingController;
+        }
+        set {
+            _BuildingController = value;
+        }
+    }
+    
     // <summary>
     // This method is the first method to be invoked when the scene first loads. Anything registered here with 'Container' will effectively 
     // be injected on controllers, and instances defined on a subsystem.And example of this would be Container.RegisterInstance<IDataRepository>(new CodeRepository()). Then any property with 
@@ -66,7 +186,15 @@ public class MainTerrainBase : SceneManager {
     public override void Setup() {
         base.Setup();
         Container.RegisterController<ChunkController>(ChunkController);
+        Container.RegisterController<TerrainManagerController>(TerrainManagerController);
         Container.RegisterController<WorldManagerController>(WorldManagerController);
+        Container.RegisterController<AStarController>(AStarController);
+        Container.RegisterController<GameLogicController>(GameLogicController);
+        Container.RegisterController<PlayerController>(PlayerController);
+        Container.RegisterController<UnitController>(UnitController);
+        Container.RegisterController<FactionController>(FactionController);
+        Container.RegisterController<CityController>(CityController);
+        Container.RegisterController<BuildingController>(BuildingController);
         this.Container.InjectAll();
     }
     

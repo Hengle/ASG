@@ -18,7 +18,7 @@ using UnityEngine;
 
 public abstract class ChunkControllerBase : Controller {
     
-    [Inject] public WorldManagerController WorldManagerController {get;set;}
+    [Inject] public TerrainManagerController TerrainManagerController {get;set;}
     public abstract void InitializeChunk(ChunkViewModel chunk);
     
     public override ViewModel CreateEmpty() {
@@ -35,11 +35,42 @@ public abstract class ChunkControllerBase : Controller {
     
     public virtual void GenerateChunk(ChunkViewModel chunk) {
     }
+    
+    public virtual void UpdateChunk(ChunkViewModel chunk) {
+    }
+    
+    public virtual void SaveChunkHexTexture(ChunkViewModel chunk) {
+    }
+}
+
+public abstract class TerrainManagerControllerBase : Controller {
+    
+    [Inject] public WorldManagerController WorldManagerController {get;set;}
+    [Inject] public ChunkController ChunkController {get;set;}
+    public abstract void InitializeTerrainManager(TerrainManagerViewModel terrainManager);
+    
+    public override ViewModel CreateEmpty() {
+        return new TerrainManagerViewModel(this);
+    }
+    
+    public virtual TerrainManagerViewModel CreateTerrainManager() {
+        return ((TerrainManagerViewModel)(this.Create()));
+    }
+    
+    public override void Initialize(ViewModel viewModel) {
+        this.InitializeTerrainManager(((TerrainManagerViewModel)(viewModel)));
+    }
+    
+    public virtual void GenerateMap(TerrainManagerViewModel terrainManager) {
+    }
+    
+    public virtual void GenerateChunks(TerrainManagerViewModel terrainManager) {
+    }
 }
 
 public abstract class WorldManagerControllerBase : Controller {
     
-    [Inject] public ChunkController ChunkController {get;set;}
+    [Inject] public TerrainManagerController TerrainManagerController {get;set;}
     public abstract void InitializeWorldManager(WorldManagerViewModel worldManager);
     
     public override ViewModel CreateEmpty() {
@@ -53,10 +84,136 @@ public abstract class WorldManagerControllerBase : Controller {
     public override void Initialize(ViewModel viewModel) {
         this.InitializeWorldManager(((WorldManagerViewModel)(viewModel)));
     }
+}
+
+public abstract class AStarControllerBase : Controller {
     
-    public virtual void GenerateMap(WorldManagerViewModel worldManager) {
+    public abstract void InitializeAStar(AStarViewModel aStar);
+    
+    public override ViewModel CreateEmpty() {
+        return new AStarViewModel(this);
     }
     
-    public virtual void GenerateChunks(WorldManagerViewModel worldManager) {
+    public virtual AStarViewModel CreateAStar() {
+        return ((AStarViewModel)(this.Create()));
+    }
+    
+    public override void Initialize(ViewModel viewModel) {
+        this.InitializeAStar(((AStarViewModel)(viewModel)));
+    }
+}
+
+public abstract class GameLogicControllerBase : Controller {
+    
+    [Inject] public PlayerController PlayerController {get;set;}
+    [Inject] public FactionController FactionController {get;set;}
+    public abstract void InitializeGameLogic(GameLogicViewModel gameLogic);
+    
+    public override ViewModel CreateEmpty() {
+        return new GameLogicViewModel(this);
+    }
+    
+    public virtual GameLogicViewModel CreateGameLogic() {
+        return ((GameLogicViewModel)(this.Create()));
+    }
+    
+    public override void Initialize(ViewModel viewModel) {
+        this.InitializeGameLogic(((GameLogicViewModel)(viewModel)));
+    }
+    
+    public virtual void NextTurn(GameLogicViewModel gameLogic) {
+    }
+}
+
+public abstract class PlayerControllerBase : Controller {
+    
+    [Inject] public GameLogicController GameLogicController {get;set;}
+    [Inject] public FactionController FactionController {get;set;}
+    [Inject] public UnitController UnitController {get;set;}
+    public abstract void InitializePlayer(PlayerViewModel player);
+    
+    public override ViewModel CreateEmpty() {
+        return new PlayerViewModel(this);
+    }
+    
+    public virtual PlayerViewModel CreatePlayer() {
+        return ((PlayerViewModel)(this.Create()));
+    }
+    
+    public override void Initialize(ViewModel viewModel) {
+        this.InitializePlayer(((PlayerViewModel)(viewModel)));
+    }
+}
+
+public abstract class UnitControllerBase : Controller {
+    
+    [Inject] public PlayerController PlayerController {get;set;}
+    [Inject] public FactionController FactionController {get;set;}
+    public abstract void InitializeUnit(UnitViewModel unit);
+    
+    public virtual UnitViewModel CreateUnit() {
+        return ((UnitViewModel)(this.Create()));
+    }
+    
+    public override void Initialize(ViewModel viewModel) {
+        this.InitializeUnit(((UnitViewModel)(viewModel)));
+    }
+}
+
+public abstract class FactionControllerBase : Controller {
+    
+    [Inject] public GameLogicController GameLogicController {get;set;}
+    [Inject] public PlayerController PlayerController {get;set;}
+    [Inject] public UnitController UnitController {get;set;}
+    [Inject] public CityController CityController {get;set;}
+    public abstract void InitializeFaction(FactionViewModel faction);
+    
+    public override ViewModel CreateEmpty() {
+        return new FactionViewModel(this);
+    }
+    
+    public virtual FactionViewModel CreateFaction() {
+        return ((FactionViewModel)(this.Create()));
+    }
+    
+    public override void Initialize(ViewModel viewModel) {
+        this.InitializeFaction(((FactionViewModel)(viewModel)));
+    }
+}
+
+public abstract class CityControllerBase : Controller {
+    
+    [Inject] public FactionController FactionController {get;set;}
+    [Inject] public BuildingController BuildingController {get;set;}
+    public abstract void InitializeCity(CityViewModel city);
+    
+    public override ViewModel CreateEmpty() {
+        return new CityViewModel(this);
+    }
+    
+    public virtual CityViewModel CreateCity() {
+        return ((CityViewModel)(this.Create()));
+    }
+    
+    public override void Initialize(ViewModel viewModel) {
+        this.InitializeCity(((CityViewModel)(viewModel)));
+    }
+}
+
+public abstract class BuildingControllerBase : Controller {
+    
+    [Inject] public CityController CityController {get;set;}
+    public abstract void InitializeBuilding(BuildingViewModel building);
+    
+    public override ViewModel CreateEmpty() {
+        return new BuildingViewModel(this);
+    }
+    
+    public virtual BuildingViewModel CreateBuilding() {
+        return ((BuildingViewModel)(this.Create()));
+    }
+    
+    public override void Initialize(ViewModel viewModel) {
+        this.InitializeBuilding(((BuildingViewModel)(viewModel)));
     }
 }

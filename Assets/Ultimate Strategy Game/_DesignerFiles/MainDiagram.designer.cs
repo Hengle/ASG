@@ -20,6 +20,10 @@ public class ChunkViewModelBase : ViewModel {
     
     protected CommandWithSender<ChunkViewModel> _GenerateChunk;
     
+    protected CommandWithSender<ChunkViewModel> _UpdateChunk;
+    
+    protected CommandWithSender<ChunkViewModel> _SaveChunkHexTexture;
+    
     public ChunkViewModelBase(ChunkControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
     }
@@ -40,7 +44,7 @@ public class ChunkViewModelBase : ViewModel {
 
 public partial class ChunkViewModel : ChunkViewModelBase {
     
-    private WorldManagerViewModel _ParentWorldManager;
+    private TerrainManagerViewModel _ParentTerrainManager;
     
     public ChunkViewModel(ChunkControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
@@ -134,18 +138,38 @@ public partial class ChunkViewModel : ChunkViewModelBase {
         }
     }
     
-    public virtual WorldManagerViewModel ParentWorldManager {
+    public virtual CommandWithSender<ChunkViewModel> UpdateChunk {
         get {
-            return this._ParentWorldManager;
+            return _UpdateChunk;
         }
         set {
-            _ParentWorldManager = value;
+            _UpdateChunk = value;
+        }
+    }
+    
+    public virtual CommandWithSender<ChunkViewModel> SaveChunkHexTexture {
+        get {
+            return _SaveChunkHexTexture;
+        }
+        set {
+            _SaveChunkHexTexture = value;
+        }
+    }
+    
+    public virtual TerrainManagerViewModel ParentTerrainManager {
+        get {
+            return this._ParentTerrainManager;
+        }
+        set {
+            _ParentTerrainManager = value;
         }
     }
     
     protected override void WireCommands(Controller controller) {
         var chunk = controller as ChunkControllerBase;
         this.GenerateChunk = new CommandWithSender<ChunkViewModel>(this, chunk.GenerateChunk);
+        this.UpdateChunk = new CommandWithSender<ChunkViewModel>(this, chunk.UpdateChunk);
+        this.SaveChunkHexTexture = new CommandWithSender<ChunkViewModel>(this, chunk.SaveChunkHexTexture);
     }
     
     public override void Write(ISerializerStream stream) {
@@ -182,11 +206,13 @@ public partial class ChunkViewModel : ChunkViewModelBase {
     protected override void FillCommands(List<ViewModelCommandInfo> list) {
         base.FillCommands(list);;
         list.Add(new ViewModelCommandInfo("GenerateChunk", GenerateChunk) { ParameterType = typeof(void) });
+        list.Add(new ViewModelCommandInfo("UpdateChunk", UpdateChunk) { ParameterType = typeof(void) });
+        list.Add(new ViewModelCommandInfo("SaveChunkHexTexture", SaveChunkHexTexture) { ParameterType = typeof(void) });
     }
 }
 
 [DiagramInfoAttribute("Ultimate Strategy Game")]
-public class WorldManagerViewModelBase : ViewModel {
+public class TerrainManagerViewModelBase : ViewModel {
     
     public P<Int32> _TerrainSeedProperty;
     
@@ -196,7 +222,7 @@ public class WorldManagerViewModelBase : ViewModel {
     
     public P<Int32> _PixelsPerUnitProperty;
     
-    public P<Int32> _PixelToHeightProperty;
+    public P<Single> _PixelToHeightProperty;
     
     public P<Single> _AltitudesProperty;
     
@@ -206,8 +232,6 @@ public class WorldManagerViewModelBase : ViewModel {
     
     public P<Int32> _ChunkCollisionResolutionProperty;
     
-    public P<HexProperties> _HexPropertiesProperty;
-    
     public P<Int32> _TerrainWidthProperty;
     
     public P<Int32> _TerrainHeightProperty;
@@ -216,21 +240,19 @@ public class WorldManagerViewModelBase : ViewModel {
     
     public P<Single> _AltitudeVariationProperty;
     
-    public P<Single> _HexagonSideProperty;
-    
-    public ModelCollection<Hex> _HexGridProperty;
+    public P<Int32> _HexagonSideProperty;
     
     public ModelCollection<ChunkViewModel> _ChunksProperty;
     
-    protected CommandWithSender<WorldManagerViewModel> _GenerateMap;
+    protected CommandWithSender<TerrainManagerViewModel> _GenerateMap;
     
-    protected CommandWithSender<WorldManagerViewModel> _GenerateChunks;
+    protected CommandWithSender<TerrainManagerViewModel> _GenerateChunks;
     
-    public WorldManagerViewModelBase(WorldManagerControllerBase controller, bool initialize = true) : 
+    public TerrainManagerViewModelBase(TerrainManagerControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
     }
     
-    public WorldManagerViewModelBase() : 
+    public TerrainManagerViewModelBase() : 
             base() {
     }
     
@@ -240,18 +262,16 @@ public class WorldManagerViewModelBase : ViewModel {
         _RandomizeSeedProperty = new P<Boolean>(this, "RandomizeSeed");
         _TerrainSettingsProperty = new P<TerrainSettings>(this, "TerrainSettings");
         _PixelsPerUnitProperty = new P<Int32>(this, "PixelsPerUnit");
-        _PixelToHeightProperty = new P<Int32>(this, "PixelToHeight");
+        _PixelToHeightProperty = new P<Single>(this, "PixelToHeight");
         _AltitudesProperty = new P<Single>(this, "Altitudes");
         _ChunkSizeProperty = new P<Int32>(this, "ChunkSize");
         _ChunkResolutionProperty = new P<Int32>(this, "ChunkResolution");
         _ChunkCollisionResolutionProperty = new P<Int32>(this, "ChunkCollisionResolution");
-        _HexPropertiesProperty = new P<HexProperties>(this, "HexProperties");
         _TerrainWidthProperty = new P<Int32>(this, "TerrainWidth");
         _TerrainHeightProperty = new P<Int32>(this, "TerrainHeight");
         _DetailProperty = new P<Single>(this, "Detail");
         _AltitudeVariationProperty = new P<Single>(this, "AltitudeVariation");
-        _HexagonSideProperty = new P<Single>(this, "HexagonSide");
-        _HexGridProperty = new ModelCollection<Hex>(this, "HexGrid");
+        _HexagonSideProperty = new P<Int32>(this, "HexagonSide");
         _ChunksProperty = new ModelCollection<ChunkViewModel>(this, "Chunks");
         _ChunksProperty.CollectionChanged += ChunksCollectionChanged;
     }
@@ -260,13 +280,15 @@ public class WorldManagerViewModelBase : ViewModel {
     }
 }
 
-public partial class WorldManagerViewModel : WorldManagerViewModelBase {
+public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
     
-    public WorldManagerViewModel(WorldManagerControllerBase controller, bool initialize = true) : 
+    private WorldManagerViewModel _ParentWorldManager;
+    
+    public TerrainManagerViewModel(TerrainManagerControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
     }
     
-    public WorldManagerViewModel() : 
+    public TerrainManagerViewModel() : 
             base() {
     }
     
@@ -330,13 +352,13 @@ public partial class WorldManagerViewModel : WorldManagerViewModelBase {
         }
     }
     
-    public virtual P<Int32> PixelToHeightProperty {
+    public virtual P<Single> PixelToHeightProperty {
         get {
             return this._PixelToHeightProperty;
         }
     }
     
-    public virtual Int32 PixelToHeight {
+    public virtual Single PixelToHeight {
         get {
             return _PixelToHeightProperty.Value;
         }
@@ -405,21 +427,6 @@ public partial class WorldManagerViewModel : WorldManagerViewModelBase {
         }
     }
     
-    public virtual P<HexProperties> HexPropertiesProperty {
-        get {
-            return this._HexPropertiesProperty;
-        }
-    }
-    
-    public virtual HexProperties HexProperties {
-        get {
-            return _HexPropertiesProperty.Value;
-        }
-        set {
-            _HexPropertiesProperty.Value = value;
-        }
-    }
-    
     public virtual P<Int32> TerrainWidthProperty {
         get {
             return this._TerrainWidthProperty;
@@ -480,24 +487,18 @@ public partial class WorldManagerViewModel : WorldManagerViewModelBase {
         }
     }
     
-    public virtual P<Single> HexagonSideProperty {
+    public virtual P<Int32> HexagonSideProperty {
         get {
             return this._HexagonSideProperty;
         }
     }
     
-    public virtual Single HexagonSide {
+    public virtual Int32 HexagonSide {
         get {
             return _HexagonSideProperty.Value;
         }
         set {
             _HexagonSideProperty.Value = value;
-        }
-    }
-    
-    public virtual ModelCollection<Hex> HexGrid {
-        get {
-            return this._HexGridProperty;
         }
     }
     
@@ -507,7 +508,7 @@ public partial class WorldManagerViewModel : WorldManagerViewModelBase {
         }
     }
     
-    public virtual CommandWithSender<WorldManagerViewModel> GenerateMap {
+    public virtual CommandWithSender<TerrainManagerViewModel> GenerateMap {
         get {
             return _GenerateMap;
         }
@@ -516,7 +517,7 @@ public partial class WorldManagerViewModel : WorldManagerViewModelBase {
         }
     }
     
-    public virtual CommandWithSender<WorldManagerViewModel> GenerateChunks {
+    public virtual CommandWithSender<TerrainManagerViewModel> GenerateChunks {
         get {
             return _GenerateChunks;
         }
@@ -525,10 +526,19 @@ public partial class WorldManagerViewModel : WorldManagerViewModelBase {
         }
     }
     
+    public virtual WorldManagerViewModel ParentWorldManager {
+        get {
+            return this._ParentWorldManager;
+        }
+        set {
+            _ParentWorldManager = value;
+        }
+    }
+    
     protected override void WireCommands(Controller controller) {
-        var worldManager = controller as WorldManagerControllerBase;
-        this.GenerateMap = new CommandWithSender<WorldManagerViewModel>(this, worldManager.GenerateMap);
-        this.GenerateChunks = new CommandWithSender<WorldManagerViewModel>(this, worldManager.GenerateChunks);
+        var terrainManager = controller as TerrainManagerControllerBase;
+        this.GenerateMap = new CommandWithSender<TerrainManagerViewModel>(this, terrainManager.GenerateMap);
+        this.GenerateChunks = new CommandWithSender<TerrainManagerViewModel>(this, terrainManager.GenerateChunks);
     }
     
     public override void Write(ISerializerStream stream) {
@@ -536,7 +546,7 @@ public partial class WorldManagerViewModel : WorldManagerViewModelBase {
         stream.SerializeInt("TerrainSeed", this.TerrainSeed);
         stream.SerializeBool("RandomizeSeed", this.RandomizeSeed);
         stream.SerializeInt("PixelsPerUnit", this.PixelsPerUnit);
-        stream.SerializeInt("PixelToHeight", this.PixelToHeight);
+        stream.SerializeFloat("PixelToHeight", this.PixelToHeight);
         stream.SerializeFloat("Altitudes", this.Altitudes);
         stream.SerializeInt("ChunkSize", this.ChunkSize);
         stream.SerializeInt("ChunkResolution", this.ChunkResolution);
@@ -545,7 +555,7 @@ public partial class WorldManagerViewModel : WorldManagerViewModelBase {
         stream.SerializeInt("TerrainHeight", this.TerrainHeight);
         stream.SerializeFloat("Detail", this.Detail);
         stream.SerializeFloat("AltitudeVariation", this.AltitudeVariation);
-        stream.SerializeFloat("HexagonSide", this.HexagonSide);
+        stream.SerializeInt("HexagonSide", this.HexagonSide);
         if (stream.DeepSerialize) stream.SerializeArray("Chunks", this.Chunks);
     }
     
@@ -554,7 +564,7 @@ public partial class WorldManagerViewModel : WorldManagerViewModelBase {
         		this.TerrainSeed = stream.DeserializeInt("TerrainSeed");;
         		this.RandomizeSeed = stream.DeserializeBool("RandomizeSeed");;
         		this.PixelsPerUnit = stream.DeserializeInt("PixelsPerUnit");;
-        		this.PixelToHeight = stream.DeserializeInt("PixelToHeight");;
+        		this.PixelToHeight = stream.DeserializeFloat("PixelToHeight");;
         		this.Altitudes = stream.DeserializeFloat("Altitudes");;
         		this.ChunkSize = stream.DeserializeInt("ChunkSize");;
         		this.ChunkResolution = stream.DeserializeInt("ChunkResolution");;
@@ -563,7 +573,7 @@ public partial class WorldManagerViewModel : WorldManagerViewModelBase {
         		this.TerrainHeight = stream.DeserializeInt("TerrainHeight");;
         		this.Detail = stream.DeserializeFloat("Detail");;
         		this.AltitudeVariation = stream.DeserializeFloat("AltitudeVariation");;
-        		this.HexagonSide = stream.DeserializeFloat("HexagonSide");;
+        		this.HexagonSide = stream.DeserializeInt("HexagonSide");;
 if (stream.DeepSerialize) {
         this.Chunks.Clear();
         this.Chunks.AddRange(stream.DeserializeObjectArray<ChunkViewModel>("Chunks"));
@@ -586,13 +596,11 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelPropertyInfo(_ChunkSizeProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_ChunkResolutionProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_ChunkCollisionResolutionProperty, false, false, false));
-        list.Add(new ViewModelPropertyInfo(_HexPropertiesProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_TerrainWidthProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_TerrainHeightProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_DetailProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_AltitudeVariationProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_HexagonSideProperty, false, false, false));
-        list.Add(new ViewModelPropertyInfo(_HexGridProperty, false, true, false));
         list.Add(new ViewModelPropertyInfo(_ChunksProperty, true, true, false));
     }
     
@@ -603,8 +611,813 @@ if (stream.DeepSerialize) {
     }
     
     protected override void ChunksCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.OldItems.OfType<ChunkViewModel>()) item.ParentWorldManager = null;;
-        foreach (var item in args.NewItems.OfType<ChunkViewModel>()) item.ParentWorldManager = this;;
+        foreach (var item in args.OldItems.OfType<ChunkViewModel>()) item.ParentTerrainManager = null;;
+        foreach (var item in args.NewItems.OfType<ChunkViewModel>()) item.ParentTerrainManager = this;;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public class WorldManagerViewModelBase : ViewModel {
+    
+    public P<TerrainManagerViewModel> _TerrainManagerProperty;
+    
+    public WorldManagerViewModelBase(WorldManagerControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public WorldManagerViewModelBase() : 
+            base() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        _TerrainManagerProperty = new P<TerrainManagerViewModel>(this, "TerrainManager");
+    }
+}
+
+public partial class WorldManagerViewModel : WorldManagerViewModelBase {
+    
+    public WorldManagerViewModel(WorldManagerControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public WorldManagerViewModel() : 
+            base() {
+    }
+    
+    public virtual P<TerrainManagerViewModel> TerrainManagerProperty {
+        get {
+            return this._TerrainManagerProperty;
+        }
+    }
+    
+    public virtual TerrainManagerViewModel TerrainManager {
+        get {
+            return _TerrainManagerProperty.Value;
+        }
+        set {
+            _TerrainManagerProperty.Value = value;
+            if (value != null) value.ParentWorldManager = this;
+        }
+    }
+    
+    protected override void WireCommands(Controller controller) {
+    }
+    
+    public override void Write(ISerializerStream stream) {
+		base.Write(stream);
+		if (stream.DeepSerialize) stream.SerializeObject("TerrainManager", this.TerrainManager);
+    }
+    
+    public override void Read(ISerializerStream stream) {
+		base.Read(stream);
+		if (stream.DeepSerialize) this.TerrainManager = stream.DeserializeObject<TerrainManagerViewModel>("TerrainManager");
+    }
+    
+    public override void Unbind() {
+        base.Unbind();
+    }
+    
+    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
+        base.FillProperties(list);;
+        list.Add(new ViewModelPropertyInfo(_TerrainManagerProperty, true, false, false));
+    }
+    
+    protected override void FillCommands(List<ViewModelCommandInfo> list) {
+        base.FillCommands(list);;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public class AStarViewModelBase : ViewModel {
+    
+    public AStarViewModelBase(AStarControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public AStarViewModelBase() : 
+            base() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+    }
+}
+
+public partial class AStarViewModel : AStarViewModelBase {
+    
+    public AStarViewModel(AStarControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public AStarViewModel() : 
+            base() {
+    }
+    
+    protected override void WireCommands(Controller controller) {
+    }
+    
+    public override void Write(ISerializerStream stream) {
+		base.Write(stream);
+    }
+    
+    public override void Read(ISerializerStream stream) {
+		base.Read(stream);
+    }
+    
+    public override void Unbind() {
+        base.Unbind();
+    }
+    
+    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
+        base.FillProperties(list);;
+    }
+    
+    protected override void FillCommands(List<ViewModelCommandInfo> list) {
+        base.FillCommands(list);;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public class GameLogicViewModelBase : ViewModel {
+    
+    public P<Int32> _TurnCountProperty;
+    
+    public P<PlayerViewModel> _PlayerProperty;
+    
+    public ModelCollection<FactionViewModel> _FactionsProperty;
+    
+    protected CommandWithSender<GameLogicViewModel> _NextTurn;
+    
+    public GameLogicViewModelBase(GameLogicControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public GameLogicViewModelBase() : 
+            base() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        _TurnCountProperty = new P<Int32>(this, "TurnCount");
+        _PlayerProperty = new P<PlayerViewModel>(this, "Player");
+        _FactionsProperty = new ModelCollection<FactionViewModel>(this, "Factions");
+        _FactionsProperty.CollectionChanged += FactionsCollectionChanged;
+    }
+    
+    protected virtual void FactionsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
+    }
+}
+
+public partial class GameLogicViewModel : GameLogicViewModelBase {
+    
+    public GameLogicViewModel(GameLogicControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public GameLogicViewModel() : 
+            base() {
+    }
+    
+    public virtual P<Int32> TurnCountProperty {
+        get {
+            return this._TurnCountProperty;
+        }
+    }
+    
+    public virtual Int32 TurnCount {
+        get {
+            return _TurnCountProperty.Value;
+        }
+        set {
+            _TurnCountProperty.Value = value;
+        }
+    }
+    
+    public virtual P<PlayerViewModel> PlayerProperty {
+        get {
+            return this._PlayerProperty;
+        }
+    }
+    
+    public virtual PlayerViewModel Player {
+        get {
+            return _PlayerProperty.Value;
+        }
+        set {
+            _PlayerProperty.Value = value;
+            if (value != null) value.ParentGameLogic = this;
+        }
+    }
+    
+    public virtual ModelCollection<FactionViewModel> Factions {
+        get {
+            return this._FactionsProperty;
+        }
+    }
+    
+    public virtual CommandWithSender<GameLogicViewModel> NextTurn {
+        get {
+            return _NextTurn;
+        }
+        set {
+            _NextTurn = value;
+        }
+    }
+    
+    protected override void WireCommands(Controller controller) {
+        var gameLogic = controller as GameLogicControllerBase;
+        this.NextTurn = new CommandWithSender<GameLogicViewModel>(this, gameLogic.NextTurn);
+    }
+    
+    public override void Write(ISerializerStream stream) {
+		base.Write(stream);
+        stream.SerializeInt("TurnCount", this.TurnCount);
+		if (stream.DeepSerialize) stream.SerializeObject("Player", this.Player);
+        if (stream.DeepSerialize) stream.SerializeArray("Factions", this.Factions);
+    }
+    
+    public override void Read(ISerializerStream stream) {
+		base.Read(stream);
+        		this.TurnCount = stream.DeserializeInt("TurnCount");;
+		if (stream.DeepSerialize) this.Player = stream.DeserializeObject<PlayerViewModel>("Player");
+if (stream.DeepSerialize) {
+        this.Factions.Clear();
+        this.Factions.AddRange(stream.DeserializeObjectArray<FactionViewModel>("Factions"));
+}
+    }
+    
+    public override void Unbind() {
+        base.Unbind();
+        _FactionsProperty.CollectionChanged -= FactionsCollectionChanged;
+    }
+    
+    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
+        base.FillProperties(list);;
+        list.Add(new ViewModelPropertyInfo(_TurnCountProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_PlayerProperty, true, false, false));
+        list.Add(new ViewModelPropertyInfo(_FactionsProperty, true, true, false));
+    }
+    
+    protected override void FillCommands(List<ViewModelCommandInfo> list) {
+        base.FillCommands(list);;
+        list.Add(new ViewModelCommandInfo("NextTurn", NextTurn) { ParameterType = typeof(void) });
+    }
+    
+    protected override void FactionsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
+        foreach (var item in args.OldItems.OfType<FactionViewModel>()) item.ParentGameLogic = null;;
+        foreach (var item in args.NewItems.OfType<FactionViewModel>()) item.ParentGameLogic = this;;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public class PlayerViewModelBase : ViewModel {
+    
+    public P<Boolean> _IsAIProperty;
+    
+    public P<FactionViewModel> _FactionProperty;
+    
+    public P<UnitViewModel> _SelectedUnitProperty;
+    
+    public PlayerViewModelBase(PlayerControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public PlayerViewModelBase() : 
+            base() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        _IsAIProperty = new P<Boolean>(this, "IsAI");
+        _FactionProperty = new P<FactionViewModel>(this, "Faction");
+        _SelectedUnitProperty = new P<UnitViewModel>(this, "SelectedUnit");
+    }
+}
+
+public partial class PlayerViewModel : PlayerViewModelBase {
+    
+    private GameLogicViewModel _ParentGameLogic;
+    
+    public PlayerViewModel(PlayerControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public PlayerViewModel() : 
+            base() {
+    }
+    
+    public virtual P<Boolean> IsAIProperty {
+        get {
+            return this._IsAIProperty;
+        }
+    }
+    
+    public virtual Boolean IsAI {
+        get {
+            return _IsAIProperty.Value;
+        }
+        set {
+            _IsAIProperty.Value = value;
+        }
+    }
+    
+    public virtual P<FactionViewModel> FactionProperty {
+        get {
+            return this._FactionProperty;
+        }
+    }
+    
+    public virtual FactionViewModel Faction {
+        get {
+            return _FactionProperty.Value;
+        }
+        set {
+            _FactionProperty.Value = value;
+            if (value != null) value.ParentPlayer = this;
+        }
+    }
+    
+    public virtual P<UnitViewModel> SelectedUnitProperty {
+        get {
+            return this._SelectedUnitProperty;
+        }
+    }
+    
+    public virtual UnitViewModel SelectedUnit {
+        get {
+            return _SelectedUnitProperty.Value;
+        }
+        set {
+            _SelectedUnitProperty.Value = value;
+            if (value != null) value.ParentPlayer = this;
+        }
+    }
+    
+    public virtual GameLogicViewModel ParentGameLogic {
+        get {
+            return this._ParentGameLogic;
+        }
+        set {
+            _ParentGameLogic = value;
+        }
+    }
+    
+    protected override void WireCommands(Controller controller) {
+    }
+    
+    public override void Write(ISerializerStream stream) {
+		base.Write(stream);
+        stream.SerializeBool("IsAI", this.IsAI);
+		if (stream.DeepSerialize) stream.SerializeObject("Faction", this.Faction);
+		if (stream.DeepSerialize) stream.SerializeObject("SelectedUnit", this.SelectedUnit);
+    }
+    
+    public override void Read(ISerializerStream stream) {
+		base.Read(stream);
+        		this.IsAI = stream.DeserializeBool("IsAI");;
+		if (stream.DeepSerialize) this.Faction = stream.DeserializeObject<FactionViewModel>("Faction");
+		if (stream.DeepSerialize) this.SelectedUnit = stream.DeserializeObject<UnitViewModel>("SelectedUnit");
+    }
+    
+    public override void Unbind() {
+        base.Unbind();
+    }
+    
+    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
+        base.FillProperties(list);;
+        list.Add(new ViewModelPropertyInfo(_IsAIProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_FactionProperty, true, false, false));
+        list.Add(new ViewModelPropertyInfo(_SelectedUnitProperty, true, false, false));
+    }
+    
+    protected override void FillCommands(List<ViewModelCommandInfo> list) {
+        base.FillCommands(list);;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public class UnitViewModelBase : ViewModel {
+    
+    public UnitViewModelBase(UnitControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public UnitViewModelBase() : 
+            base() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+    }
+}
+
+public partial class UnitViewModel : UnitViewModelBase {
+    
+    private PlayerViewModel _ParentPlayer;
+    
+    private FactionViewModel _ParentFaction;
+    
+    public UnitViewModel(UnitControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public UnitViewModel() : 
+            base() {
+    }
+    
+    public virtual PlayerViewModel ParentPlayer {
+        get {
+            return this._ParentPlayer;
+        }
+        set {
+            _ParentPlayer = value;
+        }
+    }
+    
+    public virtual FactionViewModel ParentFaction {
+        get {
+            return this._ParentFaction;
+        }
+        set {
+            _ParentFaction = value;
+        }
+    }
+    
+    protected override void WireCommands(Controller controller) {
+    }
+    
+    public override void Write(ISerializerStream stream) {
+		base.Write(stream);
+    }
+    
+    public override void Read(ISerializerStream stream) {
+		base.Read(stream);
+    }
+    
+    public override void Unbind() {
+        base.Unbind();
+    }
+    
+    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
+        base.FillProperties(list);;
+    }
+    
+    protected override void FillCommands(List<ViewModelCommandInfo> list) {
+        base.FillCommands(list);;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public class FactionViewModelBase : ViewModel {
+    
+    public P<String> _NameProperty;
+    
+    public P<Single> _FoodProperty;
+    
+    public P<Single> _GoldProperty;
+    
+    public ModelCollection<UnitViewModel> _UnitsProperty;
+    
+    public ModelCollection<CityViewModel> _CitiesProperty;
+    
+    public FactionViewModelBase(FactionControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public FactionViewModelBase() : 
+            base() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        _NameProperty = new P<String>(this, "Name");
+        _FoodProperty = new P<Single>(this, "Food");
+        _GoldProperty = new P<Single>(this, "Gold");
+        _UnitsProperty = new ModelCollection<UnitViewModel>(this, "Units");
+        _UnitsProperty.CollectionChanged += UnitsCollectionChanged;
+        _CitiesProperty = new ModelCollection<CityViewModel>(this, "Cities");
+        _CitiesProperty.CollectionChanged += CitiesCollectionChanged;
+    }
+    
+    protected virtual void UnitsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
+    }
+    
+    protected virtual void CitiesCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
+    }
+}
+
+public partial class FactionViewModel : FactionViewModelBase {
+    
+    private GameLogicViewModel _ParentGameLogic;
+    
+    private PlayerViewModel _ParentPlayer;
+    
+    public FactionViewModel(FactionControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public FactionViewModel() : 
+            base() {
+    }
+    
+    public virtual P<String> NameProperty {
+        get {
+            return this._NameProperty;
+        }
+    }
+    
+    public virtual String Name {
+        get {
+            return _NameProperty.Value;
+        }
+        set {
+            _NameProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Single> FoodProperty {
+        get {
+            return this._FoodProperty;
+        }
+    }
+    
+    public virtual Single Food {
+        get {
+            return _FoodProperty.Value;
+        }
+        set {
+            _FoodProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Single> GoldProperty {
+        get {
+            return this._GoldProperty;
+        }
+    }
+    
+    public virtual Single Gold {
+        get {
+            return _GoldProperty.Value;
+        }
+        set {
+            _GoldProperty.Value = value;
+        }
+    }
+    
+    public virtual ModelCollection<UnitViewModel> Units {
+        get {
+            return this._UnitsProperty;
+        }
+    }
+    
+    public virtual ModelCollection<CityViewModel> Cities {
+        get {
+            return this._CitiesProperty;
+        }
+    }
+    
+    public virtual GameLogicViewModel ParentGameLogic {
+        get {
+            return this._ParentGameLogic;
+        }
+        set {
+            _ParentGameLogic = value;
+        }
+    }
+    
+    public virtual PlayerViewModel ParentPlayer {
+        get {
+            return this._ParentPlayer;
+        }
+        set {
+            _ParentPlayer = value;
+        }
+    }
+    
+    protected override void WireCommands(Controller controller) {
+    }
+    
+    public override void Write(ISerializerStream stream) {
+		base.Write(stream);
+        stream.SerializeString("Name", this.Name);
+        stream.SerializeFloat("Food", this.Food);
+        stream.SerializeFloat("Gold", this.Gold);
+        if (stream.DeepSerialize) stream.SerializeArray("Units", this.Units);
+        if (stream.DeepSerialize) stream.SerializeArray("Cities", this.Cities);
+    }
+    
+    public override void Read(ISerializerStream stream) {
+		base.Read(stream);
+        		this.Name = stream.DeserializeString("Name");;
+        		this.Food = stream.DeserializeFloat("Food");;
+        		this.Gold = stream.DeserializeFloat("Gold");;
+if (stream.DeepSerialize) {
+        this.Units.Clear();
+        this.Units.AddRange(stream.DeserializeObjectArray<UnitViewModel>("Units"));
+}
+if (stream.DeepSerialize) {
+        this.Cities.Clear();
+        this.Cities.AddRange(stream.DeserializeObjectArray<CityViewModel>("Cities"));
+}
+    }
+    
+    public override void Unbind() {
+        base.Unbind();
+        _UnitsProperty.CollectionChanged -= UnitsCollectionChanged;
+        _CitiesProperty.CollectionChanged -= CitiesCollectionChanged;
+    }
+    
+    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
+        base.FillProperties(list);;
+        list.Add(new ViewModelPropertyInfo(_NameProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_FoodProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_GoldProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_UnitsProperty, true, true, false));
+        list.Add(new ViewModelPropertyInfo(_CitiesProperty, true, true, false));
+    }
+    
+    protected override void FillCommands(List<ViewModelCommandInfo> list) {
+        base.FillCommands(list);;
+    }
+    
+    protected override void UnitsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
+        foreach (var item in args.OldItems.OfType<UnitViewModel>()) item.ParentFaction = null;;
+        foreach (var item in args.NewItems.OfType<UnitViewModel>()) item.ParentFaction = this;;
+    }
+    
+    protected override void CitiesCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
+        foreach (var item in args.OldItems.OfType<CityViewModel>()) item.ParentFaction = null;;
+        foreach (var item in args.NewItems.OfType<CityViewModel>()) item.ParentFaction = this;;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public class CityViewModelBase : ViewModel {
+    
+    public P<String> _NameProperty;
+    
+    public ModelCollection<BuildingViewModel> _BuildingsProperty;
+    
+    public CityViewModelBase(CityControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public CityViewModelBase() : 
+            base() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        _NameProperty = new P<String>(this, "Name");
+        _BuildingsProperty = new ModelCollection<BuildingViewModel>(this, "Buildings");
+        _BuildingsProperty.CollectionChanged += BuildingsCollectionChanged;
+    }
+    
+    protected virtual void BuildingsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
+    }
+}
+
+public partial class CityViewModel : CityViewModelBase {
+    
+    private FactionViewModel _ParentFaction;
+    
+    public CityViewModel(CityControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public CityViewModel() : 
+            base() {
+    }
+    
+    public virtual P<String> NameProperty {
+        get {
+            return this._NameProperty;
+        }
+    }
+    
+    public virtual String Name {
+        get {
+            return _NameProperty.Value;
+        }
+        set {
+            _NameProperty.Value = value;
+        }
+    }
+    
+    public virtual ModelCollection<BuildingViewModel> Buildings {
+        get {
+            return this._BuildingsProperty;
+        }
+    }
+    
+    public virtual FactionViewModel ParentFaction {
+        get {
+            return this._ParentFaction;
+        }
+        set {
+            _ParentFaction = value;
+        }
+    }
+    
+    protected override void WireCommands(Controller controller) {
+    }
+    
+    public override void Write(ISerializerStream stream) {
+		base.Write(stream);
+        stream.SerializeString("Name", this.Name);
+        if (stream.DeepSerialize) stream.SerializeArray("Buildings", this.Buildings);
+    }
+    
+    public override void Read(ISerializerStream stream) {
+		base.Read(stream);
+        		this.Name = stream.DeserializeString("Name");;
+if (stream.DeepSerialize) {
+        this.Buildings.Clear();
+        this.Buildings.AddRange(stream.DeserializeObjectArray<BuildingViewModel>("Buildings"));
+}
+    }
+    
+    public override void Unbind() {
+        base.Unbind();
+        _BuildingsProperty.CollectionChanged -= BuildingsCollectionChanged;
+    }
+    
+    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
+        base.FillProperties(list);;
+        list.Add(new ViewModelPropertyInfo(_NameProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_BuildingsProperty, true, true, false));
+    }
+    
+    protected override void FillCommands(List<ViewModelCommandInfo> list) {
+        base.FillCommands(list);;
+    }
+    
+    protected override void BuildingsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
+        foreach (var item in args.OldItems.OfType<BuildingViewModel>()) item.ParentCity = null;;
+        foreach (var item in args.NewItems.OfType<BuildingViewModel>()) item.ParentCity = this;;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public class BuildingViewModelBase : ViewModel {
+    
+    public BuildingViewModelBase(BuildingControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public BuildingViewModelBase() : 
+            base() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+    }
+}
+
+public partial class BuildingViewModel : BuildingViewModelBase {
+    
+    private CityViewModel _ParentCity;
+    
+    public BuildingViewModel(BuildingControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public BuildingViewModel() : 
+            base() {
+    }
+    
+    public virtual CityViewModel ParentCity {
+        get {
+            return this._ParentCity;
+        }
+        set {
+            _ParentCity = value;
+        }
+    }
+    
+    protected override void WireCommands(Controller controller) {
+    }
+    
+    public override void Write(ISerializerStream stream) {
+		base.Write(stream);
+    }
+    
+    public override void Read(ISerializerStream stream) {
+		base.Read(stream);
+    }
+    
+    public override void Unbind() {
+        base.Unbind();
+    }
+    
+    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
+        base.FillProperties(list);;
+    }
+    
+    protected override void FillCommands(List<ViewModelCommandInfo> list) {
+        base.FillCommands(list);;
     }
 }
 

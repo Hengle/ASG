@@ -70,10 +70,18 @@ public abstract class ChunkViewBase : ViewBase {
     public virtual void ExecuteGenerateChunk() {
         this.ExecuteCommand(Chunk.GenerateChunk);
     }
+    
+    public virtual void ExecuteUpdateChunk() {
+        this.ExecuteCommand(Chunk.UpdateChunk);
+    }
+    
+    public virtual void ExecuteSaveChunkHexTexture() {
+        this.ExecuteCommand(Chunk.SaveChunkHexTexture);
+    }
 }
 
 [DiagramInfoAttribute("Ultimate Strategy Game")]
-public abstract class WorldManagerViewBase : ViewBase {
+public abstract class TerrainManagerViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
@@ -89,7 +97,7 @@ public abstract class WorldManagerViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _PixelToHeight;
+    public Single _PixelToHeight;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
@@ -125,7 +133,59 @@ public abstract class WorldManagerViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Single _HexagonSide;
+    public Int32 _HexagonSide;
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(TerrainManagerViewModel);
+        }
+    }
+    
+    public TerrainManagerViewModel TerrainManager {
+        get {
+            return ((TerrainManagerViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<TerrainManagerController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+        TerrainManagerViewModel terrainManager = ((TerrainManagerViewModel)(viewModel));
+        terrainManager.TerrainSeed = this._TerrainSeed;
+        terrainManager.RandomizeSeed = this._RandomizeSeed;
+        terrainManager.PixelsPerUnit = this._PixelsPerUnit;
+        terrainManager.PixelToHeight = this._PixelToHeight;
+        terrainManager.Altitudes = this._Altitudes;
+        terrainManager.ChunkSize = this._ChunkSize;
+        terrainManager.ChunkResolution = this._ChunkResolution;
+        terrainManager.ChunkCollisionResolution = this._ChunkCollisionResolution;
+        terrainManager.TerrainWidth = this._TerrainWidth;
+        terrainManager.TerrainHeight = this._TerrainHeight;
+        terrainManager.Detail = this._Detail;
+        terrainManager.AltitudeVariation = this._AltitudeVariation;
+        terrainManager.HexagonSide = this._HexagonSide;
+    }
+    
+    public virtual void ExecuteGenerateMap() {
+        this.ExecuteCommand(TerrainManager.GenerateMap);
+    }
+    
+    public virtual void ExecuteGenerateChunks() {
+        this.ExecuteCommand(TerrainManager.GenerateChunks);
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class WorldManagerViewBase : ViewBase {
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _TerrainManager;
     
     public override System.Type ViewModelType {
         get {
@@ -148,31 +208,293 @@ public abstract class WorldManagerViewBase : ViewBase {
     
     protected override void InitializeViewModel(ViewModel viewModel) {
         WorldManagerViewModel worldManager = ((WorldManagerViewModel)(viewModel));
-        worldManager.TerrainSeed = this._TerrainSeed;
-        worldManager.RandomizeSeed = this._RandomizeSeed;
-        worldManager.PixelsPerUnit = this._PixelsPerUnit;
-        worldManager.PixelToHeight = this._PixelToHeight;
-        worldManager.Altitudes = this._Altitudes;
-        worldManager.ChunkSize = this._ChunkSize;
-        worldManager.ChunkResolution = this._ChunkResolution;
-        worldManager.ChunkCollisionResolution = this._ChunkCollisionResolution;
-        worldManager.TerrainWidth = this._TerrainWidth;
-        worldManager.TerrainHeight = this._TerrainHeight;
-        worldManager.Detail = this._Detail;
-        worldManager.AltitudeVariation = this._AltitudeVariation;
-        worldManager.HexagonSide = this._HexagonSide;
-    }
-    
-    public virtual void ExecuteGenerateMap() {
-        this.ExecuteCommand(WorldManager.GenerateMap);
-    }
-    
-    public virtual void ExecuteGenerateChunks() {
-        this.ExecuteCommand(WorldManager.GenerateChunks);
+        worldManager.TerrainManager = this._TerrainManager == null ? null : this._TerrainManager.ViewModelObject as TerrainManagerViewModel;
     }
 }
 
-public class WorldManagerViewViewBase : WorldManagerViewBase {
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class AStarViewBase : ViewBase {
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(AStarViewModel);
+        }
+    }
+    
+    public AStarViewModel AStar {
+        get {
+            return ((AStarViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<AStarController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class GameLogicViewBase : ViewBase {
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _TurnCount;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _Player;
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(GameLogicViewModel);
+        }
+    }
+    
+    public GameLogicViewModel GameLogic {
+        get {
+            return ((GameLogicViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<GameLogicController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+        GameLogicViewModel gameLogic = ((GameLogicViewModel)(viewModel));
+        gameLogic.TurnCount = this._TurnCount;
+        gameLogic.Player = this._Player == null ? null : this._Player.ViewModelObject as PlayerViewModel;
+    }
+    
+    public virtual void ExecuteNextTurn() {
+        this.ExecuteCommand(GameLogic.NextTurn);
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class PlayerViewBase : ViewBase {
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Boolean _IsAI;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _Faction;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _SelectedUnit;
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(PlayerViewModel);
+        }
+    }
+    
+    public PlayerViewModel Player {
+        get {
+            return ((PlayerViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<PlayerController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+        PlayerViewModel player = ((PlayerViewModel)(viewModel));
+        player.IsAI = this._IsAI;
+        player.Faction = this._Faction == null ? null : this._Faction.ViewModelObject as FactionViewModel;
+        player.SelectedUnit = this._SelectedUnit == null ? null : this._SelectedUnit.ViewModelObject as UnitViewModel;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class UnitViewBase : ViewBase {
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(UnitViewModel);
+        }
+    }
+    
+    public UnitViewModel Unit {
+        get {
+            return ((UnitViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<UnitController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class FactionViewBase : ViewBase {
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public String _Name;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Single _Food;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Single _Gold;
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(FactionViewModel);
+        }
+    }
+    
+    public FactionViewModel Faction {
+        get {
+            return ((FactionViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<FactionController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+        FactionViewModel faction = ((FactionViewModel)(viewModel));
+        faction.Name = this._Name;
+        faction.Food = this._Food;
+        faction.Gold = this._Gold;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class CityViewBase : ViewBase {
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public String _Name;
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(CityViewModel);
+        }
+    }
+    
+    public CityViewModel City {
+        get {
+            return ((CityViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<CityController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+        CityViewModel city = ((CityViewModel)(viewModel));
+        city.Name = this._Name;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class BuildingViewBase : ViewBase {
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(BuildingViewModel);
+        }
+    }
+    
+    public BuildingViewModel Building {
+        get {
+            return ((BuildingViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<BuildingController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+    }
+}
+
+public class ChunkViewViewBase : ChunkViewBase {
+    
+    [UFToggleGroup("GenerateChunk")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindGenerateChunk = true;
+    
+    [UFToggleGroup("SaveChunkHexTexture")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSaveChunkHexTexture = true;
+    
+    [UFToggleGroup("UpdateChunk")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindUpdateChunk = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<ChunkController>());
+    }
+    
+    /// Invokes GenerateChunkExecuted when the GenerateChunk command is executed.
+    public virtual void GenerateChunkExecuted() {
+    }
+    
+    /// Invokes SaveChunkHexTextureExecuted when the SaveChunkHexTexture command is executed.
+    public virtual void SaveChunkHexTextureExecuted() {
+    }
+    
+    /// Invokes UpdateChunkExecuted when the UpdateChunk command is executed.
+    public virtual void UpdateChunkExecuted() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        if (this._BindGenerateChunk) {
+            this.BindCommandExecuted(Chunk.GenerateChunk, GenerateChunkExecuted);
+        }
+        if (this._BindSaveChunkHexTexture) {
+            this.BindCommandExecuted(Chunk.SaveChunkHexTexture, SaveChunkHexTextureExecuted);
+        }
+        if (this._BindUpdateChunk) {
+            this.BindCommandExecuted(Chunk.UpdateChunk, UpdateChunkExecuted);
+        }
+    }
+}
+
+public partial class ChunkView : ChunkViewViewBase {
+}
+
+public class TerrainManagerViewViewBase : TerrainManagerViewBase {
     
     [UFToggleGroup("GenerateMap")]
     [UnityEngine.HideInInspector()]
@@ -195,7 +517,7 @@ public class WorldManagerViewViewBase : WorldManagerViewBase {
     public UnityEngine.Transform _ChunksContainer;
     
     public override ViewModel CreateModel() {
-        return this.RequestViewModel(GameManager.Container.Resolve<WorldManagerController>());
+        return this.RequestViewModel(GameManager.Container.Resolve<TerrainManagerController>());
     }
     
     /// Invokes GenerateMapExecuted when the GenerateMap command is executed.
@@ -222,41 +544,93 @@ public class WorldManagerViewViewBase : WorldManagerViewBase {
     public override void Bind() {
         base.Bind();
         if (this._BindGenerateMap) {
-            this.BindCommandExecuted(WorldManager.GenerateMap, GenerateMapExecuted);
+            this.BindCommandExecuted(TerrainManager.GenerateMap, GenerateMapExecuted);
         }
         if (this._BindGenerateChunks) {
-            this.BindCommandExecuted(WorldManager.GenerateChunks, GenerateChunksExecuted);
+            this.BindCommandExecuted(TerrainManager.GenerateChunks, GenerateChunksExecuted);
         }
         if (this._BindChunks) {
-            this.BindToViewCollection( WorldManager._ChunksProperty, viewModel=>{ return CreateChunksView(viewModel as ChunkViewModel); }, ChunksAdded, ChunksRemoved, _ChunksContainer, _ChunksSceneFirst);
+            this.BindToViewCollection( TerrainManager._ChunksProperty, viewModel=>{ return CreateChunksView(viewModel as ChunkViewModel); }, ChunksAdded, ChunksRemoved, _ChunksContainer, _ChunksSceneFirst);
         }
     }
 }
 
-public partial class WorldManagerView : WorldManagerViewViewBase {
+public partial class TerrainManagerView : TerrainManagerViewViewBase {
 }
 
-public class ChunkViewViewBase : ChunkViewBase {
+public class GameLogicGUIViewBase : GameLogicViewBase {
     
-    [UFToggleGroup("GenerateChunk")]
+    [UFToggleGroup("TurnCount")]
     [UnityEngine.HideInInspector()]
-    public bool _BindGenerateChunk = true;
+    [UFRequireInstanceMethod("TurnCountChanged")]
+    public bool _BindTurnCount = true;
+    
+    [UFToggleGroup("NextTurn")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindNextTurn = true;
+    
+    [UFToggleGroup("Factions")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindFactions = true;
     
     public override ViewModel CreateModel() {
-        return this.RequestViewModel(GameManager.Container.Resolve<ChunkController>());
+        return this.RequestViewModel(GameManager.Container.Resolve<GameLogicController>());
     }
     
-    /// Invokes GenerateChunkExecuted when the GenerateChunk command is executed.
-    public virtual void GenerateChunkExecuted() {
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void TurnCountChanged(Int32 value) {
+    }
+    
+    /// Invokes NextTurnExecuted when the NextTurn command is executed.
+    public virtual void NextTurnExecuted() {
+    }
+    
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public virtual void FactionsAdded(FactionViewModel item) {
+    }
+    
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public virtual void FactionsRemoved(FactionViewModel item) {
     }
     
     public override void Bind() {
         base.Bind();
-        if (this._BindGenerateChunk) {
-            this.BindCommandExecuted(Chunk.GenerateChunk, GenerateChunkExecuted);
+        if (this._BindTurnCount) {
+            this.BindProperty(GameLogic._TurnCountProperty, this.TurnCountChanged);
+        }
+        if (this._BindNextTurn) {
+            this.BindCommandExecuted(GameLogic.NextTurn, NextTurnExecuted);
+        }
+        if (this._BindFactions) {
+            this.BindCollection(GameLogic._FactionsProperty, FactionsAdded, FactionsRemoved);
         }
     }
 }
 
-public partial class ChunkView : ChunkViewViewBase {
+public partial class GameLogicGUI : GameLogicGUIViewBase {
+}
+
+public class PlayerViewViewBase : PlayerViewBase {
+    
+    [UFToggleGroup("SelectedUnit")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSelectedUnit = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<PlayerController>());
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void SelectedUnitChanged(UnitViewModel value) {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        if (this._BindSelectedUnit) {
+            this.BindProperty(Player._SelectedUnitProperty, this.SelectedUnitChanged);
+        }
+    }
+}
+
+public partial class PlayerView : PlayerViewViewBase {
 }

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class TerrainManager : MonoBehaviour 
+public class TerrainManager2 : MonoBehaviour 
 {
 
 
