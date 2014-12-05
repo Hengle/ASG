@@ -7,8 +7,8 @@ using UniRx;
 using System.IO;
 
 
-public partial class ChunkView 
-{ 
+public partial class ChunkView
+{
 
 
     private int chunkSize, chunkResolution, collisionResolution, pixelsPerUnit;
@@ -30,7 +30,7 @@ public partial class ChunkView
     public Color[] altitudes;
 
 
-    void Start ()
+    void Start()
     {
         chunkSize = Chunk.ParentTerrainManager.ChunkSize;
         chunkResolution = Chunk.ParentTerrainManager.ChunkResolution;
@@ -44,21 +44,25 @@ public partial class ChunkView
 
         // The issue is here -----------------------------------------------------
 
-        ProceduralMaterial s = renderer.sharedMaterial as ProceduralMaterial;
-        s.isReadable = true;
         substance = renderer.material as ProceduralMaterial;
         substance.isReadable = true;
-       
-        substanceTexture = substance.GetGeneratedTexture(substance.GetGeneratedTextures()[0].name);
-        substanceTexture2D = new Texture2D(substanceTexture.width, substanceTexture.height, TextureFormat.ARGB32, false);
-        substance.SetProceduralTexture("Hexagon_Heights", hexBiomeMap);
 
+        substance.SetProceduralTexture("biome_data", hexBiomeMap);
+        substance.SetProceduralTexture("hexagon_heightmap", hexHeightmap);
+        // If you want to use a non-zero value without causing super blurry seams, set the Blur node to "No Tiling" in your Substance Graph
+        //substance.SetProceduralFloat("Blur_Intensity", 0.0f);
         substance.RebuildTexturesImmediately();
-        
 
-        substanceTexture2D.wrapMode = TextureWrapMode.Clamp;
+        substanceTexture = substance.GetGeneratedTexture("Terrain_HeightMap");
+        substanceTexture2D = new Texture2D(substanceTexture.width, substanceTexture.height, TextureFormat.ARGB32, false);
         substanceTexture2D.SetPixels32(substanceTexture.GetPixels32(0, 0, substanceTexture.width, substanceTexture.height));
         substanceTexture2D.Apply();
+        substanceTexture2D.wrapMode = TextureWrapMode.Clamp;
+
+        // Set the wrapping mode of the generated diffuse and normal outputs to Clamp
+        substance.GetGeneratedTexture(substance.GetGeneratedTextures()[0].name).wrapMode = TextureWrapMode.Clamp;
+        substance.GetGeneratedTexture(substance.GetGeneratedTextures()[1].name).wrapMode = TextureWrapMode.Clamp;
+
 
         //------------------------------------------------------------------------
 
@@ -69,7 +73,7 @@ public partial class ChunkView
         //substance.RebuildTexturesImmediately();
 
         //proceduralTexture = substance.GetGeneratedTexture("TerrainTest2_diffuse"); //substance.GetProceduralTexture("TerrainTest2_diffuse");
-        
+
 
         //temp = new Texture2D(proceduralTexture.width, proceduralTexture.height, TextureFormat.ARGB32, false);
         //var pixels = proceduralTexture.GetPixels32(0, 0, proceduralTexture.width, proceduralTexture.height);
@@ -84,17 +88,18 @@ public partial class ChunkView
         //substanceTexture2D = new Texture2D(proceduralTexture.width, proceduralTexture.height, TextureFormat.RGB24, false);
         //substanceTexture2D.SetPixels32(proceduralTexture.GetPixels32(0, 0, proceduralTexture.width, proceduralTexture.height));
         //substanceTexture2D.Apply();
-        
+
 
         GenerateMesh();
         GenerateCollisionMesh();
         //GenerateTexture();
-       
+
     }
 
 
     /// Invokes GenerateChunkExecuted when the GenerateChunk command is executed.
-    public override void GenerateChunkExecuted() {
+    public override void GenerateChunkExecuted()
+    {
         base.GenerateChunkExecuted();
 
         chunkSize = Chunk.ParentTerrainManager.ChunkSize;
@@ -151,25 +156,6 @@ public partial class ChunkView
             }
         }
 
-        // SEt edges
-        Color col;
-        Color col2;
-        for (int x = 0; x <= chunkSize; x++)
-        {
-            col = texture.GetPixel(x, 0);
-            texture.SetPixel(x, 0, new Color(col.r, col.g, col.b, 0));
-            col2 = texture.GetPixel(x, chunkSize);
-            texture.SetPixel(x, chunkSize, new Color(col2.r, col2.g, col2.b, 0));
-        }
-
-        for (int y = 0; y <= chunkSize; y++)
-        {
-            col = texture.GetPixel(0, y);
-            texture.SetPixel(0, y, new Color(col.r, col.g, col.b, 0));
-            col2 = texture.GetPixel(chunkSize, y);
-            texture.SetPixel(chunkSize, y, new Color(col2.r, col2.g, col2.b, 0));
-
-        }
 
         texture.Apply();
         return texture;
@@ -178,7 +164,7 @@ public partial class ChunkView
     public Texture2D DrawHexBiomeMap(int dataX, int dataY)
     {
 
-        Texture2D texture = new Texture2D(chunkSize, chunkSize); 
+        Texture2D texture = new Texture2D(chunkSize, chunkSize);
         texture.wrapMode = TextureWrapMode.Clamp;
 
         float terrainVal = 0;
@@ -246,10 +232,7 @@ public partial class ChunkView
             {
                 if (x + centerX >= 0 && x + centerX <= chunkSize && y + centerY >= 0 && y + centerY <= chunkSize)
                 {
-                    //if (x <= 0 || y <= 0 || x + centerX >= chunkSize || y + centerY >= chunkSize)
-                    //    texture.SetPixel(x + centerX, y + centerY, new Color(color.r, color.g, color.b, 0));
-                    //else
-                        texture.SetPixel(x + centerX, y + centerY, new Color(color.r, color.g, color.b, 1));
+                    texture.SetPixel(x + centerX, y + centerY, color);
                 }
             }
         }
@@ -262,7 +245,7 @@ public partial class ChunkView
         mesh.Clear();
 
         // Pixels per vetex point
-        float resStep = chunkSize / chunkResolution;
+        float resStep = (float)chunkSize / (float)chunkResolution;
         float uvStep = 1f / chunkSize;
 
         vertices = new Vector3[(chunkResolution + 1) * (chunkResolution + 1)];
@@ -275,7 +258,7 @@ public partial class ChunkView
             for (int x = 0; x <= chunkResolution; x++, v++)
             {
                 vertices[v] = new Vector3(x * resStep / pixelsPerUnit,
-                                          hexHeightmap.GetPixel((int)(x * resStep), (int)(z * resStep)).grayscale * Chunk.ParentTerrainManager.PixelToHeight, //, //Chunk.ParentTerrainManager.terrainData[x + Chunk.TerrainDataX, z + Chunk.TerrainDataY] * Chunk.ParentTerrainManager.PixelToHeight
+                                          substanceTexture2D.GetPixel((int)(x * resStep), (int)(z * resStep)).grayscale * Chunk.ParentTerrainManager.PixelToHeight, //, //Chunk.ParentTerrainManager.terrainData[x + Chunk.TerrainDataX, z + Chunk.TerrainDataY] * Chunk.ParentTerrainManager.PixelToHeight
                                           z * resStep / pixelsPerUnit
                                           );
 
@@ -309,7 +292,7 @@ public partial class ChunkView
 
     }
 
-    
+
     private void GenerateCollisionMesh()
     {
 
@@ -327,7 +310,7 @@ public partial class ChunkView
             for (int x = 0; x <= collisionResolution; x++, v++)
             {
                 colVertices[v] = new Vector3(x * resStep / pixelsPerUnit,
-                                             hexHeightmap.GetPixel((int)(x * resStep), (int)(z * resStep)).grayscale * Chunk.ParentTerrainManager.PixelToHeight,
+                                             substanceTexture2D.GetPixel((int)(x * resStep), (int)(z * resStep)).grayscale * Chunk.ParentTerrainManager.PixelToHeight,
                                              z * resStep / pixelsPerUnit
                                              );
             }
@@ -355,7 +338,7 @@ public partial class ChunkView
 
 
     }
-    
+
 
     private float GetXDerivative(int x, int z)
     {

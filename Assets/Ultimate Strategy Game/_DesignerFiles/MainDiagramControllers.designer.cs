@@ -217,3 +217,37 @@ public abstract class BuildingControllerBase : Controller {
         this.InitializeBuilding(((BuildingViewModel)(viewModel)));
     }
 }
+
+public abstract class KristianControllerBase : Controller {
+    
+    public abstract void InitializeKristian(KristianViewModel kristian);
+    
+    public override ViewModel CreateEmpty() {
+        return new KristianViewModel(this);
+    }
+    
+    public virtual KristianViewModel CreateKristian() {
+        return ((KristianViewModel)(this.Create()));
+    }
+    
+    public override void Initialize(ViewModel viewModel) {
+        this.InitializeKristian(((KristianViewModel)(viewModel)));
+    }
+}
+
+public abstract class TerrainElementControllerBase : Controller {
+    
+    public abstract void InitializeTerrainElement(TerrainElementViewModel terrainElement);
+    
+    public override ViewModel CreateEmpty() {
+        return new TerrainElementViewModel(this);
+    }
+    
+    public virtual TerrainElementViewModel CreateTerrainElement() {
+        return ((TerrainElementViewModel)(this.Create()));
+    }
+    
+    public override void Initialize(ViewModel viewModel) {
+        this.InitializeTerrainElement(((TerrainElementViewModel)(viewModel)));
+    }
+}

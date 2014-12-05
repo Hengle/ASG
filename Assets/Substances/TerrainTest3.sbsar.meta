@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2f50b4b96cdccd044bf05ea87a823479
+guid: 9731a7eed67c3a4459a4a58555a50c3e
 SubstanceImporter:
   serializedVersion: 5
   materialInstances:
   - serializedVersion: 12
-    name: Terrain
+    name: TerrainTest2
     prototypeName: TerrainTest2
     shader: {fileID: 4, guid: 0000000000000000f000000000000000, type: 0}
     inputs:
@@ -12,6 +12,13 @@ SubstanceImporter:
       value:
         scalar[0]: 8
         scalar[1]: 8
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: Hexagon_Heights
+      value:
+        scalar[0]: 0
+        scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
         texture: {instanceID: 0}
@@ -29,65 +36,9 @@ SubstanceImporter:
         scalar[2]: 0
         scalar[3]: 0
         texture: {instanceID: 0}
-    - name: Blur_Intensity
+    - name: Height_Map_Blur
       value:
         scalar[0]: 3
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: Terrain_Noise
-      value:
-        scalar[0]: 0
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: Normal_Intensity
-      value:
-        scalar[0]: .779999971
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: Hexagon_Heights
-      value:
-        scalar[0]: 0
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: biome_data
-      value:
-        scalar[0]: 0
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: hexagon_heightmap
-      value:
-        scalar[0]: 0
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: biome_blur
-      value:
-        scalar[0]: 4
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: normal_intensity
-      value:
-        scalar[0]: .779999971
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: heightmap_blur
-      value:
-        scalar[0]: 4.21000004
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -96,8 +47,8 @@ SubstanceImporter:
       serializedVersion: 5
       offset: {x: 0, y: 0}
       scale: {x: 1, y: 1}
-      generateMipmaps: 1
-      generateAllOutputs: 1
+      generateMipmaps: 0
+      generateAllOutputs: 0
       animationUpdateRate: 0
     materialProperties:
       serializedVersion: 2
@@ -131,22 +82,12 @@ SubstanceImporter:
             name: _SpecColor
           second: {r: .5, g: .5, b: .5, a: 1}
     textureParameters:
-    - name: Terrain_diffuse
+    - name: TerrainTest2_diffuse
       alphaSource: 5
       filterMode: 1
       aniso: 1
       wrapMode: 0
-    - name: Terrain_Normal
-      alphaSource: 0
-      filterMode: 1
-      aniso: 1
-      wrapMode: 0
-    - name: Terrain_output
-      alphaSource: 0
-      filterMode: 1
-      aniso: 1
-      wrapMode: 0
-    - name: Terrain_HeightMap
+    - name: TerrainTest2_output
       alphaSource: 0
       filterMode: 1
       aniso: 1
@@ -155,11 +96,11 @@ SubstanceImporter:
     - shaderProp:
         name: _MainTex
       material: {instanceID: 0}
-      baseUID: 1506879227
+      baseUID: 1505891072
     - shaderProp:
         name: _BumpMap
       material: {instanceID: 0}
-      baseUID: 1506884963
+      baseUID: 1446323693
     buildTargetSettings:
     - serializedVersion: 2
       buildTarget: 

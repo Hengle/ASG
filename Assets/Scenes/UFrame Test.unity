@@ -373,8 +373,8 @@ MonoBehaviour:
   _Save: 0
   _TerrainSeed: 0
   _RandomizeSeed: 0
-  _PixelsPerUnit: 8
-  _PixelToHeight: 4
+  _PixelsPerUnit: 16
+  _PixelToHeight: 6
   _Altitudes: .166600004
   _ChunkSize: 512
   _ChunkResolution: 64
@@ -384,8 +384,8 @@ MonoBehaviour:
   _Detail: .75
   _AltitudeVariation: .913999975
   _HexagonSide: 30
-  _RiverCount: 3
-  _MinRiverHeight: 4
+  _RiverCount: 0
+  _MinRiverHeight: 5
   _MinRiverStrength: 8
   _MaxRiverStrength: 8
   _BindGenerateMap: 1
@@ -678,6 +678,8 @@ MonoBehaviour:
   _SelectedUnit: {fileID: 0}
   _BindSelectedUnit: 1
   hoverHexHeightLight: {fileID: 0}
+  hoverHexAraray: {x: 0, y: 0}
+  terrain: {fileID: 0}
 --- !u!4 &884823654
 Transform:
   m_ObjectHideFlags: 0
@@ -797,7 +799,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: _PixelToHeight
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: _InjectView
@@ -809,7 +811,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: _PixelsPerUnit
-      value: 8
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: _Altitudes
@@ -825,11 +827,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: _RiverCount
-      value: 3
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: _MinRiverHeight
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: _MinRiverStrength

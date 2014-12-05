@@ -1505,6 +1505,127 @@ public partial class BuildingViewModel : BuildingViewModelBase {
     }
 }
 
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public class KristianViewModelBase : ViewModel {
+    
+    public P<Int32> _ageProperty;
+    
+    public KristianViewModelBase(KristianControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public KristianViewModelBase() : 
+            base() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        _ageProperty = new P<Int32>(this, "age");
+    }
+}
+
+public partial class KristianViewModel : KristianViewModelBase {
+    
+    public KristianViewModel(KristianControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public KristianViewModel() : 
+            base() {
+    }
+    
+    public virtual P<Int32> ageProperty {
+        get {
+            return this._ageProperty;
+        }
+    }
+    
+    public virtual Int32 age {
+        get {
+            return _ageProperty.Value;
+        }
+        set {
+            _ageProperty.Value = value;
+        }
+    }
+    
+    protected override void WireCommands(Controller controller) {
+    }
+    
+    public override void Write(ISerializerStream stream) {
+		base.Write(stream);
+        stream.SerializeInt("age", this.age);
+    }
+    
+    public override void Read(ISerializerStream stream) {
+		base.Read(stream);
+        		this.age = stream.DeserializeInt("age");;
+    }
+    
+    public override void Unbind() {
+        base.Unbind();
+    }
+    
+    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
+        base.FillProperties(list);;
+        list.Add(new ViewModelPropertyInfo(_ageProperty, false, false, false));
+    }
+    
+    protected override void FillCommands(List<ViewModelCommandInfo> list) {
+        base.FillCommands(list);;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public class TerrainElementViewModelBase : ViewModel {
+    
+    public TerrainElementViewModelBase(TerrainElementControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public TerrainElementViewModelBase() : 
+            base() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+    }
+}
+
+public partial class TerrainElementViewModel : TerrainElementViewModelBase {
+    
+    public TerrainElementViewModel(TerrainElementControllerBase controller, bool initialize = true) : 
+            base(controller, initialize) {
+    }
+    
+    public TerrainElementViewModel() : 
+            base() {
+    }
+    
+    protected override void WireCommands(Controller controller) {
+    }
+    
+    public override void Write(ISerializerStream stream) {
+		base.Write(stream);
+    }
+    
+    public override void Read(ISerializerStream stream) {
+		base.Read(stream);
+    }
+    
+    public override void Unbind() {
+        base.Unbind();
+    }
+    
+    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
+        base.FillProperties(list);;
+    }
+    
+    protected override void FillCommands(List<ViewModelCommandInfo> list) {
+        base.FillCommands(list);;
+    }
+}
+
 public enum TerrainType {
     
     GrassLand,

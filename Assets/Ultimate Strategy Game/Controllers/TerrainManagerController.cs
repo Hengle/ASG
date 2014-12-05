@@ -174,19 +174,21 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
             while (riverStrength > 0)
             {
-                // Got down the path fo the lowest neighbor height
+                /* Got down the path fo the lowest neighbor height
                 for (int n = 0; n < 6; n++)
                 {
-                    if (nextHex.neighbors[n] != null && nextHex.neighbors[n].heightmapHeight <= nextHex.heightmapHeight)
+                    if (nextHex.neighbors[n] != null && nextHex.neighbors[n].heightmapHeight < nextHex.heightmapHeight)
                     {
                         nextHex = nextHex.neighbors[n];
                         break;
                     }else{
-                        //if (n == 5)
-                         //   nextHex
+                        if (n == 5)
+                            nextHex = nextHex.neighbors[(int)UnityEngine.Random.Range(0, 5)];
                     }
                     
-                }
+                }*/
+
+                nextHex = nextHex.neighbors[(int)UnityEngine.Random.Range(0, 5)];
 
                 nextHex.RiverStrength = riverStrength;
                 Debug.Log("Flowing " + nextHex.arrayCoord);

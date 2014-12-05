@@ -467,6 +467,64 @@ public abstract class BuildingViewBase : ViewBase {
     }
 }
 
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class KristianViewBase : ViewBase {
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _age;
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(KristianViewModel);
+        }
+    }
+    
+    public KristianViewModel Kristian {
+        get {
+            return ((KristianViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<KristianController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+        KristianViewModel kristian = ((KristianViewModel)(viewModel));
+        kristian.age = this._age;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class TerrainElementViewBase : ViewBase {
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(TerrainElementViewModel);
+        }
+    }
+    
+    public TerrainElementViewModel TerrainElement {
+        get {
+            return ((TerrainElementViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<TerrainElementController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+    }
+}
+
 public class ChunkViewViewBase : ChunkViewBase {
     
     [UFToggleGroup("GenerateChunk")]

@@ -13,7 +13,9 @@ public partial class PlayerView
     public Hex hoverHex;
     public GameObject hoverHexHeightLight;
 
+    public Vector2 hoverHexAraray;
 
+    public TerrainManagerView terrain;
 
     /// Subscribes to the property and is notified anytime the value changes.
     public override void SelectedUnitChanged(UnitViewModel value) 
@@ -23,19 +25,21 @@ public partial class PlayerView
 
     void FixedUpdate()
     {
-        //HexSelect();
+        HexSelect();
+        
     }
 
-    /*
+    
     void HexSelect()
     {
+        /*
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 200))
         {
             Debug.DrawLine(ray.origin, hit.point);
 
-            float stepSize = 1f / chunkSize;
+            float stepSize = 1f / chunkSize; 
             float resScale = chunkSize / chunkResolution;
 
 
@@ -43,13 +47,13 @@ public partial class PlayerView
             float pointZ = hit.point.z;
             pointX = pointX * pixelsPerUnit;
             pointZ = pointZ * pixelsPerUnit;
-            pointZ += hexProperties.tileH;
-            pointX -= hexProperties.width / 2;
-            pointZ -= (hexProperties.height - hexProperties.tileH);
+            pointZ += HexProperties.tileH;
+            pointX -= HexProperties.width / 2;
+            pointZ -= (HexProperties.height - HexProperties.tileH);
 
 
-            float q = (1f / 3f * Mathf.Sqrt(3f) * pointX - 1f / 3f * pointZ) / hexProperties.side;
-            float r = 2f / 3f * pointZ / hexProperties.side;
+            float q = (1f / 3f * Mathf.Sqrt(3f) * pointX - 1f / 3f * pointZ) / HexProperties.side;
+            float r = 2f / 3f * pointZ / HexProperties.side;
 
 
             Vector3 cube = new Vector3();
@@ -70,7 +74,7 @@ public partial class PlayerView
             if (Input.GetButton("Fire1"))
             {
                 int pathCost = 0;
-                path = Pathfinding.GetPath(hexGrid[2, 2], hoverHex, pathCost);
+                //path = Pathfinding.GetPath(hexGrid[2, 2], hoverHex, pathCost);
                 Debug.Log(pathCost);
             }
 
@@ -84,12 +88,8 @@ public partial class PlayerView
         {
             hoverHexHeightLight.transform.position = Vector3.up * -100;
         }
-
+        */
 
     }
-    */
-
-
-
 
 }

@@ -25,6 +25,7 @@ public partial class TerrainManagerView
         if (Input.GetKeyDown(KeyCode.G))
         {
             ExecuteGenerateMap();
+         
         }
     }
 
@@ -94,7 +95,7 @@ public partial class TerrainManagerView
 
     void OnDrawGizmos()
     {
-        if (displayHexNodes)
+        if (displayHexNodes && TerrainManager.hexGrid != null)
         {
             Gizmos.color = Color.white;
             Vector2 arrayPos = Vector2.zero;
@@ -102,7 +103,7 @@ public partial class TerrainManagerView
             {
                 for (int y = 0; y < TerrainManager.hexGrid.GetLength(1); y++)
                 {
-                    Gizmos.DrawWireSphere(TerrainManager.hexGrid[x, y].worldPos, 0.35f);
+                    Gizmos.DrawWireSphere(new Vector3(TerrainManager.hexGrid[x, y].worldPos.x, TerrainManager.PixelToHeight / (6 / TerrainManager.hexGrid[x, y].height), TerrainManager.hexGrid[x, y].worldPos.z), 1f);
                     //if (hoverHex == hexGrid[x, y])
                     //Gizmos.DrawWireSphere(hexGrid[x, y].worldPos, 0.5f);
 

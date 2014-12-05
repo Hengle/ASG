@@ -34,6 +34,10 @@ public class MainTerrainBase : SceneManager {
     
     private AStarController _AStarController;
     
+    private KristianController _KristianController;
+    
+    private TerrainElementController _TerrainElementController;
+    
     private GameLogicController _GameLogicController;
     
     private PlayerController _PlayerController;
@@ -97,6 +101,32 @@ public class MainTerrainBase : SceneManager {
         }
         set {
             _AStarController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual KristianController KristianController {
+        get {
+            if ((this._KristianController == null)) {
+                this._KristianController = new KristianController() { Container = Container };
+            }
+            return this._KristianController;
+        }
+        set {
+            _KristianController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual TerrainElementController TerrainElementController {
+        get {
+            if ((this._TerrainElementController == null)) {
+                this._TerrainElementController = new TerrainElementController() { Container = Container };
+            }
+            return this._TerrainElementController;
+        }
+        set {
+            _TerrainElementController = value;
         }
     }
     
@@ -189,6 +219,8 @@ public class MainTerrainBase : SceneManager {
         Container.RegisterController<TerrainManagerController>(TerrainManagerController);
         Container.RegisterController<WorldManagerController>(WorldManagerController);
         Container.RegisterController<AStarController>(AStarController);
+        Container.RegisterController<KristianController>(KristianController);
+        Container.RegisterController<TerrainElementController>(TerrainElementController);
         Container.RegisterController<GameLogicController>(GameLogicController);
         Container.RegisterController<PlayerController>(PlayerController);
         Container.RegisterController<UnitController>(UnitController);
