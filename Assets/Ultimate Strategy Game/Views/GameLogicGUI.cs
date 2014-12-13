@@ -6,28 +6,8 @@ using UnityEngine;
 using UniRx;
 
 
-public partial class GameLogicGUI {
-    
-    /// Subscribes to the property and is notified anytime the value changes.
-    public override void TurnCountChanged(Int32 value) {
-        base.TurnCountChanged(value);
-    }
-    
-    /// Invokes NextTurnExecuted when the NextTurn command is executed.
-    public override void NextTurnExecuted() {
-        base.NextTurnExecuted();
-    }
-    
-    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public override void FactionsAdded(FactionViewModel item) {
-        base.FactionsAdded(item);
-    }
-    
-    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public override void FactionsRemoved(FactionViewModel item) {
-        base.FactionsRemoved(item);
-    }
-
+public partial class GameLogicGUI 
+{ 
     
     public void NextTurn ()
     {

@@ -26,6 +26,8 @@ public sealed partial class MainTerrainSettings {
 // </summary>
 public class MainTerrainBase : SceneManager {
     
+    private TerrainManagerViewModel _TerrainManager;
+    
     private ChunkController _ChunkController;
     
     private TerrainManagerController _TerrainManagerController;
@@ -33,8 +35,6 @@ public class MainTerrainBase : SceneManager {
     private WorldManagerController _WorldManagerController;
     
     private AStarController _AStarController;
-    
-    private KristianController _KristianController;
     
     private TerrainElementController _TerrainElementController;
     
@@ -50,7 +50,26 @@ public class MainTerrainBase : SceneManager {
     
     private BuildingController _BuildingController;
     
+    private AIPlayerController _AIPlayerController;
+    
+    private SettlerUnitController _SettlerUnitController;
+    
+    private CombatUnitController _CombatUnitController;
+    
     public MainTerrainSettings _MainTerrainSettings = new MainTerrainSettings();
+    
+    [Inject("TerrainManager")]
+    public virtual TerrainManagerViewModel TerrainManager {
+        get {
+            if ((this._TerrainManager == null)) {
+                this._TerrainManager = CreateInstanceViewModel<TerrainManagerViewModel>(TerrainManagerController, "TerrainManager");
+            }
+            return this._TerrainManager;
+        }
+        set {
+            _TerrainManager = value;
+        }
+    }
     
     [Inject()]
     public virtual ChunkController ChunkController {
@@ -101,19 +120,6 @@ public class MainTerrainBase : SceneManager {
         }
         set {
             _AStarController = value;
-        }
-    }
-    
-    [Inject()]
-    public virtual KristianController KristianController {
-        get {
-            if ((this._KristianController == null)) {
-                this._KristianController = new KristianController() { Container = Container };
-            }
-            return this._KristianController;
-        }
-        set {
-            _KristianController = value;
         }
     }
     
@@ -208,6 +214,45 @@ public class MainTerrainBase : SceneManager {
         }
     }
     
+    [Inject()]
+    public virtual AIPlayerController AIPlayerController {
+        get {
+            if ((this._AIPlayerController == null)) {
+                this._AIPlayerController = new AIPlayerController() { Container = Container };
+            }
+            return this._AIPlayerController;
+        }
+        set {
+            _AIPlayerController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual SettlerUnitController SettlerUnitController {
+        get {
+            if ((this._SettlerUnitController == null)) {
+                this._SettlerUnitController = new SettlerUnitController() { Container = Container };
+            }
+            return this._SettlerUnitController;
+        }
+        set {
+            _SettlerUnitController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual CombatUnitController CombatUnitController {
+        get {
+            if ((this._CombatUnitController == null)) {
+                this._CombatUnitController = new CombatUnitController() { Container = Container };
+            }
+            return this._CombatUnitController;
+        }
+        set {
+            _CombatUnitController = value;
+        }
+    }
+    
     // <summary>
     // This method is the first method to be invoked when the scene first loads. Anything registered here with 'Container' will effectively 
     // be injected on controllers, and instances defined on a subsystem.And example of this would be Container.RegisterInstance<IDataRepository>(new CodeRepository()). Then any property with 
@@ -215,11 +260,11 @@ public class MainTerrainBase : SceneManager {
     // </summary>
     public override void Setup() {
         base.Setup();
+        Container.RegisterViewModel<TerrainManagerViewModel>(TerrainManager,"TerrainManager");
         Container.RegisterController<ChunkController>(ChunkController);
         Container.RegisterController<TerrainManagerController>(TerrainManagerController);
         Container.RegisterController<WorldManagerController>(WorldManagerController);
         Container.RegisterController<AStarController>(AStarController);
-        Container.RegisterController<KristianController>(KristianController);
         Container.RegisterController<TerrainElementController>(TerrainElementController);
         Container.RegisterController<GameLogicController>(GameLogicController);
         Container.RegisterController<PlayerController>(PlayerController);
@@ -227,7 +272,11 @@ public class MainTerrainBase : SceneManager {
         Container.RegisterController<FactionController>(FactionController);
         Container.RegisterController<CityController>(CityController);
         Container.RegisterController<BuildingController>(BuildingController);
+        Container.RegisterController<AIPlayerController>(AIPlayerController);
+        Container.RegisterController<SettlerUnitController>(SettlerUnitController);
+        Container.RegisterController<CombatUnitController>(CombatUnitController);
         this.Container.InjectAll();
+        TerrainManagerController.Initialize(TerrainManager);
     }
     
     public override void Initialize() {

@@ -7,79 +7,97 @@ using UniRx;
 
 
 public partial class PlayerView 
-{
+{ 
 
-        
-    public Hex hoverHex;
     public GameObject hoverHexHeightLight;
 
     public Vector2 hoverHexAraray;
 
     public TerrainManagerView terrain;
 
+    public Transform pathContainer;
+    public GameObject pathPrefab;
+    public List<Transform> pathNodes;
+
+    public int pathNodeCount = 30;
+
+
+
+    public override void Start()
+    {
+        base.Start();
+
+        SetupPathNodes();
+    }
+
+    private void SetupPathNodes ()
+    {
+        Transform newPath;
+        // Pool the path nodes at the start
+        for (int p = 0; p < pathNodeCount; p++)
+        {
+            newPath = (Instantiate(pathPrefab, Vector3.zero, Quaternion.identity) as GameObject).GetComponent<Transform>();
+            newPath.parent = pathContainer;
+            pathNodes.Add(newPath);
+        }
+    }
+
+    public override void Update()
+    {
+        MouseSelect();
+    }
+
     /// Subscribes to the property and is notified anytime the value changes.
     public override void SelectedUnitChanged(UnitViewModel value) 
     {
         base.SelectedUnitChanged(value);
+
+
     }
 
-    void FixedUpdate()
+    void MouseSelect()
     {
-        HexSelect();
-        
-    }
 
-    
-    void HexSelect()
-    {
-        /*
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 200))
+        if (Physics.Raycast(ray, out hit, 400))
         {
             Debug.DrawLine(ray.origin, hit.point);
 
-            float stepSize = 1f / chunkSize; 
-            float resScale = chunkSize / chunkResolution;
-
-
-            float pointX = hit.point.x;
-            float pointZ = hit.point.z;
-            pointX = pointX * pixelsPerUnit;
-            pointZ = pointZ * pixelsPerUnit;
-            pointZ += HexProperties.tileH;
-            pointX -= HexProperties.width / 2;
-            pointZ -= (HexProperties.height - HexProperties.tileH);
-
-
-            float q = (1f / 3f * Mathf.Sqrt(3f) * pointX - 1f / 3f * pointZ) / HexProperties.side;
-            float r = 2f / 3f * pointZ / HexProperties.side;
-
-
-            Vector3 cube = new Vector3();
-            cube.x = q;
-            cube.z = r;
-            cube.y = -cube.x - cube.z;
-
-            cube = Hexagon.RoundCubeCoord(cube);
-
-            hoverHexAraray = Hexagon.CubeToOffsetOddQ(cube);
-
-
-            if (hoverHexAraray.x >= 0 && hoverHexAraray.y >= 0 && hoverHexAraray.x < hexGrid.GetLength(0) && hoverHexAraray.y < hexGrid.GetLength(1))
-                hoverHex = hexGrid[(int)hoverHexAraray.x, (int)hoverHexAraray.y];
-            else
-                hoverHex = null;
-
-            if (Input.GetButton("Fire1"))
+            
+            if (Input.GetButtonDown("Mouse0"))
             {
-                int pathCost = 0;
-                //path = Pathfinding.GetPath(hexGrid[2, 2], hoverHex, pathCost);
-                Debug.Log(pathCost);
+                // Select Unit
+                if (hit.collider.gameObject.CompareTag("CampainUnit"))
+                {
+                    ExecuteSelectUnit(hit.collider.gameObject.GetComponent<UnitView>().Unit);
+                    return;
+                }
+                // Deselect Unit
+                if (hit.collider.gameObject.CompareTag("Terrain"))
+                {
+                    ExecuteSelectUnit(null);
+                    Player.MovingUnit = false;
+                }
+            }
+            else
+            {
+                ExecuteGetHexAtWorldPos(hit.point);
             }
 
+            if (Input.GetButtonDown("Mouse1") && Player.SelectedUnit != null && Player.SelectedHex != null)
+            {
+                Player.MovingUnit = true;
+            }
         }
 
+        if (Input.GetButtonUp("Mouse1") && Player.SelectedUnit != null && Player.SelectedHex != null)
+        {
+            ExecuteMoveUnit(Player.SelectedUnit);
+            HidePath();
+        }
+
+        /*
         if (hoverHex != null)
         {
             hoverHexHeightLight.transform.position = hoverHex.worldPos;
@@ -90,6 +108,51 @@ public partial class PlayerView
         }
         */
 
+    }
+
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void SelectedHexChanged(Hex hex)
+    {
+        if (Player.MovingUnit == true && hex != null && Player.SelectedUnit != null)
+        {
+            ShowPath();
+        }
+    }
+
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void MovingUnitChanged(Boolean value)
+    {
+        base.MovingUnitChanged(value);
+        
+        if (value == false)
+        {
+            HidePath();
+        }
+        else
+        {
+            ShowPath();
+        }
+    }
+
+    private void ShowPath ()
+    {
+        List<Hex> path = Pathfinding.GetPath(Player.SelectedUnit.HexLocation, Player.SelectedHex, 0);
+
+        for (int h = 0; path != null && h < path.Count; h++)
+        {
+            if (h >= pathNodes.Count)
+                break;
+
+            pathNodes[h].position = path[h].worldPos;
+        }
+    }
+
+    private void HidePath ()
+    {
+        for (int p = 0; p < pathNodes.Count; p++)
+        {
+            pathNodes[p].position = Vector3.zero;
+        }
     }
 
 }

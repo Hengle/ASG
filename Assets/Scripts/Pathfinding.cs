@@ -5,9 +5,6 @@ using System.Collections.Generic;
 public class Pathfinding : MonoBehaviour
 {
 
-    public TerrainManager2 terrainManager;
-
-
     /*
     frontier = PriorityQueue()
     frontier.put(start, 0)
@@ -30,7 +27,7 @@ public class Pathfinding : MonoBehaviour
     */
 
 
-    public static List<Hexagon> GetPath(Hexagon fromHex, Hexagon toHex, int pathCost) //, out int pathCost
+    public static List<Hex> GetPath(Hex fromHex, Hex toHex, int pathCost) //, out int pathCost
     {
 
   		int pathStart = System.Environment.TickCount;
@@ -45,15 +42,16 @@ public class Pathfinding : MonoBehaviour
         }
 
         
-        int minF;
-        Hexagon minFHex = null;
+        int minF, tmp;
+        Hex minFHex = null;
+
 
         // just to be on the safer side:
         fromHex.SetPathParent(null);
         toHex.SetPathParent(null);
 
-        List<Hexagon> openList = new List<Hexagon>();
-        List<Hexagon> closedList = new List<Hexagon>();
+        List<Hex> openList = new List<Hex>();
+        List<Hex> closedList = new List<Hex>();
 
         openList.Add(fromHex);
 
@@ -68,9 +66,9 @@ public class Pathfinding : MonoBehaviour
             minF = int.MaxValue;
 
             // find the lowest FScore
-            foreach (Hexagon hex in openList)
+            foreach (Hex hex in openList)
             {
-                int tmp = hex.GetPathScores(toHex);
+                tmp = hex.GetPathScores(toHex);
 
                 if (tmp < minF)
                 {
@@ -87,6 +85,8 @@ public class Pathfinding : MonoBehaviour
             findAdjacentWalkable(minFHex, toHex, openList, closedList);
         }
 
+        Debug.Log("Scanned " + closedList.Count);
+
         // if path not found
         if (openList.Count == 0) Debug.Log("path not found " + fromHex + "->" + toHex);
 
@@ -98,10 +98,10 @@ public class Pathfinding : MonoBehaviour
         
 
         // Find path hex to with the info
-        List<Hexagon> retList = new List<Hexagon>();
+        List<Hex> retList = new List<Hex>();
 
         // Get the to hex
-        Hexagon tmphex = openList.Find(hex => hex.Equals(toHex));
+        Hex tmphex = openList.Find(hex => hex.Equals(toHex));
 
         pathCost = tmphex.pathScore;
 
@@ -119,16 +119,17 @@ public class Pathfinding : MonoBehaviour
 
         Debug.Log ("Path found in: " + (System.Environment.TickCount - pathStart) + "ms");
 
+        retList.Reverse();
 
         return retList;
     }
 
     
-    private static void GetAdjacentHexes(Hexagon fromHex, Hexagon toHex, List<Hexagon> openList, List<Hexagon> closedList)
+    private static void GetAdjacentHexes(Hex fromHex, Hex toHex, List<Hex> openList, List<Hex> closedList)
     {
-        //for (int n = 0; n < Hexagon.neighborDirs.Length; n++)
+        //for (int n = 0; n < Hex.neighborDirs.Length; n++)
         //{
-        //    arrayPos = Hexagon.CubeToOffsetOddQ(hexGrid[x, y].cubeCoord + Hexagon.neighborDirs[n]);
+        //    arrayPos = Hex.CubeToOffsetOddQ(hexGrid[x, y].cubeCoord + Hex.neighborDirs[n]);
 
         for (int n = 0; n < fromHex.neighbors.Length; n++)
         {
@@ -145,9 +146,9 @@ public class Pathfinding : MonoBehaviour
     }
 
 
-    private static void findAdjacentWalkable(Hexagon fromHex, Hexagon toHex, List<Hexagon> openList, List<Hexagon> closedList)
+    private static void findAdjacentWalkable(Hex fromHex, Hex toHex, List<Hex> openList, List<Hex> closedList)
     {
-        foreach (Hexagon neighHex in fromHex.neighbors) if (neighHex != null)
+        foreach (Hex neighHex in fromHex.neighbors) if (neighHex != null)
             {
                 if (openList.Contains(neighHex) || closedList.Contains(neighHex)) continue;
 
@@ -163,18 +164,18 @@ public class Pathfinding : MonoBehaviour
 
 
     /*
-    void GetPath (Hexagon start, Hexagon goal)
+    void GetPath (Hex start, Hex goal)
     {
         // The hexes we have already visited
-        List<Hexagon> visited = new List<Hexagon>();
+        List<Hex> visited = new List<Hex>();
         // The hexes open to evaluation
-        List<Hexagon> openSet = new List<Hexagon>();
+        List<Hex> openSet = new List<Hex>();
         // The map of navigated nodes
-        List<Hexagon> path = new List<Hexagon>();
+        List<Hex> path = new List<Hex>();
 
         int cost = 0;
 
-        Hexagon current;
+        Hex current;
 
         while (openSet.Count > 0)
         {
@@ -187,7 +188,7 @@ public class Pathfinding : MonoBehaviour
 
     }
 
-    List<Hexagon> CreatePath(List<Hexagon> path, Hexagon goal)
+    List<Hex> CreatePath(List<Hex> path, Hex goal)
     {
         return null;
     }

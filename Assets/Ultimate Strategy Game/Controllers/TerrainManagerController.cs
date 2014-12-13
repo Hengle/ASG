@@ -38,6 +38,37 @@ public class TerrainManagerController : TerrainManagerControllerBase
         Debug.Log("Terrain generated: " + (System.Environment.TickCount - timeStart) + "ms");
 
     }
+
+    /* Use this later for timed mao generation
+    public IEnumerator GenerateMap(TerrainManagerViewModel terrainManager)
+    {
+        /*
+        // Don't want to generate anything less than 10x10 tiles
+        if (coreMap.Height < 10) coreMap.Height = 10;
+        if (coreMap.Width < 10) coreMap.Width = 10;
+        var tileSize = coreMap.TileSize;
+        var total = coreMap.Height * coreMap.Width;
+        var progress = 0;
+        for (int i = 0; i < coreMap.Width; i++)
+        {
+            for (int j = 0; j < coreMap.Height; j++)
+            {
+                var tileToAdd = new MapTileViewModel(MapTileController)
+                {
+                    Position = new Vector3(i * tileSize, 0, j * tileSize)
+                };
+                tileToAdd.Position = new Vector3(i * tileSize, 0, j * tileSize);
+                coreMap.VisibleTiles.Add(tileToAdd);
+                coreMap.GenerationProgress = (float)++progress / total;
+                yield return null;
+            }
+        }
+        yield break;
+         
+    }* */
+
+
+
     public override void GenerateChunks(TerrainManagerViewModel terrainManager)
     {
         int timeStart = System.Environment.TickCount;
@@ -50,6 +81,8 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
         int chunkCountX = Mathf.CeilToInt(terrainManager.TerrainWidth * HexProperties.width / (float)terrainManager.ChunkSize);
         int chunkCountY = Mathf.CeilToInt(terrainManager.TerrainHeight * (HexProperties.tileH + HexProperties.side) / (float)terrainManager.ChunkSize);
+
+
 
         Debug.Log("chunkHexCount X " + chunkHexCountX);
         Debug.Log("ChunkHexCount Y " + chunkHexCountY);
@@ -216,6 +249,29 @@ public class TerrainManagerController : TerrainManagerControllerBase
     public void CalculateBiomes(TerrainManagerViewModel terrainManager)
     {
 
+    }
+
+    public Hex GetStartingLocation (TerrainManagerViewModel terrainManager)
+    {   
+        Hex hex = null;
+
+        int randomX = 0, randomY = 0;
+
+        while (hex == null)
+        {
+            randomX = (int)UnityEngine.Random.Range(0, terrainManager.TerrainWidth);
+            randomY = (int)UnityEngine.Random.Range(0, terrainManager.TerrainHeight);
+            
+            hex = terrainManager.hexGrid[randomX, randomY];
+
+            // If the hex an invalid spawning location get a new one!
+            if (hex.terrainType == TerrainType.Water || hex.RiverStrength > 0)
+            {
+                hex = null;
+            }
+        }
+
+        return hex;
     }
 
 

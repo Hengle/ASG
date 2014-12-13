@@ -6,8 +6,8 @@ using UniRx;
 using UnityEngine;
 
 
-public class KristianController : KristianControllerBase {
+public class AIPlayerController : AIPlayerControllerBase {
     
-    public override void InitializeKristian(KristianViewModel kristian) {
+    public override void InitializeAIPlayer(AIPlayerViewModel aIPlayer) {
     }
 }

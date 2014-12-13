@@ -93,8 +93,6 @@ public class HexChunk : MonoBehaviour
         mesh.RecalculateBounds();
         TangentSolver.Solve(mesh);
 
-
-
     }
 
 

@@ -5,5 +5,5 @@ using System.Linq;
 using UnityEngine;
 
 
-public partial class KristianViewModel {
+public partial class AIPlayerViewModel {
 }

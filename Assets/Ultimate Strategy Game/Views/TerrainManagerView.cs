@@ -18,19 +18,6 @@ public partial class TerrainManagerView
     public bool displayHexNodes;
     public bool displayHexPath;
 
-
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            ExecuteGenerateMap();
-         
-        }
-    }
-
-
-
     /// Invokes GenerateMapExecuted when the GenerateMap command is executed.
     public override void GenerateMapExecuted()
     {

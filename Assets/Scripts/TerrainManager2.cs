@@ -175,7 +175,7 @@ public class TerrainManager2 : MonoBehaviour
             if (Input.GetButton("Fire1"))
             {
                 int pathCost = 0;
-                path = Pathfinding.GetPath(hexGrid[2, 2], hoverHex, pathCost);
+                //path = Pathfinding.GetPath(hexGrid[2, 2], hoverHex, pathCost);
                 Debug.Log(pathCost);
             }
 

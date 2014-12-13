@@ -14,7 +14,7 @@ GameObject:
   - 114: {fileID: 11400000}
   m_Layer: 0
   m_Name: _NewChunk
-  m_TagString: Untagged
+  m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -99,8 +99,6 @@ MonoBehaviour:
   hexBiomeMap: {fileID: 0}
   hexHeightmap: {fileID: 0}
   substance: {fileID: 0}
-  proceduralTexture: {fileID: 0}
-  substanceTexture: {fileID: 0}
   substanceTexture2D: {fileID: 0}
   altitudes:
   - {r: .0758619308, g: 0, b: 1, a: 0}

@@ -5,9 +5,5 @@ using System.Linq;
 using UnityEngine;
 
 
-public partial class ChunkViewModel 
-{
-
-
-
+public partial class CombatUnitViewModel {
 }

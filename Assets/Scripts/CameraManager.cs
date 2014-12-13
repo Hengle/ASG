@@ -45,7 +45,7 @@ public class CameraManager : MonoBehaviour
         
 
 
-        if (Input.GetKey(KeyCode.Mouse1))
+        if (Input.GetKey(KeyCode.Mouse2))
         {
             x += Input.GetAxis("Mouse X") * rotationSpeed * Time.fixedDeltaTime;
             y -= Input.GetAxis("Mouse Y") * rotationSpeed * Time.fixedDeltaTime;
