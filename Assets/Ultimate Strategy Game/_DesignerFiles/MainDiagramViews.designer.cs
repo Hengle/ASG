@@ -295,6 +295,24 @@ public abstract class GameLogicViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public GameState _GameState;
     
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Seasons _Season;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _Year;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public String _String1;
+    
+    public override string DefaultIdentifier {
+        get {
+            return "GameLogic";
+        }
+    }
+    
     public override System.Type ViewModelType {
         get {
             return typeof(GameLogicViewModel);
@@ -322,6 +340,9 @@ public abstract class GameLogicViewBase : ViewBase {
         gameLogic.HumanPlayer = this._HumanPlayer == null ? null : this._HumanPlayer.ViewModelObject as PlayerViewModel;
         gameLogic.TerrainManager = this._TerrainManager == null ? null : this._TerrainManager.ViewModelObject as TerrainManagerViewModel;
         gameLogic.GameState = this._GameState;
+        gameLogic.Season = this._Season;
+        gameLogic.Year = this._Year;
+        gameLogic.String1 = this._String1;
     }
     
     public virtual void ExecuteStartGame() {
@@ -397,16 +418,16 @@ public abstract class PlayerViewBase : ViewBase {
         this.ExecuteCommand(Player.SelectHex, arg);
     }
     
+    public virtual void ExecuteSelectHexAtPos(Vector3 arg) {
+        this.ExecuteCommand(Player.SelectHexAtPos, arg);
+    }
+    
     public virtual void ExecuteSelectUnit(UnitViewModel unit) {
         this.ExecuteCommand(Player.SelectUnit, unit);
     }
     
     public virtual void ExecuteMoveUnit(UnitViewModel unit) {
         this.ExecuteCommand(Player.MoveUnit, unit);
-    }
-    
-    public virtual void ExecuteGetHexAtWorldPos(Vector3 arg) {
-        this.ExecuteCommand(Player.GetHexAtWorldPos, arg);
     }
 }
 
@@ -427,15 +448,15 @@ public abstract class UnitViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _MovementRange;
+    public Int32 _MovementPoints;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public String _State;
+    public Int32 _MovementPointsTotal;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public String _IsSelected;
+    public Boolean _IsSelected;
     
     public override System.Type ViewModelType {
         get {
@@ -461,8 +482,8 @@ public abstract class UnitViewBase : ViewBase {
         unit.Name = this._Name;
         unit.Health = this._Health;
         unit.MaxHealth = this._MaxHealth;
-        unit.MovementRange = this._MovementRange;
-        unit.State = this._State;
+        unit.MovementPoints = this._MovementPoints;
+        unit.MovementPointsTotal = this._MovementPointsTotal;
         unit.IsSelected = this._IsSelected;
     }
     
@@ -472,6 +493,10 @@ public abstract class UnitViewBase : ViewBase {
     
     public virtual void ExecuteCancelMove() {
         this.ExecuteCommand(Unit.CancelMove);
+    }
+    
+    public virtual void ExecuteWorldPosToHexLocation(Vector3 arg) {
+        this.ExecuteCommand(Unit.WorldPosToHexLocation, arg);
     }
 }
 
@@ -662,6 +687,10 @@ public abstract class SettlerUnitViewBase : UnitViewBase {
     protected override void InitializeViewModel(ViewModel viewModel) {
         base.InitializeViewModel(viewModel);
     }
+    
+    public virtual void ExecuteSettle() {
+        this.ExecuteCommand(SettlerUnit.Settle);
+    }
 }
 
 [DiagramInfoAttribute("Ultimate Strategy Game")]
@@ -804,34 +833,58 @@ public partial class TerrainManagerView : TerrainManagerViewViewBase {
 
 public class GameLogicGUIViewBase : GameLogicViewBase {
     
+    [UFToggleGroup("NextTurn")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindNextTurn = true;
+    
+    [UFToggleGroup("Season")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("SeasonChanged")]
+    public bool _BindSeason = true;
+    
+    [UFToggleGroup("Year")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("YearChanged")]
+    public bool _BindYear = true;
+    
     [UFToggleGroup("TurnCount")]
     [UnityEngine.HideInInspector()]
     [UFRequireInstanceMethod("TurnCountChanged")]
     public bool _BindTurnCount = true;
     
-    [UFToggleGroup("NextTurn")]
-    [UnityEngine.HideInInspector()]
-    public bool _BindNextTurn = true;
-    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<GameLogicController>());
-    }
-    
-    /// Subscribes to the property and is notified anytime the value changes.
-    public virtual void TurnCountChanged(Int32 value) {
     }
     
     /// Invokes NextTurnExecuted when the NextTurn command is executed.
     public virtual void NextTurnExecuted() {
     }
     
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void SeasonChanged(Seasons value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void YearChanged(Int32 value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void TurnCountChanged(Int32 value) {
+    }
+    
     public override void Bind() {
         base.Bind();
-        if (this._BindTurnCount) {
-            this.BindProperty(GameLogic._TurnCountProperty, this.TurnCountChanged);
-        }
         if (this._BindNextTurn) {
             this.BindCommandExecuted(GameLogic.NextTurn, NextTurnExecuted);
+        }
+        if (this._BindSeason) {
+            this.BindProperty(GameLogic._SeasonProperty, this.SeasonChanged);
+        }
+        if (this._BindYear) {
+            this.BindProperty(GameLogic._YearProperty, this.YearChanged);
+        }
+        if (this._BindTurnCount) {
+            this.BindProperty(GameLogic._TurnCountProperty, this.TurnCountChanged);
         }
     }
 }
@@ -1067,9 +1120,16 @@ public partial class GameLogicView : GameLogicViewViewBase {
 
 public class UnitViewViewBase : UnitViewBase {
     
+    private IDisposable _WorldPosDisposable;
+    
     [UFToggleGroup("Move")]
     [UnityEngine.HideInInspector()]
     public bool _BindMove = true;
+    
+    [UFToggleGroup("State")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("StateChanged")]
+    public bool _BindState = true;
     
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<UnitController>());
@@ -1079,10 +1139,43 @@ public class UnitViewViewBase : UnitViewBase {
     public virtual void MoveExecuted() {
     }
     
+    /// Subscribes to the state machine property and executes a method for each state.
+    public virtual void StateChanged(Invert.StateMachine.State value) {
+        if (value is Idling) {
+            this.OnIdling();
+        }
+        if (value is Moving) {
+            this.OnMoving();
+        }
+    }
+    
+    public virtual void OnIdling() {
+    }
+    
+    public virtual void OnMoving() {
+    }
+    
+    public virtual void ResetWorldPos() {
+        if (_WorldPosDisposable != null) _WorldPosDisposable.Dispose();
+        _WorldPosDisposable = GetWorldPosObservable().Subscribe(Unit._WorldPosProperty).DisposeWith(this);
+    }
+    
+    protected virtual Vector3 CalculateWorldPos() {
+        return default(Vector3);
+    }
+    
+    protected virtual UniRx.IObservable<Vector3> GetWorldPosObservable() {
+        return this.UpdateAsObservable().Select(p => CalculateWorldPos());
+    }
+    
     public override void Bind() {
         base.Bind();
+        ResetWorldPos();
         if (this._BindMove) {
             this.BindCommandExecuted(Unit.Move, MoveExecuted);
+        }
+        if (this._BindState) {
+            this.BindProperty(Unit._StateProperty, this.StateChanged);
         }
     }
 }
@@ -1090,7 +1183,25 @@ public class UnitViewViewBase : UnitViewBase {
 public partial class UnitView : UnitViewViewBase {
 }
 
-public class SettlerUnitViewViewBase : UnitView {
+public class CityViewViewBase : CityViewBase {
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<CityController>());
+    }
+    
+    public override void Bind() {
+        base.Bind();
+    }
+}
+
+public partial class CityView : CityViewViewBase {
+}
+
+public class SettlerViewViewBase : UnitView {
+    
+    [UFToggleGroup("Settle")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSettle = true;
     
     public SettlerUnitViewModel SettlerUnit {
         get {
@@ -1111,14 +1222,25 @@ public class SettlerUnitViewViewBase : UnitView {
         return this.RequestViewModel(GameManager.Container.Resolve<SettlerUnitController>());
     }
     
+    /// Invokes SettleExecuted when the Settle command is executed.
+    public virtual void SettleExecuted() {
+    }
+    
     public override void Bind() {
         base.Bind();
+        if (this._BindSettle) {
+            this.BindCommandExecuted(SettlerUnit.Settle, SettleExecuted);
+        }
     }
     
     protected override void InitializeViewModel(ViewModel viewModel) {
         base.InitializeViewModel(viewModel);
     }
+    
+    public virtual void ExecuteSettle() {
+        this.ExecuteCommand(SettlerUnit.Settle);
+    }
 }
 
-public partial class SettlerUnitView : SettlerUnitViewViewBase {
+public partial class SettlerView : SettlerViewViewBase {
 }

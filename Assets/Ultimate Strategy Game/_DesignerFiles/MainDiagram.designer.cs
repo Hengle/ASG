@@ -861,6 +861,12 @@ public class GameLogicViewModelBase : ViewModel {
     
     public P<GameState> _GameStateProperty;
     
+    public P<Seasons> _SeasonProperty;
+    
+    public P<Int32> _YearProperty;
+    
+    public P<String> _String1Property;
+    
     public ModelCollection<PlayerViewModel> _PlayersProperty;
     
     public ModelCollection<FactionViewModel> _FactionsProperty;
@@ -887,6 +893,9 @@ public class GameLogicViewModelBase : ViewModel {
         _HumanPlayerProperty = new P<PlayerViewModel>(this, "HumanPlayer");
         _TerrainManagerProperty = new P<TerrainManagerViewModel>(this, "TerrainManager");
         _GameStateProperty = new P<GameState>(this, "GameState");
+        _SeasonProperty = new P<Seasons>(this, "Season");
+        _YearProperty = new P<Int32>(this, "Year");
+        _String1Property = new P<String>(this, "String1");
         _PlayersProperty = new ModelCollection<PlayerViewModel>(this, "Players");
         _PlayersProperty.CollectionChanged += PlayersCollectionChanged;
         _FactionsProperty = new ModelCollection<FactionViewModel>(this, "Factions");
@@ -1003,6 +1012,51 @@ public partial class GameLogicViewModel : GameLogicViewModelBase {
         }
     }
     
+    public virtual P<Seasons> SeasonProperty {
+        get {
+            return this._SeasonProperty;
+        }
+    }
+    
+    public virtual Seasons Season {
+        get {
+            return _SeasonProperty.Value;
+        }
+        set {
+            _SeasonProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Int32> YearProperty {
+        get {
+            return this._YearProperty;
+        }
+    }
+    
+    public virtual Int32 Year {
+        get {
+            return _YearProperty.Value;
+        }
+        set {
+            _YearProperty.Value = value;
+        }
+    }
+    
+    public virtual P<String> String1Property {
+        get {
+            return this._String1Property;
+        }
+    }
+    
+    public virtual String String1 {
+        get {
+            return _String1Property.Value;
+        }
+        set {
+            _String1Property.Value = value;
+        }
+    }
+    
     public virtual ModelCollection<PlayerViewModel> Players {
         get {
             return this._PlayersProperty;
@@ -1057,6 +1111,9 @@ public partial class GameLogicViewModel : GameLogicViewModelBase {
 		if (stream.DeepSerialize) stream.SerializeObject("HumanPlayer", this.HumanPlayer);
 		if (stream.DeepSerialize) stream.SerializeObject("TerrainManager", this.TerrainManager);
 		stream.SerializeInt("GameState", (int)this.GameState);
+		stream.SerializeInt("Season", (int)this.Season);
+        stream.SerializeInt("Year", this.Year);
+        stream.SerializeString("String1", this.String1);
         if (stream.DeepSerialize) stream.SerializeArray("Players", this.Players);
         if (stream.DeepSerialize) stream.SerializeArray("Factions", this.Factions);
     }
@@ -1069,6 +1126,9 @@ public partial class GameLogicViewModel : GameLogicViewModelBase {
 		if (stream.DeepSerialize) this.HumanPlayer = stream.DeserializeObject<PlayerViewModel>("HumanPlayer");
 		if (stream.DeepSerialize) this.TerrainManager = stream.DeserializeObject<TerrainManagerViewModel>("TerrainManager");
 		this.GameState = (GameState)stream.DeserializeInt("GameState");
+		this.Season = (Seasons)stream.DeserializeInt("Season");
+        		this.Year = stream.DeserializeInt("Year");;
+        		this.String1 = stream.DeserializeString("String1");;
 if (stream.DeepSerialize) {
         this.Players.Clear();
         this.Players.AddRange(stream.DeserializeObjectArray<PlayerViewModel>("Players"));
@@ -1093,6 +1153,9 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelPropertyInfo(_HumanPlayerProperty, true, false, false));
         list.Add(new ViewModelPropertyInfo(_TerrainManagerProperty, true, false, false));
         list.Add(new ViewModelPropertyInfo(_GameStateProperty, false, false, true));
+        list.Add(new ViewModelPropertyInfo(_SeasonProperty, false, false, true));
+        list.Add(new ViewModelPropertyInfo(_YearProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_String1Property, false, false, false));
         list.Add(new ViewModelPropertyInfo(_PlayersProperty, true, true, false));
         list.Add(new ViewModelPropertyInfo(_FactionsProperty, true, true, false));
     }
@@ -1136,11 +1199,11 @@ public class PlayerViewModelBase : ViewModel {
     
     protected CommandWithSenderAndArgument<PlayerViewModel, Hex> _SelectHex;
     
+    protected CommandWithSenderAndArgument<PlayerViewModel, Vector3> _SelectHexAtPos;
+    
     protected CommandWithSenderAndArgument<PlayerViewModel, UnitViewModel> _SelectUnit;
     
     protected CommandWithSenderAndArgument<PlayerViewModel, UnitViewModel> _MoveUnit;
-    
-    protected CommandWithSenderAndArgument<PlayerViewModel, Vector3> _GetHexAtWorldPos;
     
     public PlayerViewModelBase(PlayerControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
@@ -1306,6 +1369,15 @@ public partial class PlayerViewModel : PlayerViewModelBase {
         }
     }
     
+    public virtual CommandWithSenderAndArgument<PlayerViewModel, Vector3> SelectHexAtPos {
+        get {
+            return _SelectHexAtPos;
+        }
+        set {
+            _SelectHexAtPos = value;
+        }
+    }
+    
     public virtual CommandWithSenderAndArgument<PlayerViewModel, UnitViewModel> SelectUnit {
         get {
             return _SelectUnit;
@@ -1324,15 +1396,6 @@ public partial class PlayerViewModel : PlayerViewModelBase {
         }
     }
     
-    public virtual CommandWithSenderAndArgument<PlayerViewModel, Vector3> GetHexAtWorldPos {
-        get {
-            return _GetHexAtWorldPos;
-        }
-        set {
-            _GetHexAtWorldPos = value;
-        }
-    }
-    
     public virtual GameLogicViewModel ParentGameLogic {
         get {
             return this._ParentGameLogic;
@@ -1345,9 +1408,9 @@ public partial class PlayerViewModel : PlayerViewModelBase {
     protected override void WireCommands(Controller controller) {
         var player = controller as PlayerControllerBase;
         this.SelectHex = new CommandWithSenderAndArgument<PlayerViewModel, Hex>(this, player.SelectHex);
+        this.SelectHexAtPos = new CommandWithSenderAndArgument<PlayerViewModel, Vector3>(this, player.SelectHexAtPos);
         this.SelectUnit = new CommandWithSenderAndArgument<PlayerViewModel, UnitViewModel>(this, player.SelectUnit);
         this.MoveUnit = new CommandWithSenderAndArgument<PlayerViewModel, UnitViewModel>(this, player.MoveUnit);
-        this.GetHexAtWorldPos = new CommandWithSenderAndArgument<PlayerViewModel, Vector3>(this, player.GetHexAtWorldPos);
     }
     
     public override void Write(ISerializerStream stream) {
@@ -1387,14 +1450,20 @@ public partial class PlayerViewModel : PlayerViewModelBase {
     protected override void FillCommands(List<ViewModelCommandInfo> list) {
         base.FillCommands(list);;
         list.Add(new ViewModelCommandInfo("SelectHex", SelectHex) { ParameterType = typeof(Hex) });
+        list.Add(new ViewModelCommandInfo("SelectHexAtPos", SelectHexAtPos) { ParameterType = typeof(Vector3) });
         list.Add(new ViewModelCommandInfo("SelectUnit", SelectUnit) { ParameterType = typeof(UnitViewModel) });
         list.Add(new ViewModelCommandInfo("MoveUnit", MoveUnit) { ParameterType = typeof(UnitViewModel) });
-        list.Add(new ViewModelCommandInfo("GetHexAtWorldPos", GetHexAtWorldPos) { ParameterType = typeof(Vector3) });
     }
 }
 
 [DiagramInfoAttribute("Ultimate Strategy Game")]
 public class UnitViewModelBase : ViewModel {
+    
+    private IDisposable _HexLocationDisposable;
+    
+    private IDisposable _MovementCompletedDisposable;
+    
+    private IDisposable _CalculateMovementDisposable;
     
     public P<String> _NameProperty;
     
@@ -1402,21 +1471,33 @@ public class UnitViewModelBase : ViewModel {
     
     public P<Int32> _MaxHealthProperty;
     
-    public P<Int32> _MovementRangeProperty;
+    public P<Int32> _MovementPointsProperty;
     
-    public P<Hex> _HexLocationProperty;
+    public P<Int32> _MovementPointsTotalProperty;
     
     public P<Hex> _ToHexLocationProperty;
     
-    public P<String> _StateProperty;
+    public UnitState _StateProperty;
     
-    public P<String> _IsSelectedProperty;
+    public P<Boolean> _IsSelectedProperty;
+    
+    public P<Vector3> _WorldPosProperty;
+    
+    public P<Hex> _NextHexInPathProperty;
+    
+    public P<Hex> _HexLocationProperty;
+    
+    public P<Boolean> _MovementCompletedProperty;
+    
+    public P<Hex> _CalculateMovementProperty;
     
     public ModelCollection<Hex> _MovementPathProperty;
     
     protected CommandWithSenderAndArgument<UnitViewModel, Hex> _Move;
     
     protected CommandWithSender<UnitViewModel> _CancelMove;
+    
+    protected CommandWithSenderAndArgument<UnitViewModel, Vector3> _WorldPosToHexLocation;
     
     public UnitViewModelBase(UnitControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
@@ -1431,12 +1512,66 @@ public class UnitViewModelBase : ViewModel {
         _NameProperty = new P<String>(this, "Name");
         _HealthProperty = new P<Int32>(this, "Health");
         _MaxHealthProperty = new P<Int32>(this, "MaxHealth");
-        _MovementRangeProperty = new P<Int32>(this, "MovementRange");
-        _HexLocationProperty = new P<Hex>(this, "HexLocation");
+        _MovementPointsProperty = new P<Int32>(this, "MovementPoints");
+        _MovementPointsTotalProperty = new P<Int32>(this, "MovementPointsTotal");
         _ToHexLocationProperty = new P<Hex>(this, "ToHexLocation");
-        _StateProperty = new P<String>(this, "State");
-        _IsSelectedProperty = new P<String>(this, "IsSelected");
+        _StateProperty = new UnitState(this, "State");
+        _IsSelectedProperty = new P<Boolean>(this, "IsSelected");
+        _WorldPosProperty = new P<Vector3>(this, "WorldPos");
+        _NextHexInPathProperty = new P<Hex>(this, "NextHexInPath");
+        _HexLocationProperty = new P<Hex>(this, "HexLocation");
+        _MovementCompletedProperty = new P<Boolean>(this, "MovementCompleted");
+        _CalculateMovementProperty = new P<Hex>(this, "CalculateMovement");
         _MovementPathProperty = new ModelCollection<Hex>(this, "MovementPath");
+        this.ResetHexLocation();
+        this.ResetMovementCompleted();
+        this.ResetCalculateMovement();
+        this._Move.Subscribe(_StateProperty.Move);
+        this._CancelMove.Subscribe(_StateProperty.CancelMove);
+        this._StateProperty.MovementCompleted.AddComputer(_MovementCompletedProperty);
+    }
+    
+    public virtual void ResetHexLocation() {
+        if (_HexLocationDisposable != null) _HexLocationDisposable.Dispose();
+        _HexLocationDisposable = _HexLocationProperty.ToComputed( ComputeHexLocation, this.GetHexLocationDependents().ToArray() ).DisposeWith(this);
+    }
+    
+    public virtual void ResetMovementCompleted() {
+        if (_MovementCompletedDisposable != null) _MovementCompletedDisposable.Dispose();
+        _MovementCompletedDisposable = _MovementCompletedProperty.ToComputed( ComputeMovementCompleted, this.GetMovementCompletedDependents().ToArray() ).DisposeWith(this);
+    }
+    
+    public virtual void ResetCalculateMovement() {
+        if (_CalculateMovementDisposable != null) _CalculateMovementDisposable.Dispose();
+        _CalculateMovementDisposable = _CalculateMovementProperty.ToComputed( ComputeCalculateMovement, this.GetCalculateMovementDependents().ToArray() ).DisposeWith(this);
+    }
+    
+    public virtual Hex ComputeHexLocation() {
+        return default(Hex);
+    }
+    
+    public virtual IEnumerable<IObservableProperty> GetHexLocationDependents() {
+        yield return _WorldPosProperty;
+        yield break;
+    }
+    
+    public virtual Boolean ComputeMovementCompleted() {
+        return default(Boolean);
+    }
+    
+    public virtual IEnumerable<IObservableProperty> GetMovementCompletedDependents() {
+        yield return _WorldPosProperty;
+        yield break;
+    }
+    
+    public virtual Hex ComputeCalculateMovement() {
+        return default(Hex);
+    }
+    
+    public virtual IEnumerable<IObservableProperty> GetCalculateMovementDependents() {
+        yield return _WorldPosProperty;
+        yield return _StateProperty;
+        yield break;
     }
 }
 
@@ -1499,33 +1634,33 @@ public partial class UnitViewModel : UnitViewModelBase {
         }
     }
     
-    public virtual P<Int32> MovementRangeProperty {
+    public virtual P<Int32> MovementPointsProperty {
         get {
-            return this._MovementRangeProperty;
+            return this._MovementPointsProperty;
         }
     }
     
-    public virtual Int32 MovementRange {
+    public virtual Int32 MovementPoints {
         get {
-            return _MovementRangeProperty.Value;
+            return _MovementPointsProperty.Value;
         }
         set {
-            _MovementRangeProperty.Value = value;
+            _MovementPointsProperty.Value = value;
         }
     }
     
-    public virtual P<Hex> HexLocationProperty {
+    public virtual P<Int32> MovementPointsTotalProperty {
         get {
-            return this._HexLocationProperty;
+            return this._MovementPointsTotalProperty;
         }
     }
     
-    public virtual Hex HexLocation {
+    public virtual Int32 MovementPointsTotal {
         get {
-            return _HexLocationProperty.Value;
+            return _MovementPointsTotalProperty.Value;
         }
         set {
-            _HexLocationProperty.Value = value;
+            _MovementPointsTotalProperty.Value = value;
         }
     }
     
@@ -1544,13 +1679,13 @@ public partial class UnitViewModel : UnitViewModelBase {
         }
     }
     
-    public virtual P<String> StateProperty {
+    public virtual UnitState StateProperty {
         get {
             return this._StateProperty;
         }
     }
     
-    public virtual String State {
+    public virtual Invert.StateMachine.State State {
         get {
             return _StateProperty.Value;
         }
@@ -1559,18 +1694,93 @@ public partial class UnitViewModel : UnitViewModelBase {
         }
     }
     
-    public virtual P<String> IsSelectedProperty {
+    public virtual P<Boolean> IsSelectedProperty {
         get {
             return this._IsSelectedProperty;
         }
     }
     
-    public virtual String IsSelected {
+    public virtual Boolean IsSelected {
         get {
             return _IsSelectedProperty.Value;
         }
         set {
             _IsSelectedProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Vector3> WorldPosProperty {
+        get {
+            return this._WorldPosProperty;
+        }
+    }
+    
+    public virtual Vector3 WorldPos {
+        get {
+            return _WorldPosProperty.Value;
+        }
+        set {
+            _WorldPosProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Hex> NextHexInPathProperty {
+        get {
+            return this._NextHexInPathProperty;
+        }
+    }
+    
+    public virtual Hex NextHexInPath {
+        get {
+            return _NextHexInPathProperty.Value;
+        }
+        set {
+            _NextHexInPathProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Hex> HexLocationProperty {
+        get {
+            return this._HexLocationProperty;
+        }
+    }
+    
+    public virtual Hex HexLocation {
+        get {
+            return _HexLocationProperty.Value;
+        }
+        set {
+            _HexLocationProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Boolean> MovementCompletedProperty {
+        get {
+            return this._MovementCompletedProperty;
+        }
+    }
+    
+    public virtual Boolean MovementCompleted {
+        get {
+            return _MovementCompletedProperty.Value;
+        }
+        set {
+            _MovementCompletedProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Hex> CalculateMovementProperty {
+        get {
+            return this._CalculateMovementProperty;
+        }
+    }
+    
+    public virtual Hex CalculateMovement {
+        get {
+            return _CalculateMovementProperty.Value;
+        }
+        set {
+            _CalculateMovementProperty.Value = value;
         }
     }
     
@@ -1598,6 +1808,15 @@ public partial class UnitViewModel : UnitViewModelBase {
         }
     }
     
+    public virtual CommandWithSenderAndArgument<UnitViewModel, Vector3> WorldPosToHexLocation {
+        get {
+            return _WorldPosToHexLocation;
+        }
+        set {
+            _WorldPosToHexLocation = value;
+        }
+    }
+    
     public virtual PlayerViewModel ParentPlayer {
         get {
             return this._ParentPlayer;
@@ -1620,6 +1839,7 @@ public partial class UnitViewModel : UnitViewModelBase {
         var unit = controller as UnitControllerBase;
         this.Move = new CommandWithSenderAndArgument<UnitViewModel, Hex>(this, unit.Move);
         this.CancelMove = new CommandWithSender<UnitViewModel>(this, unit.CancelMove);
+        this.WorldPosToHexLocation = new CommandWithSenderAndArgument<UnitViewModel, Vector3>(this, unit.WorldPosToHexLocation);
     }
     
     public override void Write(ISerializerStream stream) {
@@ -1627,9 +1847,11 @@ public partial class UnitViewModel : UnitViewModelBase {
         stream.SerializeString("Name", this.Name);
         stream.SerializeInt("Health", this.Health);
         stream.SerializeInt("MaxHealth", this.MaxHealth);
-        stream.SerializeInt("MovementRange", this.MovementRange);
-        stream.SerializeString("State", this.State);
-        stream.SerializeString("IsSelected", this.IsSelected);
+        stream.SerializeInt("MovementPoints", this.MovementPoints);
+        stream.SerializeInt("MovementPointsTotal", this.MovementPointsTotal);
+        stream.SerializeString("State", this.State.Name);;
+        stream.SerializeBool("IsSelected", this.IsSelected);
+        stream.SerializeVector3("WorldPos", this.WorldPos);
     }
     
     public override void Read(ISerializerStream stream) {
@@ -1637,9 +1859,11 @@ public partial class UnitViewModel : UnitViewModelBase {
         		this.Name = stream.DeserializeString("Name");;
         		this.Health = stream.DeserializeInt("Health");;
         		this.MaxHealth = stream.DeserializeInt("MaxHealth");;
-        		this.MovementRange = stream.DeserializeInt("MovementRange");;
-        		this.State = stream.DeserializeString("State");;
-        		this.IsSelected = stream.DeserializeString("IsSelected");;
+        		this.MovementPoints = stream.DeserializeInt("MovementPoints");;
+        		this.MovementPointsTotal = stream.DeserializeInt("MovementPointsTotal");;
+        this._StateProperty.SetState(stream.DeserializeString("State"));
+        		this.IsSelected = stream.DeserializeBool("IsSelected");;
+        		this.WorldPos = stream.DeserializeVector3("WorldPos");;
     }
     
     public override void Unbind() {
@@ -1651,11 +1875,16 @@ public partial class UnitViewModel : UnitViewModelBase {
         list.Add(new ViewModelPropertyInfo(_NameProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_HealthProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_MaxHealthProperty, false, false, false));
-        list.Add(new ViewModelPropertyInfo(_MovementRangeProperty, false, false, false));
-        list.Add(new ViewModelPropertyInfo(_HexLocationProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_MovementPointsProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_MovementPointsTotalProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_ToHexLocationProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_StateProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_IsSelectedProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_WorldPosProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_NextHexInPathProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_HexLocationProperty, false, false, false, true));
+        list.Add(new ViewModelPropertyInfo(_MovementCompletedProperty, false, false, false, true));
+        list.Add(new ViewModelPropertyInfo(_CalculateMovementProperty, false, false, false, true));
         list.Add(new ViewModelPropertyInfo(_MovementPathProperty, false, true, false));
     }
     
@@ -1663,6 +1892,7 @@ public partial class UnitViewModel : UnitViewModelBase {
         base.FillCommands(list);;
         list.Add(new ViewModelCommandInfo("Move", Move) { ParameterType = typeof(Hex) });
         list.Add(new ViewModelCommandInfo("CancelMove", CancelMove) { ParameterType = typeof(void) });
+        list.Add(new ViewModelCommandInfo("WorldPosToHexLocation", WorldPosToHexLocation) { ParameterType = typeof(Vector3) });
     }
 }
 
@@ -2158,6 +2388,8 @@ public partial class AIPlayerViewModel : AIPlayerViewModelBase {
 [DiagramInfoAttribute("Ultimate Strategy Game")]
 public class SettlerUnitViewModelBase : UnitViewModel {
     
+    protected CommandWithSender<SettlerUnitViewModel> _Settle;
+    
     public SettlerUnitViewModelBase(SettlerUnitControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
     }
@@ -2181,8 +2413,19 @@ public partial class SettlerUnitViewModel : SettlerUnitViewModelBase {
             base() {
     }
     
+    public virtual CommandWithSender<SettlerUnitViewModel> Settle {
+        get {
+            return _Settle;
+        }
+        set {
+            _Settle = value;
+        }
+    }
+    
     protected override void WireCommands(Controller controller) {
         base.WireCommands(controller);
+        var settlerUnit = controller as SettlerUnitControllerBase;
+        this.Settle = new CommandWithSender<SettlerUnitViewModel>(this, settlerUnit.Settle);
     }
     
     public override void Write(ISerializerStream stream) {
@@ -2203,6 +2446,7 @@ public partial class SettlerUnitViewModel : SettlerUnitViewModelBase {
     
     protected override void FillCommands(List<ViewModelCommandInfo> list) {
         base.FillCommands(list);;
+        list.Add(new ViewModelCommandInfo("Settle", Settle) { ParameterType = typeof(void) });
     }
 }
 
@@ -2264,6 +2508,17 @@ public enum TerrainType {
     Forest,
     
     Water,
+}
+
+public enum Seasons {
+    
+    Spring,
+    
+    Summer,
+    
+    Autum,
+    
+    Winter,
 }
 
 public enum GameState {

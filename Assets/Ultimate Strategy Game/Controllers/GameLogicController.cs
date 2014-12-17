@@ -9,7 +9,6 @@ using UnityEngine;
 public class GameLogicController : GameLogicControllerBase 
 {
 
-
     [Inject]
     public UnitController UnitController { get; set; }
     [Inject]
@@ -20,16 +19,24 @@ public class GameLogicController : GameLogicControllerBase
     }
 
 
+
     public override void StartGame(GameLogicViewModel gameLogic)
     {
         base.StartGame(gameLogic);
 
         gameLogic.GameState = GameState.GeneratingMap;
-        TerrainManagerController.GenerateMap(gameLogic.TerrainManager);
-        SetupPlayers(gameLogic);
-
-
         gameLogic.GameState = GameState.Playing;
+        gameLogic.Season = Seasons.Spring;
+
+        Debug.Log(gameLogic.TerrainManager);
+
+        // Make sure to set the tell the units what the terrain manager.
+        UnitViewModel.terrainManager = gameLogic.TerrainManager;
+
+
+        TerrainManagerController.GenerateMap(gameLogic.TerrainManager);
+        
+        SetupPlayers(gameLogic);
 
     }
 
@@ -76,11 +83,12 @@ public class GameLogicController : GameLogicControllerBase
     {
 
         // Spawn the settle
-        var settler = new UnitViewModel(UnitController)
+        var settler = new SettlerUnitViewModel(SettlerUnitController)
         {
             Name = "Settler",
             HexLocation = player.StartingHex
         };
+        
 
         player.Faction.Units.Add(settler);
 
@@ -114,7 +122,14 @@ public class GameLogicController : GameLogicControllerBase
         base.NextTurn(gameLogic);
 
         gameLogic.TurnCount += 1;
+        gameLogic.Season += 1;
 
+        // Next year
+        if ((int)gameLogic.Season == 4)
+        {
+            gameLogic.Season = Seasons.Spring;
+            gameLogic.Year++;
+        }
 
         Debug.Log("Turn " + gameLogic.TurnCount);
 

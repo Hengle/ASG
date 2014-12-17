@@ -19,6 +19,7 @@ using UnityEngine;
 public abstract class ChunkControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public TerrainManagerController TerrainManagerController {get;set;}
     public abstract void InitializeChunk(ChunkViewModel chunk);
     
@@ -47,6 +48,7 @@ public abstract class ChunkControllerBase : Controller {
 public abstract class TerrainManagerControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public WorldManagerController WorldManagerController {get;set;}
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public ChunkController ChunkController {get;set;}
@@ -77,6 +79,7 @@ public abstract class TerrainManagerControllerBase : Controller {
 public abstract class WorldManagerControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public TerrainManagerController TerrainManagerController {get;set;}
     public abstract void InitializeWorldManager(WorldManagerViewModel worldManager);
     
@@ -96,6 +99,7 @@ public abstract class WorldManagerControllerBase : Controller {
 public abstract class AStarControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     public abstract void InitializeAStar(AStarViewModel aStar);
     
     public override ViewModel CreateEmpty() {
@@ -114,6 +118,7 @@ public abstract class AStarControllerBase : Controller {
 public abstract class GameLogicControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public TerrainManagerController TerrainManagerController {get;set;}
     [Inject] public FactionController FactionController {get;set;}
@@ -144,6 +149,7 @@ public abstract class GameLogicControllerBase : Controller {
 public abstract class PlayerControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public UnitController UnitController {get;set;}
     [Inject] public FactionController FactionController {get;set;}
@@ -164,19 +170,20 @@ public abstract class PlayerControllerBase : Controller {
     public virtual void SelectHex(PlayerViewModel player, Hex arg) {
     }
     
+    public virtual void SelectHexAtPos(PlayerViewModel player, Vector3 arg) {
+    }
+    
     public virtual void SelectUnit(PlayerViewModel player, UnitViewModel arg) {
     }
     
     public virtual void MoveUnit(PlayerViewModel player, UnitViewModel arg) {
-    }
-    
-    public virtual void GetHexAtWorldPos(PlayerViewModel player, Vector3 arg) {
     }
 }
 
 public abstract class UnitControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public FactionController FactionController {get;set;}
     public abstract void InitializeUnit(UnitViewModel unit);
@@ -198,11 +205,15 @@ public abstract class UnitControllerBase : Controller {
     
     public virtual void CancelMove(UnitViewModel unit) {
     }
+    
+    public virtual void WorldPosToHexLocation(UnitViewModel unit, Vector3 arg) {
+    }
 }
 
 public abstract class FactionControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public UnitController UnitController {get;set;}
@@ -225,6 +236,7 @@ public abstract class FactionControllerBase : Controller {
 public abstract class CityControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public FactionController FactionController {get;set;}
     [Inject] public BuildingController BuildingController {get;set;}
     public abstract void InitializeCity(CityViewModel city);
@@ -245,6 +257,7 @@ public abstract class CityControllerBase : Controller {
 public abstract class BuildingControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public CityController CityController {get;set;}
     public abstract void InitializeBuilding(BuildingViewModel building);
     
@@ -264,6 +277,7 @@ public abstract class BuildingControllerBase : Controller {
 public abstract class TerrainElementControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     public abstract void InitializeTerrainElement(TerrainElementViewModel terrainElement);
     
     public override ViewModel CreateEmpty() {
@@ -315,6 +329,9 @@ public abstract class SettlerUnitControllerBase : UnitController {
     public override void Initialize(ViewModel viewModel) {
         base.Initialize(viewModel);
         this.InitializeSettlerUnit(((SettlerUnitViewModel)(viewModel)));
+    }
+    
+    public virtual void Settle(SettlerUnitViewModel settlerUnit) {
     }
 }
 

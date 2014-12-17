@@ -28,6 +28,8 @@ public class MainTerrainBase : SceneManager {
     
     private TerrainManagerViewModel _TerrainManager;
     
+    private GameLogicViewModel _GameLogic;
+    
     private ChunkController _ChunkController;
     
     private TerrainManagerController _TerrainManagerController;
@@ -68,6 +70,19 @@ public class MainTerrainBase : SceneManager {
         }
         set {
             _TerrainManager = value;
+        }
+    }
+    
+    [Inject("GameLogic")]
+    public virtual GameLogicViewModel GameLogic {
+        get {
+            if ((this._GameLogic == null)) {
+                this._GameLogic = CreateInstanceViewModel<GameLogicViewModel>(GameLogicController, "GameLogic");
+            }
+            return this._GameLogic;
+        }
+        set {
+            _GameLogic = value;
         }
     }
     
@@ -261,6 +276,7 @@ public class MainTerrainBase : SceneManager {
     public override void Setup() {
         base.Setup();
         Container.RegisterViewModel<TerrainManagerViewModel>(TerrainManager,"TerrainManager");
+        Container.RegisterViewModel<GameLogicViewModel>(GameLogic,"GameLogic");
         Container.RegisterController<ChunkController>(ChunkController);
         Container.RegisterController<TerrainManagerController>(TerrainManagerController);
         Container.RegisterController<WorldManagerController>(WorldManagerController);
@@ -277,6 +293,7 @@ public class MainTerrainBase : SceneManager {
         Container.RegisterController<CombatUnitController>(CombatUnitController);
         this.Container.InjectAll();
         TerrainManagerController.Initialize(TerrainManager);
+        GameLogicController.Initialize(GameLogic);
     }
     
     public override void Initialize() {

@@ -71,7 +71,18 @@ public partial class Hex
             // Do score logic here
             // score = calculate hight differences
 
+
             pathScore = parentScore + score;
+
+
+            //if (Mathf.Abs(neighbors[pathParent].height - this.height) >= 2)
+             //   pathScore += 50;
+
+            //if (neighbors[pathParent].height == 5)
+              //  pathScore += 20;
+
+            //if (neighbors[pathParent].height == 0)
+              //  pathScore += 20;
 
         }
 
@@ -185,6 +196,37 @@ public partial class Hex
         */
 
         return results;
+    }
+
+    public static Hex GetHexAtPos (TerrainManagerViewModel terrainManager, Vector3 pos)
+    {
+        float pointX = pos.x;
+        float pointZ = pos.z;
+        pointX = pointX * terrainManager.PixelsPerUnit;
+        pointZ = pointZ * terrainManager.PixelsPerUnit;
+        pointZ += HexProperties.tileH;
+        pointX -= HexProperties.width / 2;
+        pointZ -= (HexProperties.height - HexProperties.tileH);
+
+
+        float q = (1f / 3f * Mathf.Sqrt(3f) * pointX - 1f / 3f * pointZ) / HexProperties.side;
+        float r = 2f / 3f * pointZ / HexProperties.side;
+
+
+        Vector3 cube = new Vector3();
+        cube.x = q;
+        cube.z = r;
+        cube.y = -cube.x - cube.z;
+
+        cube = Hexagon.RoundCubeCoord(cube);
+
+        Vector2 hoverHexAraray = Hexagon.CubeToOffsetOddQ(cube);
+        Hex hex = null;
+
+        if (hoverHexAraray.x >= 0 && hoverHexAraray.y >= 0 && hoverHexAraray.x < terrainManager.hexGrid.GetLength(0) && hoverHexAraray.y < terrainManager.hexGrid.GetLength(1))
+            hex = terrainManager.hexGrid[(int)hoverHexAraray.x, (int)hoverHexAraray.y];
+
+        return hex;
     }
 
 }

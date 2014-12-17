@@ -45,6 +45,12 @@ public partial class PlayerView
     public override void Update()
     {
         MouseSelect();
+
+        if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            
+        }
+
     }
 
     /// Subscribes to the property and is notified anytime the value changes.
@@ -82,7 +88,7 @@ public partial class PlayerView
             }
             else
             {
-                ExecuteGetHexAtWorldPos(hit.point);
+                ExecuteSelectHexAtPos(hit.point);
             }
 
             if (Input.GetButtonDown("Mouse1") && Player.SelectedUnit != null && Player.SelectedHex != null)
@@ -141,7 +147,7 @@ public partial class PlayerView
         for (int h = 0; path != null && h < path.Count; h++)
         {
             if (h >= pathNodes.Count)
-                break;
+                pathNodes[h].position = Vector3.zero;
 
             pathNodes[h].position = path[h].worldPos;
         }

@@ -143,7 +143,7 @@ public class TerrainManagerController : TerrainManagerControllerBase
             {
 
                 worldPos.x = Mathf.RoundToInt(x * 2 * HexProperties.tileR + (y % 2 == 0 ? 0 : 1) * HexProperties.tileR + HexProperties.tileR) / (float)terrainManager.PixelsPerUnit;
-                worldPos.y = terrainManager.terrainData[x, y] * terrainManager.PixelToHeight;
+                worldPos.y = Mathf.Round(terrainManager.terrainData[x, y] / terrainManager.Altitudes) * terrainManager.Altitudes * terrainManager.PixelToHeight;
                 worldPos.z = Mathf.RoundToInt(y * (HexProperties.tileH + HexProperties.side) + HexProperties.side) / (float)terrainManager.PixelsPerUnit;
                 gameHeight = (int)(Mathf.Round(terrainManager.terrainData[x, y] / terrainManager.Altitudes) * terrainManager.Altitudes / terrainManager.terrainData[x, y] / terrainManager.Altitudes - 1);
 
@@ -370,5 +370,4 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
         Debug.Log("Diamond Square: " + ((System.Environment.TickCount - diamondTimer) / 100f) + "ms");
     }
-
 }

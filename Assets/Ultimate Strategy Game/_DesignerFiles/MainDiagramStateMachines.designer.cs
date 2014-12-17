@@ -17,64 +17,70 @@ using Invert.StateMachine;
 
 public class UnitStateBase : Invert.StateMachine.StateMachine {
     
-    private StateMachineTrigger _StartIdle;
-
-    private StateMachineTrigger _StartMoving;
-
-    private StateMachineTrigger _StartDefending;
+    private StateMachineTrigger _Idle;
     
-    private Idle _Idle;
+    private StateMachineTrigger _Move;
+    
+    private StateMachineTrigger _CancelMove;
+    
+    private StateMachineTrigger _MovementCompleted;
+    
+    private Idling _Idling;
     
     private Moving _Moving;
-    
-    private Defending _Defending;
     
     public UnitStateBase(ViewModel vm, string propertyName) : 
             base(vm, propertyName) {
     }
     
-    public virtual StateMachineTrigger StartIdle {
+    public virtual StateMachineTrigger Idle {
         get {
-            if ((this._StartIdle == null))
-            {
-                this._StartIdle = new StateMachineTrigger(this, "Idle");
+            if ((this._Idle == null)) {
+                this._Idle = new StateMachineTrigger(this, "Idle");
             }
-            return this._StartIdle;
+            return this._Idle;
         }
     }
     
-    public virtual StateMachineTrigger StartMoving {
+    public virtual StateMachineTrigger Move {
         get {
-            if ((this._StartMoving == null))
-            {
-                this._StartMoving = new StateMachineTrigger(this, "Moving");
+            if ((this._Move == null)) {
+                this._Move = new StateMachineTrigger(this, "Move");
             }
-            return this._StartMoving;
+            return this._Move;
         }
     }
     
-    public virtual StateMachineTrigger StartDefending {
+    public virtual StateMachineTrigger CancelMove {
         get {
-            if ((this._StartDefending == null))
-            {
-                this._StartDefending = new StateMachineTrigger(this, "Defending");
+            if ((this._CancelMove == null)) {
+                this._CancelMove = new StateMachineTrigger(this, "CancelMove");
             }
-            return this._StartDefending;
+            return this._CancelMove;
+        }
+    }
+    
+    public virtual StateMachineTrigger MovementCompleted {
+        get {
+            if ((this._MovementCompleted == null)) {
+                this._MovementCompleted = new StateMachineTrigger(this, "MovementCompleted");
+            }
+            return this._MovementCompleted;
         }
     }
     
     public override Invert.StateMachine.State StartState {
         get {
-            return this.Idle;
+            return this.Idling;
         }
     }
     
-    public virtual Idle Idle {
+    public virtual Idling Idling {
         get {
-            if ((this._Idle == null)) {
-                this._Idle = new Idle();
+            if ((this._Idling == null)) {
+                this._Idling = new Idling();
             }
-            return this._Idle;
+            return this._Idling;
         }
     }
     
@@ -87,84 +93,66 @@ public class UnitStateBase : Invert.StateMachine.StateMachine {
         }
     }
     
-    public virtual Defending Defending {
-        get {
-            if ((this._Defending == null)) {
-                this._Defending = new Defending();
-            }
-            return this._Defending;
-        }
-    }
-    
     public override void Compose(List<State> states) {
         base.Compose(states);
-        this.Idle.StateMachine = this;
-        Idle.Moving = new StateTransition("Moving", Idle,Moving);
-        Idle.Defending = new StateTransition("Defending", Idle,Defending);
-        Idle.AddTrigger(StartMoving, Idle.Moving);
-        Idle.AddTrigger(StartDefending, Idle.Defending);
-        states.Add(Idle);
+        this.Idling.StateMachine = this;
+        Idling.Move = new StateTransition("Move", Idling,Moving);
+        Idling.AddTrigger(Move, Idling.Move);
+        states.Add(Idling);
         this.Moving.StateMachine = this;
-        Moving.Idle = new StateTransition("Idle", Moving,Idle);
-        Moving.AddTrigger(StartIdle, Moving.Idle);
+        Moving.CancelMove = new StateTransition("CancelMove", Moving,Idling);
+        Moving.MovementCompleted = new StateTransition("MovementCompleted", Moving,Idling);
+        Moving.AddTrigger(CancelMove, Moving.CancelMove);
+        Moving.AddTrigger(MovementCompleted, Moving.MovementCompleted);
         states.Add(Moving);
-        this.Defending.StateMachine = this;
-        Defending.Moving = new StateTransition("Moving", Defending,Moving);
-        //Defending.AddTrigger(StartIdle, Defending.Idle);
-        //Defending.AddTrigger(StartMoving, Defending.Moving);
-        states.Add(Defending);
     }
 }
 
-public class Idle : Invert.StateMachine.State {
+public class Idling : Invert.StateMachine.State {
     
-    private StateTransition _Moving;
+    private StateTransition _Move;
     
-    private StateTransition _Defending;
-    
-    public virtual StateTransition Moving {
+    public virtual StateTransition Move {
         get {
-            return this._Moving;
+            return this._Move;
         }
         set {
-            _Moving = value;
-        }
-    }
-    
-    public virtual StateTransition Defending {
-        get {
-            return this._Defending;
-        }
-        set {
-            _Defending = value;
+            _Move = value;
         }
     }
     
     public override string Name {
         get {
-            return "Idle";
+            return "Idling";
         }
     }
     
-    private void MovingTransition() {
-        this.Transition(this.Moving);
-    }
-    
-    private void DefendingTransition() {
-        this.Transition(this.Defending);
+    private void MoveTransition() {
+        this.Transition(this.Move);
     }
 }
 
 public class Moving : Invert.StateMachine.State {
     
-    private StateTransition _Idle;
+    private StateTransition _CancelMove;
     
-    public virtual StateTransition Idle {
+    private StateTransition _MovementCompleted;
+    
+    public virtual StateTransition CancelMove {
         get {
-            return this._Idle;
+            return this._CancelMove;
         }
         set {
-            _Idle = value;
+            _CancelMove = value;
+        }
+    }
+    
+    public virtual StateTransition MovementCompleted {
+        get {
+            return this._MovementCompleted;
+        }
+        set {
+            _MovementCompleted = value;
         }
     }
     
@@ -174,31 +162,11 @@ public class Moving : Invert.StateMachine.State {
         }
     }
     
-    private void IdleTransition() {
-        this.Transition(this.Idle);
-    }
-}
-
-public class Defending : Invert.StateMachine.State {
-    
-    private StateTransition _Moving;
-    
-    public virtual StateTransition Moving {
-        get {
-            return this._Moving;
-        }
-        set {
-            _Moving = value;
-        }
+    private void CancelMoveTransition() {
+        this.Transition(this.CancelMove);
     }
     
-    public override string Name {
-        get {
-            return "Defending";
-        }
-    }
-    
-    private void MovingTransition() {
-        this.Transition(this.Moving);
+    private void MovementCompletedTransition() {
+        this.Transition(this.MovementCompleted);
     }
 }
