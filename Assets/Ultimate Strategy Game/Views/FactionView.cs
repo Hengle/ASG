@@ -9,30 +9,42 @@ using UniRx;
 public partial class FactionView 
 {
 
+    public GameObject unitStackPrefab;
     public GameObject settlerUnitPrefab;
+    public GameObject cityPrefab;
+
+
+    /// This binding will add or remove views based on an element/viewmodel collection.
+    public override ViewBase CreateUnitStacksView(UnitStackViewModel item) 
+    {
+        var unitStack = InstantiateView(unitStackPrefab, item, item.HexLocation.worldPos, Quaternion.identity);
+        // Use the properties used in the inspector
+        unitStack.InitializeData(item);
+
+        return unitStack;
+    }
+    
+    /// This binding will add or remove views based on an element/viewmodel collection.
+    public override void UnitStacksAdded(ViewBase item) {
+        base.UnitStacksAdded(item);
+    }
+    
+    /// This binding will add or remove views based on an element/viewmodel collection.
+    public override void UnitStacksRemoved(ViewBase item) {
+        base.UnitStacksRemoved(item);
+    }
+
+
+
   
 
     /// This binding will add or remove views based on an element/viewmodel collection.
-    public override ViewBase CreateUnitsView(UnitViewModel item) 
-    {
-        var unit = InstantiateView(settlerUnitPrefab, item, item.HexLocation.worldPos, Quaternion.identity);
-
-        return unit;
-    }
-    
-    /// This binding will add or remove views based on an element/viewmodel collection.
-    public override void UnitsAdded(ViewBase item) {
-        base.UnitsAdded(item);
-    }
-    
-    /// This binding will add or remove views based on an element/viewmodel collection.
-    public override void UnitsRemoved(ViewBase item) {
-        base.UnitsRemoved(item);
-    }
-
-    /// This binding will add or remove views based on an element/viewmodel collection.
     public override ViewBase CreateCitiesView(CityViewModel item) {
-        return base.CreateCitiesView(item);
+        var city = InstantiateView(cityPrefab, item, item.HexLocation.worldPos, Quaternion.identity);
+        // Use the properties used in the inspector
+        //city.InitializeData(item);
+
+        return city;
     }
     
     /// This binding will add or remove views based on an element/viewmodel collection.

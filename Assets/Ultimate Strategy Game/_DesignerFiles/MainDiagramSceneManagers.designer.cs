@@ -44,7 +44,7 @@ public class MainTerrainBase : SceneManager {
     
     private PlayerController _PlayerController;
     
-    private UnitController _UnitController;
+    private UnitStackController _UnitStackController;
     
     private FactionController _FactionController;
     
@@ -54,9 +54,9 @@ public class MainTerrainBase : SceneManager {
     
     private AIPlayerController _AIPlayerController;
     
-    private SettlerUnitController _SettlerUnitController;
+    private UnitController _UnitController;
     
-    private CombatUnitController _CombatUnitController;
+    private SettlerUnitController _SettlerUnitController;
     
     public MainTerrainSettings _MainTerrainSettings = new MainTerrainSettings();
     
@@ -178,15 +178,15 @@ public class MainTerrainBase : SceneManager {
     }
     
     [Inject()]
-    public virtual UnitController UnitController {
+    public virtual UnitStackController UnitStackController {
         get {
-            if ((this._UnitController == null)) {
-                this._UnitController = new UnitController() { Container = Container };
+            if ((this._UnitStackController == null)) {
+                this._UnitStackController = new UnitStackController() { Container = Container };
             }
-            return this._UnitController;
+            return this._UnitStackController;
         }
         set {
-            _UnitController = value;
+            _UnitStackController = value;
         }
     }
     
@@ -243,6 +243,19 @@ public class MainTerrainBase : SceneManager {
     }
     
     [Inject()]
+    public virtual UnitController UnitController {
+        get {
+            if ((this._UnitController == null)) {
+                this._UnitController = new UnitController() { Container = Container };
+            }
+            return this._UnitController;
+        }
+        set {
+            _UnitController = value;
+        }
+    }
+    
+    [Inject()]
     public virtual SettlerUnitController SettlerUnitController {
         get {
             if ((this._SettlerUnitController == null)) {
@@ -252,19 +265,6 @@ public class MainTerrainBase : SceneManager {
         }
         set {
             _SettlerUnitController = value;
-        }
-    }
-    
-    [Inject()]
-    public virtual CombatUnitController CombatUnitController {
-        get {
-            if ((this._CombatUnitController == null)) {
-                this._CombatUnitController = new CombatUnitController() { Container = Container };
-            }
-            return this._CombatUnitController;
-        }
-        set {
-            _CombatUnitController = value;
         }
     }
     
@@ -284,13 +284,13 @@ public class MainTerrainBase : SceneManager {
         Container.RegisterController<TerrainElementController>(TerrainElementController);
         Container.RegisterController<GameLogicController>(GameLogicController);
         Container.RegisterController<PlayerController>(PlayerController);
-        Container.RegisterController<UnitController>(UnitController);
+        Container.RegisterController<UnitStackController>(UnitStackController);
         Container.RegisterController<FactionController>(FactionController);
         Container.RegisterController<CityController>(CityController);
         Container.RegisterController<BuildingController>(BuildingController);
         Container.RegisterController<AIPlayerController>(AIPlayerController);
+        Container.RegisterController<UnitController>(UnitController);
         Container.RegisterController<SettlerUnitController>(SettlerUnitController);
-        Container.RegisterController<CombatUnitController>(CombatUnitController);
         this.Container.InjectAll();
         TerrainManagerController.Initialize(TerrainManager);
         GameLogicController.Initialize(GameLogic);

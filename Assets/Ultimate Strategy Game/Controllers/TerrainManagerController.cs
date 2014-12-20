@@ -184,7 +184,7 @@ public class TerrainManagerController : TerrainManagerControllerBase
         Hex nextHex = null;
         int iterations = 0;
 
-        // Keep creating rivers unit we are done
+        // Keep creating rivers unitStack we are done
         while (totalRivers < terrainManager.RiverCount && iterations <= 100)
         {
             // Get a new hex of the minimum height

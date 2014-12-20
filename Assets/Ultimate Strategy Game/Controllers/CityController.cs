@@ -9,5 +9,6 @@ using UnityEngine;
 public class CityController : CityControllerBase {
     
     public override void InitializeCity(CityViewModel city) {
+        
     }
 }

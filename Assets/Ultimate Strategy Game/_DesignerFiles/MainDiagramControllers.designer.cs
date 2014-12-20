@@ -151,8 +151,10 @@ public abstract class PlayerControllerBase : Controller {
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public GameLogicController GameLogicController {get;set;}
-    [Inject] public UnitController UnitController {get;set;}
+    [Inject] public UnitStackController UnitStackController {get;set;}
+    [Inject] public CityController CityController {get;set;}
     [Inject] public FactionController FactionController {get;set;}
+    [Inject] public UnitController UnitController {get;set;}
     public abstract void InitializePlayer(PlayerViewModel player);
     
     public override ViewModel CreateEmpty() {
@@ -173,40 +175,53 @@ public abstract class PlayerControllerBase : Controller {
     public virtual void SelectHexAtPos(PlayerViewModel player, Vector3 arg) {
     }
     
+    public virtual void SelectUnitStack(PlayerViewModel player, UnitStackViewModel arg) {
+    }
+    
     public virtual void SelectUnit(PlayerViewModel player, UnitViewModel arg) {
     }
     
-    public virtual void MoveUnit(PlayerViewModel player, UnitViewModel arg) {
+    public virtual void SelectCity(PlayerViewModel player, CityViewModel arg) {
+    }
+    
+    public virtual void MoveUnitStack(PlayerViewModel player, UnitStackViewModel arg) {
+    }
+    
+    public virtual void DeselectAll(PlayerViewModel player) {
     }
 }
 
-public abstract class UnitControllerBase : Controller {
+public abstract class UnitStackControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public FactionController FactionController {get;set;}
-    public abstract void InitializeUnit(UnitViewModel unit);
+    [Inject] public UnitController UnitController {get;set;}
+    public abstract void InitializeUnitStack(UnitStackViewModel unitStack);
     
     public override ViewModel CreateEmpty() {
-        return new UnitViewModel(this);
+        return new UnitStackViewModel(this);
     }
     
-    public virtual UnitViewModel CreateUnit() {
-        return ((UnitViewModel)(this.Create()));
+    public virtual UnitStackViewModel CreateUnitStack() {
+        return ((UnitStackViewModel)(this.Create()));
     }
     
     public override void Initialize(ViewModel viewModel) {
-        this.InitializeUnit(((UnitViewModel)(viewModel)));
+        this.InitializeUnitStack(((UnitStackViewModel)(viewModel)));
     }
     
-    public virtual void Move(UnitViewModel unit, Hex arg) {
+    public virtual void Move(UnitStackViewModel unitStack, Hex arg) {
     }
     
-    public virtual void CancelMove(UnitViewModel unit) {
+    public virtual void StopMove(UnitStackViewModel unitStack) {
     }
     
-    public virtual void WorldPosToHexLocation(UnitViewModel unit, Vector3 arg) {
+    public virtual void CancelMove(UnitStackViewModel unitStack) {
+    }
+    
+    public virtual void WorldPosToHexLocation(UnitStackViewModel unitStack, Vector3 arg) {
     }
 }
 
@@ -217,6 +232,7 @@ public abstract class FactionControllerBase : Controller {
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public UnitController UnitController {get;set;}
+    [Inject] public UnitStackController UnitStackController {get;set;}
     [Inject] public CityController CityController {get;set;}
     public abstract void InitializeFaction(FactionViewModel faction);
     
@@ -237,8 +253,10 @@ public abstract class CityControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
+    [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public FactionController FactionController {get;set;}
     [Inject] public BuildingController BuildingController {get;set;}
+    [Inject] public UnitController UnitController {get;set;}
     public abstract void InitializeCity(CityViewModel city);
     
     public override ViewModel CreateEmpty() {
@@ -314,6 +332,29 @@ public abstract class AIPlayerControllerBase : PlayerController {
     }
 }
 
+public abstract class UnitControllerBase : Controller {
+    
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
+    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
+    [Inject] public PlayerController PlayerController {get;set;}
+    [Inject] public UnitStackController UnitStackController {get;set;}
+    [Inject] public FactionController FactionController {get;set;}
+    [Inject] public CityController CityController {get;set;}
+    public abstract void InitializeUnit(UnitViewModel unit);
+    
+    public override ViewModel CreateEmpty() {
+        return new UnitViewModel(this);
+    }
+    
+    public virtual UnitViewModel CreateUnit() {
+        return ((UnitViewModel)(this.Create()));
+    }
+    
+    public override void Initialize(ViewModel viewModel) {
+        this.InitializeUnit(((UnitViewModel)(viewModel)));
+    }
+}
+
 public abstract class SettlerUnitControllerBase : UnitController {
     
     public abstract void InitializeSettlerUnit(SettlerUnitViewModel settlerUnit);
@@ -332,23 +373,5 @@ public abstract class SettlerUnitControllerBase : UnitController {
     }
     
     public virtual void Settle(SettlerUnitViewModel settlerUnit) {
-    }
-}
-
-public abstract class CombatUnitControllerBase : UnitController {
-    
-    public abstract void InitializeCombatUnit(CombatUnitViewModel combatUnit);
-    
-    public override ViewModel CreateEmpty() {
-        return new CombatUnitViewModel(this);
-    }
-    
-    public virtual CombatUnitViewModel CreateCombatUnit() {
-        return ((CombatUnitViewModel)(this.Create()));
-    }
-    
-    public override void Initialize(ViewModel viewModel) {
-        base.Initialize(viewModel);
-        this.InitializeCombatUnit(((CombatUnitViewModel)(viewModel)));
     }
 }

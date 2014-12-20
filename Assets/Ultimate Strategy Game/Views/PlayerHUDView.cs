@@ -15,6 +15,17 @@ public partial class PlayerHUDView
 
     public Text unitName;
 
+    public override void SelectedUnitStackChanged(UnitStackViewModel unitStack)
+    {
+        if (unitStack != null)
+        {
+            unitName.text = unitStack.ComputeLeadingUnit().Name;
+        }
+        else
+        {
+            unitName.text = "No Unit Selected";
+        }
+    }
 
     /// Subscribes to the property and is notified anytime the value changes.
     public override void SelectedHexChanged(Hex hex) 
@@ -30,20 +41,7 @@ public partial class PlayerHUDView
             toolTip.gameObject.SetActive(false);
         }
     }
-
-
-    /// Subscribes to the property and is notified anytime the value changes.
-    public override void SelectedUnitChanged(UnitViewModel unit)
-    {
-        if (unit != null)
-        {
-            unitName.text = unit.Name;
-        }
-        else
-        {
-            unitName.text = "No Unit Selected";
-        }
-    }
+    
 
     public override void Update()
     {

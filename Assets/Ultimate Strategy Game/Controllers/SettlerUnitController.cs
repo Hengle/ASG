@@ -10,5 +10,4 @@ public class SettlerUnitController : SettlerUnitControllerBase {
     
     public override void InitializeSettlerUnit(SettlerUnitViewModel settlerUnit) {
     }
-
 }

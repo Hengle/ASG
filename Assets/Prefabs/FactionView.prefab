@@ -48,13 +48,15 @@ MonoBehaviour:
   _Name: 
   _Food: 0
   _Gold: 0
-  _BindUnits: 1
-  _UnitsSceneFirst: 0
-  _UnitsContainer: {fileID: 0}
   _BindCities: 1
   _CitiesSceneFirst: 0
   _CitiesContainer: {fileID: 0}
+  _BindUnitStacks: 1
+  _UnitStacksSceneFirst: 0
+  _UnitStacksContainer: {fileID: 0}
+  unitStackPrefab: {fileID: 100000, guid: 65f0818cbd7c06441ab9332ec27f77fe, type: 2}
   settlerUnitPrefab: {fileID: 100000, guid: 65f0818cbd7c06441ab9332ec27f77fe, type: 2}
+  cityPrefab: {fileID: 100000, guid: 5f51c90edd63110499a82c82b56b149c, type: 2}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

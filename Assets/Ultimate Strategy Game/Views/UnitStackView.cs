@@ -6,8 +6,8 @@ using UnityEngine;
 using UniRx;
 
 
-public partial class UnitView 
-{
+public partial class UnitStackView 
+{ 
 
     public float movementSpeed;
 
@@ -35,14 +35,14 @@ public partial class UnitView
     public override void OnMoving() 
     {
         base.OnMoving();
-        Observable.EveryFixedUpdate().Subscribe(state => Moving()).DisposeWhenChanged(Unit.StateProperty, true);
+        Observable.EveryFixedUpdate().Subscribe(state => Moving()).DisposeWhenChanged(UnitStack.StateProperty, true);
     }
 
 
     public void Moving()
     {
-        if (Unit.NextHexInPath != null)
-            _transform.position = Vector3.MoveTowards(_transform.position, Unit.NextHexInPath.worldPos, movementSpeed * Time.fixedDeltaTime);
+        if (UnitStack.NextHexInPath != null)
+            _transform.position = Vector3.MoveTowards(_transform.position, UnitStack.NextHexInPath.worldPos, movementSpeed * Time.fixedDeltaTime);
 
     }
 

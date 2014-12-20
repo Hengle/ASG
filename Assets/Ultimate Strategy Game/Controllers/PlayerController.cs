@@ -17,9 +17,26 @@ public class PlayerController : PlayerControllerBase
         player.SelectedHex = hex;
     }
 
+    public override void SelectUnitStack(PlayerViewModel player, UnitStackViewModel unitStack)
+    {
+        player.SelectedUnitStack = unitStack;
+    }
+
     public override void SelectUnit(PlayerViewModel player, UnitViewModel unit)
     {
-        player.SelectedUnit = unit;
+        player.SelectedUnits.Add(unit);
+    }
+
+    public override void SelectCity(PlayerViewModel player, CityViewModel city)
+    {
+        player.SelectedCity = city;
+    }
+
+    public override void DeselectAll(PlayerViewModel player)
+    {
+        player.SelectUnit = null;
+        player.SelectedCity = null;
+        player.MovingUnit = false;
     }
 
     public override void SelectHexAtPos(PlayerViewModel player, Vector3 pos)
@@ -27,9 +44,10 @@ public class PlayerController : PlayerControllerBase
         ExecuteCommand(player.SelectHex, Hex.GetHexAtPos(TerrainManager, pos));
     }
 
-    public override void MoveUnit(PlayerViewModel player, UnitViewModel unit)
+    public override void MoveUnitStack(PlayerViewModel player, UnitStackViewModel unitStack)
     {
-        ExecuteCommand(unit.Move, player.SelectedHex);
-        player.MovingUnit = false;   
+        ExecuteCommand(unitStack.Move, player.SelectedHex);
+        player.MovingUnit = false;
     }
+
 }

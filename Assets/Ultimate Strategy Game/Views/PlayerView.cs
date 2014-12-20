@@ -9,6 +9,12 @@ using UniRx;
 public partial class PlayerView 
 { 
 
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void SelectedUnitStackChanged(UnitStackViewModel value) {
+        base.SelectedUnitStackChanged(value);
+    }
+ 
+
     public GameObject hoverHexHeightLight;
 
     public Vector2 hoverHexAraray;
@@ -53,13 +59,6 @@ public partial class PlayerView
 
     }
 
-    /// Subscribes to the property and is notified anytime the value changes.
-    public override void SelectedUnitChanged(UnitViewModel value) 
-    {
-        base.SelectedUnitChanged(value);
-
-
-    }
 
     void MouseSelect()
     {
@@ -76,14 +75,22 @@ public partial class PlayerView
                 // Select Unit
                 if (hit.collider.gameObject.CompareTag("CampainUnit"))
                 {
-                    ExecuteSelectUnit(hit.collider.gameObject.GetComponent<UnitView>().Unit);
+                    ExecuteSelectUnitStack(hit.collider.gameObject.GetComponent<UnitStackView>().UnitStack);
                     return;
                 }
+
+                // Select City
+                if (hit.collider.gameObject.CompareTag("City"))
+                {
+                    ExecuteSelectCity(hit.collider.gameObject.GetComponent<CityView>().City);
+                    return;
+                }
+
                 // Deselect Unit
                 if (hit.collider.gameObject.CompareTag("Terrain"))
                 {
-                    ExecuteSelectUnit(null);
-                    Player.MovingUnit = false;
+                    ExecuteDeselectAll();
+                    return;
                 }
             }
             else
@@ -91,15 +98,15 @@ public partial class PlayerView
                 ExecuteSelectHexAtPos(hit.point);
             }
 
-            if (Input.GetButtonDown("Mouse1") && Player.SelectedUnit != null && Player.SelectedHex != null)
+            if (Input.GetButtonDown("Mouse1") && Player.SelectedUnitStack != null && Player.SelectedHex != null)
             {
                 Player.MovingUnit = true;
             }
         }
 
-        if (Input.GetButtonUp("Mouse1") && Player.SelectedUnit != null && Player.SelectedHex != null)
+        if (Input.GetButtonUp("Mouse1") && Player.SelectedUnitStack != null && Player.SelectedHex != null)
         {
-            ExecuteMoveUnit(Player.SelectedUnit);
+            ExecuteMoveUnitStack(Player.SelectedUnitStack);
             HidePath();
         }
 
@@ -119,7 +126,7 @@ public partial class PlayerView
     /// Subscribes to the property and is notified anytime the value changes.
     public override void SelectedHexChanged(Hex hex)
     {
-        if (Player.MovingUnit == true && hex != null && Player.SelectedUnit != null)
+        if (Player.MovingUnit == true && hex != null && Player.SelectedUnitStack != null)
         {
             ShowPath();
         }
@@ -142,7 +149,8 @@ public partial class PlayerView
 
     private void ShowPath ()
     {
-        List<Hex> path = Pathfinding.GetPath(Player.SelectedUnit.HexLocation, Player.SelectedHex, 0);
+        
+        List<Hex> path = Pathfinding.GetPath(Player.SelectedUnitStack.HexLocation, Player.SelectedHex, 0);
 
         for (int h = 0; path != null && h < path.Count; h++)
         {

@@ -10,7 +10,8 @@ public class GameLogicController : GameLogicControllerBase
 {
 
     [Inject]
-    public UnitController UnitController { get; set; }
+    public UnitStackController UnitStackController { get; set; }
+
     [Inject]
     public SettlerUnitController SettlerUnitController { get; set; }
 
@@ -31,7 +32,7 @@ public class GameLogicController : GameLogicControllerBase
         Debug.Log(gameLogic.TerrainManager);
 
         // Make sure to set the tell the units what the terrain manager.
-        UnitViewModel.terrainManager = gameLogic.TerrainManager;
+        UnitStackViewModel.terrainManager = gameLogic.TerrainManager;
 
 
         TerrainManagerController.GenerateMap(gameLogic.TerrainManager);
@@ -83,26 +84,40 @@ public class GameLogicController : GameLogicControllerBase
     {
 
         // Spawn the settle
-        var settler = new SettlerUnitViewModel(SettlerUnitController)
+        SettlerUnitViewModel settler = new SettlerUnitViewModel(SettlerUnitController)
         {
             Name = "Settler",
-            HexLocation = player.StartingHex
+            UnitCount = 400,
+            UnitCountMax = 500
         };
-        
 
+
+
+        var unitStack = new UnitStackViewModel(UnitStackController)
+        {
+            Owner = player,
+            HexLocation = player.StartingHex,
+        };
+
+        unitStack.Units.Add(settler);
+        unitStack.ComputeLeadingUnit();
+
+        player.Faction.UnitStacks.Add(unitStack);
         player.Faction.Units.Add(settler);
-
-        /* Give each player 1 worker and 1 combat unit
+        
+        /*
+        // Give each player 1 worker and 1 combat unitStack
         var worker = new WorkerUnitViewModel(WorkerUnitController)
         {
             Owner = player,
             CurrentTile = startTile,
             Position = player.StartingPosition
         };
-        player.AllUnits.Add(worker);
+
+        player..Add(worker);
         ExecuteCommand(startTile.SpawnUnit, worker);
 
-        // Hack: grab a new starting position from the map and spawn a combat unit
+        // Hack: grab a new starting position from the map and spawn a combat unitStack
         var randomPos = CoreMapController.GetRandomPlayerStartPosition();
         var tile = CoreMapController.GetTile(CoreMap, randomPos);
         var combatUnit = new CombatUnitViewModel(CombatUnitController)

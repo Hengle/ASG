@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Invert.StateMachine;
 
-/*
-public class UnitState : UnitStateBase {
+
+public class UnitStackState : UnitStackStateBase {
     
-    public UnitState(ViewModel vm, string propertyName) : 
+    public UnitStackState(ViewModel vm, string propertyName) : 
             base(vm, propertyName) {
     }
-}*/
+}
