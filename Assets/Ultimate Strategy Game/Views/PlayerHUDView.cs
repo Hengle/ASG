@@ -15,11 +15,25 @@ public partial class PlayerHUDView
 
     public Text unitName;
 
+
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public override void SelectedUnitsAdded(UnitViewModel item)
+    {
+        base.SelectedUnitsAdded(item);
+    }
+
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public override void SelectedUnitsRemoved(UnitViewModel item)
+    {
+        base.SelectedUnitsRemoved(item);
+    }
+
+
     public override void SelectedUnitStackChanged(UnitStackViewModel unitStack)
     {
         if (unitStack != null)
         {
-            unitName.text = unitStack.ComputeLeadingUnit().Name;
+            unitName.text = unitStack.LeadingUnit.Name;
         }
         else
         {
@@ -45,8 +59,6 @@ public partial class PlayerHUDView
 
     public override void Update()
     {
-        base.Update();
-
         toolTip.rectTransform.anchoredPosition = new Vector2(Input.mousePosition.x + toolTip.rectTransform.sizeDelta.x / 2 + 15, Input.mousePosition.y - toolTip.rectTransform.sizeDelta.y / 2 - 15);
     }
 

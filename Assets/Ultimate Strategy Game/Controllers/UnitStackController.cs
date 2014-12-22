@@ -32,9 +32,12 @@ public class UnitStackController : UnitStackControllerBase {
         if (path != null) unitStack.Path.AddRange(path);
     }
 
-    public override void WorldPosToHexLocation(UnitStackViewModel unitStack, Vector3 pos)
+    public override void AddUnitToStack(UnitStackViewModel unitStack, UnitViewModel unit)
     {
-        unitStack.HexLocation = Hex.GetHexAtPos(TerrainManager, pos);
+        base.AddUnitToStack(unitStack, unit);
+        unitStack.Units.Add(unit);
+        unitStack.LeadingUnit = unitStack.Units[0];
+        Debug.Log(unitStack.LeadingUnit);
     }
 
 }

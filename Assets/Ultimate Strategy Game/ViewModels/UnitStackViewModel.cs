@@ -11,15 +11,6 @@ public partial class UnitStackViewModel
 
     public static TerrainManagerViewModel terrainManager;
 
-    // Unit stack units are added or removed the leading unit is recalculated
-    public override UnitViewModel ComputeLeadingUnit()
-    {
-        Debug.Log("Computing prop " + Units.Count);
-        if (Units.Count > 0) return Units.First();
-
-        return null;
-    }
-
 
     public override Hex ComputeHexLocation()
     {

@@ -35,6 +35,7 @@ public class PlayerController : PlayerControllerBase
     public override void DeselectAll(PlayerViewModel player)
     {
         player.SelectUnit = null;
+        player.SelectedUnitStack = null;
         player.SelectedCity = null;
         player.MovingUnit = false;
     }

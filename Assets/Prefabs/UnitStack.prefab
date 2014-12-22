@@ -11,7 +11,6 @@ GameObject:
   - 33: {fileID: 3300000}
   - 136: {fileID: 13600000}
   - 23: {fileID: 2300000}
-  - 114: {fileID: 11400000}
   m_Layer: 0
   m_Name: UnitStack
   m_TagString: CampainUnit
@@ -244,31 +243,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d10922de73cf12e4c8a5c13579efbd4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _LogEvents: 0
-  _forceResolveViewModel: 0
-  _InjectView: 0
-  _overrideViewModel: 0
-  _resolveName: 
-  _Save: 0
-  _MovePoints: 0
-  _MovePointsTotal: 0
-  _Owner: {fileID: 0}
-  _BindMove: 1
-  _BindState: 1
-  _BindUnits: 1
-  _BindLeadingUnit: 1
-  movementSpeed: 20
 --- !u!136 &13600000
 CapsuleCollider:
   m_ObjectHideFlags: 1

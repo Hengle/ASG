@@ -453,6 +453,14 @@ public abstract class UnitStackViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
+    public ViewBase _LeadingUnit;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Vector3 _WorldPos;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
     public Int32 _MovePoints;
     
     [UFGroup("View Model Properties")]
@@ -484,6 +492,8 @@ public abstract class UnitStackViewBase : ViewBase {
     
     protected override void InitializeViewModel(ViewModel viewModel) {
         UnitStackViewModel unitStack = ((UnitStackViewModel)(viewModel));
+        unitStack.LeadingUnit = this._LeadingUnit == null ? null : this._LeadingUnit.ViewModelObject as UnitViewModel;
+        unitStack.WorldPos = this._WorldPos;
         unitStack.MovePoints = this._MovePoints;
         unitStack.MovePointsTotal = this._MovePointsTotal;
         unitStack.Owner = this._Owner == null ? null : this._Owner.ViewModelObject as PlayerViewModel;
@@ -501,8 +511,12 @@ public abstract class UnitStackViewBase : ViewBase {
         this.ExecuteCommand(UnitStack.CancelMove);
     }
     
-    public virtual void ExecuteWorldPosToHexLocation(Vector3 arg) {
-        this.ExecuteCommand(UnitStack.WorldPosToHexLocation, arg);
+    public virtual void ExecuteAddUnitToStack(UnitViewModel unit) {
+        this.ExecuteCommand(UnitStack.AddUnitToStack, unit);
+    }
+    
+    public virtual void ExecuteRemoveUnitFromStack(UnitViewModel unit) {
+        this.ExecuteCommand(UnitStack.RemoveUnitFromStack, unit);
     }
 }
 
@@ -683,6 +697,10 @@ public abstract class UnitViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public Int32 _UnitCountMax;
     
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _Owner;
+    
     public override System.Type ViewModelType {
         get {
             return typeof(UnitViewModel);
@@ -707,11 +725,16 @@ public abstract class UnitViewBase : ViewBase {
         unit.Name = this._Name;
         unit.UnitCount = this._UnitCount;
         unit.UnitCountMax = this._UnitCountMax;
+        unit.Owner = this._Owner == null ? null : this._Owner.ViewModelObject as PlayerViewModel;
     }
 }
 
 [DiagramInfoAttribute("Ultimate Strategy Game")]
 public abstract class SettlerUnitViewBase : UnitViewBase {
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _Population;
     
     public override System.Type ViewModelType {
         get {
@@ -734,6 +757,8 @@ public abstract class SettlerUnitViewBase : UnitViewBase {
     
     protected override void InitializeViewModel(ViewModel viewModel) {
         base.InitializeViewModel(viewModel);
+        SettlerUnitViewModel settlerUnit = ((SettlerUnitViewModel)(viewModel));
+        settlerUnit.Population = this._Population;
     }
     
     public virtual void ExecuteSettle() {
@@ -913,85 +938,51 @@ public class GameLogicGUIViewBase : GameLogicViewBase {
 public partial class GameLogicGUI : GameLogicGUIViewBase {
 }
 
-public class PlayerViewViewBase : PlayerViewBase {
-    
-    [UFToggleGroup("SelectedHex")]
-    [UnityEngine.HideInInspector()]
-    [UFRequireInstanceMethod("SelectedHexChanged")]
-    public bool _BindSelectedHex = true;
-    
-    [UFToggleGroup("MovingUnit")]
-    [UnityEngine.HideInInspector()]
-    [UFRequireInstanceMethod("MovingUnitChanged")]
-    public bool _BindMovingUnit = true;
-    
-    [UFToggleGroup("SelectedUnitStack")]
-    [UnityEngine.HideInInspector()]
-    public bool _BindSelectedUnitStack = true;
-    
-    public override ViewModel CreateModel() {
-        return this.RequestViewModel(GameManager.Container.Resolve<PlayerController>());
-    }
-    
-    /// Subscribes to the property and is notified anytime the value changes.
-    public virtual void SelectedHexChanged(Hex value) {
-    }
-    
-    /// Subscribes to the property and is notified anytime the value changes.
-    public virtual void MovingUnitChanged(Boolean value) {
-    }
-    
-    /// Subscribes to the property and is notified anytime the value changes.
-    public virtual void SelectedUnitStackChanged(UnitStackViewModel value) {
-    }
-    
-    public override void Bind() {
-        base.Bind();
-        if (this._BindSelectedHex) {
-            this.BindProperty(Player._SelectedHexProperty, this.SelectedHexChanged);
-        }
-        if (this._BindMovingUnit) {
-            this.BindProperty(Player._MovingUnitProperty, this.MovingUnitChanged);
-        }
-        if (this._BindSelectedUnitStack) {
-            this.BindProperty(Player._SelectedUnitStackProperty, this.SelectedUnitStackChanged);
-        }
-    }
-}
-
-public partial class PlayerView : PlayerViewViewBase {
-}
-
 public class PlayerHUDViewViewBase : PlayerViewBase {
     
+    [UFToggleGroup("SelectedUnitStack")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSelectedUnitStack = true;
+    
+    [UFToggleGroup("SelectedUnits")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSelectedUnits = true;
+    
     [UFToggleGroup("SelectedHex")]
     [UnityEngine.HideInInspector()]
     [UFRequireInstanceMethod("SelectedHexChanged")]
     public bool _BindSelectedHex = true;
-    
-    [UFToggleGroup("SelectedUnitStack")]
-    [UnityEngine.HideInInspector()]
-    public bool _BindSelectedUnitStack = true;
     
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<PlayerController>());
     }
     
     /// Subscribes to the property and is notified anytime the value changes.
-    public virtual void SelectedHexChanged(Hex value) {
+    public virtual void SelectedUnitStackChanged(UnitStackViewModel value) {
+    }
+    
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public virtual void SelectedUnitsAdded(UnitViewModel item) {
+    }
+    
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public virtual void SelectedUnitsRemoved(UnitViewModel item) {
     }
     
     /// Subscribes to the property and is notified anytime the value changes.
-    public virtual void SelectedUnitStackChanged(UnitStackViewModel value) {
+    public virtual void SelectedHexChanged(Hex value) {
     }
     
     public override void Bind() {
         base.Bind();
-        if (this._BindSelectedHex) {
-            this.BindProperty(Player._SelectedHexProperty, this.SelectedHexChanged);
-        }
         if (this._BindSelectedUnitStack) {
             this.BindProperty(Player._SelectedUnitStackProperty, this.SelectedUnitStackChanged);
+        }
+        if (this._BindSelectedUnits) {
+            this.BindCollection(Player._SelectedUnitsProperty, SelectedUnitsAdded, SelectedUnitsRemoved);
+        }
+        if (this._BindSelectedHex) {
+            this.BindProperty(Player._SelectedHexProperty, this.SelectedHexChanged);
         }
     }
 }
@@ -1139,97 +1130,6 @@ public class GameLogicViewViewBase : GameLogicViewBase {
 public partial class GameLogicView : GameLogicViewViewBase {
 }
 
-public class UnitStackViewViewBase : UnitStackViewBase {
-    
-    private IDisposable _WorldPosDisposable;
-    
-    [UFToggleGroup("Move")]
-    [UnityEngine.HideInInspector()]
-    public bool _BindMove = true;
-    
-    [UFToggleGroup("State")]
-    [UnityEngine.HideInInspector()]
-    [UFRequireInstanceMethod("StateChanged")]
-    public bool _BindState = true;
-    
-    [UFToggleGroup("Units")]
-    [UnityEngine.HideInInspector()]
-    public bool _BindUnits = true;
-    
-    [UFToggleGroup("LeadingUnit")]
-    [UnityEngine.HideInInspector()]
-    public bool _BindLeadingUnit = true;
-    
-    public override ViewModel CreateModel() {
-        return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
-    }
-    
-    /// Invokes MoveExecuted when the Move command is executed.
-    public virtual void MoveExecuted() {
-    }
-    
-    /// Subscribes to the state machine property and executes a method for each state.
-    public virtual void StateChanged(Invert.StateMachine.State value) {
-        if (value is Idling) {
-            this.OnIdling();
-        }
-        if (value is Moving) {
-            this.OnMoving();
-        }
-    }
-    
-    public virtual void OnIdling() {
-    }
-    
-    public virtual void OnMoving() {
-    }
-    
-    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public virtual void UnitsAdded(UnitViewModel item) {
-    }
-    
-    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public virtual void UnitsRemoved(UnitViewModel item) {
-    }
-    
-    /// Subscribes to the property and is notified anytime the value changes.
-    public virtual void LeadingUnitChanged(UnitViewModel value) {
-    }
-    
-    public virtual void ResetWorldPos() {
-        if (_WorldPosDisposable != null) _WorldPosDisposable.Dispose();
-        _WorldPosDisposable = GetWorldPosObservable().Subscribe(UnitStack._WorldPosProperty).DisposeWith(this);
-    }
-    
-    protected virtual Vector3 CalculateWorldPos() {
-        return default(Vector3);
-    }
-    
-    protected virtual UniRx.IObservable<Vector3> GetWorldPosObservable() {
-        return this.UpdateAsObservable().Select(p => CalculateWorldPos());
-    }
-    
-    public override void Bind() {
-        base.Bind();
-        ResetWorldPos();
-        if (this._BindMove) {
-            this.BindCommandExecuted(UnitStack.Move, MoveExecuted);
-        }
-        if (this._BindState) {
-            this.BindProperty(UnitStack._StateProperty, this.StateChanged);
-        }
-        if (this._BindUnits) {
-            this.BindCollection(UnitStack._UnitsProperty, UnitsAdded, UnitsRemoved);
-        }
-        if (this._BindLeadingUnit) {
-            this.BindProperty(UnitStack._LeadingUnitProperty, this.LeadingUnitChanged);
-        }
-    }
-}
-
-public partial class UnitStackView : UnitStackViewViewBase {
-}
-
 public class CityViewViewBase : CityViewBase {
     
     public override ViewModel CreateModel() {
@@ -1242,4 +1142,145 @@ public class CityViewViewBase : CityViewBase {
 }
 
 public partial class CityView : CityViewViewBase {
+}
+
+public class UnitStackSlotsViewBase : PlayerViewBase {
+    
+    [UFToggleGroup("SelectedUnitStack")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSelectedUnitStack = true;
+    
+    [UFToggleGroup("SelectedUnits")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSelectedUnits = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<PlayerController>());
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void SelectedUnitStackChanged(UnitStackViewModel value) {
+    }
+    
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public virtual void SelectedUnitsAdded(UnitViewModel item) {
+    }
+    
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public virtual void SelectedUnitsRemoved(UnitViewModel item) {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        if (this._BindSelectedUnitStack) {
+            this.BindProperty(Player._SelectedUnitStackProperty, this.SelectedUnitStackChanged);
+        }
+        if (this._BindSelectedUnits) {
+            this.BindCollection(Player._SelectedUnitsProperty, SelectedUnitsAdded, SelectedUnitsRemoved);
+        }
+    }
+}
+
+public partial class UnitStackSlots : UnitStackSlotsViewBase {
+}
+
+public class UnitSlotViewBase : UnitViewBase {
+    
+    [UFToggleGroup("UnitCount")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("UnitCountChanged")]
+    public bool _BindUnitCount = true;
+    
+    [UFToggleGroup("UnitCountMax")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("UnitCountMaxChanged")]
+    public bool _BindUnitCountMax = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<UnitController>());
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void UnitCountChanged(Int32 value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void UnitCountMaxChanged(Int32 value) {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        if (this._BindUnitCount) {
+            this.BindProperty(Unit._UnitCountProperty, this.UnitCountChanged);
+        }
+        if (this._BindUnitCountMax) {
+            this.BindProperty(Unit._UnitCountMaxProperty, this.UnitCountMaxChanged);
+        }
+    }
+}
+
+public partial class UnitSlot : UnitSlotViewBase {
+}
+
+public class PlayerViewViewBase : PlayerViewBase {
+    
+    [UFToggleGroup("SelectedHex")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("SelectedHexChanged")]
+    public bool _BindSelectedHex = true;
+    
+    [UFToggleGroup("SelectedUnitStack")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSelectedUnitStack = true;
+    
+    [UFToggleGroup("MovingUnit")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("MovingUnitChanged")]
+    public bool _BindMovingUnit = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<PlayerController>());
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void SelectedHexChanged(Hex value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void SelectedUnitStackChanged(UnitStackViewModel value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void MovingUnitChanged(Boolean value) {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        if (this._BindSelectedHex) {
+            this.BindProperty(Player._SelectedHexProperty, this.SelectedHexChanged);
+        }
+        if (this._BindSelectedUnitStack) {
+            this.BindProperty(Player._SelectedUnitStackProperty, this.SelectedUnitStackChanged);
+        }
+        if (this._BindMovingUnit) {
+            this.BindProperty(Player._MovingUnitProperty, this.MovingUnitChanged);
+        }
+    }
+}
+
+public partial class PlayerView : PlayerViewViewBase {
+}
+
+public class TestViewBase : UnitStackViewBase {
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
+    }
+    
+    public override void Bind() {
+        base.Bind();
+    }
+}
+
+public partial class Test : TestViewBase {
 }

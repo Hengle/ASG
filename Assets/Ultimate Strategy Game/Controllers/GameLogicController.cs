@@ -93,18 +93,21 @@ public class GameLogicController : GameLogicControllerBase
 
 
 
+
         var unitStack = new UnitStackViewModel(UnitStackController)
         {
             Owner = player,
             HexLocation = player.StartingHex,
         };
 
-        unitStack.Units.Add(settler);
-        unitStack.ComputeLeadingUnit();
 
         player.Faction.UnitStacks.Add(unitStack);
         player.Faction.Units.Add(settler);
-        
+
+        UnitStackController.AddUnitToStack(unitStack, settler);
+        Debug.Log(unitStack.LeadingUnit);
+
+
         /*
         // Give each player 1 worker and 1 combat unitStack
         var worker = new WorkerUnitViewModel(WorkerUnitController)

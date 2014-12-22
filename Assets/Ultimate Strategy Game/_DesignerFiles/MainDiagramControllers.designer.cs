@@ -152,9 +152,9 @@ public abstract class PlayerControllerBase : Controller {
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
+    [Inject] public UnitController UnitController {get;set;}
     [Inject] public CityController CityController {get;set;}
     [Inject] public FactionController FactionController {get;set;}
-    [Inject] public UnitController UnitController {get;set;}
     public abstract void InitializePlayer(PlayerViewModel player);
     
     public override ViewModel CreateEmpty() {
@@ -221,7 +221,10 @@ public abstract class UnitStackControllerBase : Controller {
     public virtual void CancelMove(UnitStackViewModel unitStack) {
     }
     
-    public virtual void WorldPosToHexLocation(UnitStackViewModel unitStack, Vector3 arg) {
+    public virtual void AddUnitToStack(UnitStackViewModel unitStack, UnitViewModel arg) {
+    }
+    
+    public virtual void RemoveUnitFromStack(UnitStackViewModel unitStack, UnitViewModel arg) {
     }
 }
 
