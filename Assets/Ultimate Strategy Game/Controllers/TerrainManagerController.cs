@@ -168,7 +168,7 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
                     if (arrayPos.x >= 0 && arrayPos.x < terrainManager.hexGrid.GetLength(0) && arrayPos.y >= 0 && arrayPos.y < terrainManager.hexGrid.GetLength(1))
                     {
-                        terrainManager.hexGrid[x, y].neighbors[n] = terrainManager.hexGrid[(int)arrayPos.x, (int)arrayPos.y];
+                        terrainManager.hexGrid[x, y].neighbors.Add(terrainManager.hexGrid[(int)arrayPos.x, (int)arrayPos.y]);
                     }
                 }
             }

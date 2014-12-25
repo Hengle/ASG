@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 public class Pathfinding : MonoBehaviour
 {
@@ -29,6 +30,9 @@ public class Pathfinding : MonoBehaviour
 
     public static List<Hex> GetPath(Hex fromHex, Hex toHex, int pathCost) //, out int pathCost
     {
+
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
 
   		int pathStart = System.Environment.TickCount;
 
@@ -85,10 +89,10 @@ public class Pathfinding : MonoBehaviour
             findAdjacentWalkable(minFHex, toHex, openList, closedList);
         }
 
-        Debug.Log("Scanned " + closedList.Count);
+        UnityEngine.Debug.Log("Scanned " + closedList.Count);
 
         // if path not found
-        if (openList.Count == 0) Debug.Log("path not found " + fromHex + "->" + toHex);
+        if (openList.Count == 0) UnityEngine.Debug.Log("path not found " + fromHex + "->" + toHex);
 
         if (openList.Count == 0)
         {
@@ -117,21 +121,93 @@ public class Pathfinding : MonoBehaviour
         retList.Insert(retList.Count, fromHex);
 
 
-        Debug.Log ("Path found in: " + (System.Environment.TickCount - pathStart) + "ms");
+        UnityEngine.Debug.Log("Path found in: " + (System.Environment.TickCount - pathStart) + "ms");
 
         retList.Reverse();
+
+        sw.Stop();
+        print("Path Found: " + sw.ElapsedMilliseconds + " ms");
 
         return retList;
     }
 
-    
+    public static List<Hex> FindPath(Hex startHex, Hex targetHex, int maxSize)
+    {
+        Stopwatch sw = new Stopwatch();
+        sw.Start();
+
+        if (startHex == null || targetHex == null || startHex == targetHex)
+        {
+            UnityEngine.Debug.Log("Invalid Path");
+            return null;
+        }
+
+        Heap<Hex> openSet = new Heap<Hex>(maxSize);
+        HashSet<Hex> closedSet = new HashSet<Hex>();
+        openSet.Add(startHex);
+
+        while (openSet.Count > 0)
+        {
+            Hex currentHex = openSet.RemoveFirst();
+            closedSet.Add(currentHex);
+
+            if (currentHex == targetHex)
+            {
+                sw.Stop();
+                print("Path Found: " + sw.ElapsedMilliseconds + " ms");
+                return RetracePath(startHex, targetHex);
+            }
+
+            foreach (Hex neighbour in currentHex.neighbors)
+            {
+                if (closedSet.Contains(neighbour))
+                {
+                    continue;
+                }
+
+                int newMovementCostToNeighbour = currentHex.gCost + (int)Vector3.Distance(neighbour.worldPos, targetHex.worldPos);
+                if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
+                {
+                    neighbour.gCost = newMovementCostToNeighbour;
+                    neighbour.hCost = (int)Vector3.Distance(neighbour.worldPos, targetHex.worldPos); // might break things
+                    neighbour.parent = currentHex;
+
+                    if (!openSet.Contains(neighbour))
+                        openSet.Add(neighbour);
+                }
+            }
+        }
+
+        sw.Stop();
+        print("Path Found: " + sw.ElapsedMilliseconds + " ms");
+        return null;
+    }
+
+    public static List<Hex> RetracePath(Hex startHex, Hex endHex)
+    {
+        List<Hex> path = new List<Hex>();
+        Hex currentHex = endHex;
+
+        while (currentHex != startHex)
+        {
+            path.Add(currentHex);
+            currentHex = currentHex.parent;
+        }
+        path.Reverse();
+
+        return path;
+    }
+
+
+
+
     private static void GetAdjacentHexes(Hex fromHex, Hex toHex, List<Hex> openList, List<Hex> closedList)
     {
         //for (int n = 0; n < Hex.neighborDirs.Length; n++)
         //{
         //    arrayPos = Hex.CubeToOffsetOddQ(hexGrid[x, y].cubeCoord + Hex.neighborDirs[n]);
 
-        for (int n = 0; n < fromHex.neighbors.Length; n++)
+        for (int n = 0; n < fromHex.neighbors.Count; n++)
         {
             if (fromHex.neighbors[n] != null)
             {
@@ -170,7 +246,7 @@ public class Pathfinding : MonoBehaviour
         List<Hex> visited = new List<Hex>();
         // The hexes open to evaluation
         List<Hex> openSet = new List<Hex>();
-        // The map of navigated nodes
+        // The map of navigated Hexs
         List<Hex> path = new List<Hex>();
 
         int cost = 0;
@@ -197,22 +273,22 @@ public class Pathfinding : MonoBehaviour
 
     /*
      function A*(start,goal)
-    closedset := the empty set    // The set of nodes already evaluated.
-    openset := {start}    // The set of tentative nodes to be evaluated, initially containing the start node
-    came_from := the empty map    // The map of navigated nodes.
+    closedset := the empty set    // The set of Hexs already evaluated.
+    openset := {start}    // The set of tentative Hexs to be evaluated, initially containing the start Hex
+    came_from := the empty map    // The map of navigated Hexs.
  
     g_score[start] := 0    // Cost from start along best known path.
     // Estimated total cost from start to goal through y.
     f_score[start] := g_score[start] + heuristic_cost_estimate(start, goal)
  
     while openset is not empty
-        current := the node in openset having the lowest f_score[] value
+        current := the Hex in openset having the lowest f_score[] value
         if current = goal
             return reconstruct_path(came_from, goal)
  
         remove current from openset
         add current to closedset
-        for each neighbor in neighbor_nodes(current)
+        for each neighbor in neighbor_Hexs(current)
             if neighbor in closedset
                 continue
             tentative_g_score := g_score[current] + dist_between(current,neighbor)

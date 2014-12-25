@@ -38,8 +38,6 @@ public class MainTerrainBase : SceneManager {
     
     private AStarController _AStarController;
     
-    private TerrainElementController _TerrainElementController;
-    
     private GameLogicController _GameLogicController;
     
     private PlayerController _PlayerController;
@@ -135,19 +133,6 @@ public class MainTerrainBase : SceneManager {
         }
         set {
             _AStarController = value;
-        }
-    }
-    
-    [Inject()]
-    public virtual TerrainElementController TerrainElementController {
-        get {
-            if ((this._TerrainElementController == null)) {
-                this._TerrainElementController = new TerrainElementController() { Container = Container };
-            }
-            return this._TerrainElementController;
-        }
-        set {
-            _TerrainElementController = value;
         }
     }
     
@@ -281,7 +266,6 @@ public class MainTerrainBase : SceneManager {
         Container.RegisterController<TerrainManagerController>(TerrainManagerController);
         Container.RegisterController<WorldManagerController>(WorldManagerController);
         Container.RegisterController<AStarController>(AStarController);
-        Container.RegisterController<TerrainElementController>(TerrainElementController);
         Container.RegisterController<GameLogicController>(GameLogicController);
         Container.RegisterController<PlayerController>(PlayerController);
         Container.RegisterController<UnitStackController>(UnitStackController);

@@ -20,6 +20,11 @@ public partial class FactionView
         var unitStack = InstantiateView(unitStackPrefab, item, item.HexLocation.worldPos, Quaternion.identity);
         // Use the properties used in the inspector
         unitStack.InitializeData(item);
+        //unitStack.GetComponent<UnitStackFlagView>().UnitStack = item;
+
+        //unitStack.GetComponent<UnitStackFlagView>().InitializeData(item);
+        unitStack.GetComponent<UnitStackFlagView>().UnitStack = item;
+        unitStack.GetComponent<UnitStackFlagView>().SetupBindings();
 
         return unitStack;
     }

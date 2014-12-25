@@ -37,7 +37,6 @@ public class PlayerController : PlayerControllerBase
         player.SelectUnit = null;
         player.SelectedUnitStack = null;
         player.SelectedCity = null;
-        player.MovingUnit = false;
     }
 
     public override void SelectHexAtPos(PlayerViewModel player, Vector3 pos)
@@ -48,7 +47,6 @@ public class PlayerController : PlayerControllerBase
     public override void MoveUnitStack(PlayerViewModel player, UnitStackViewModel unitStack)
     {
         ExecuteCommand(unitStack.Move, player.SelectedHex);
-        player.MovingUnit = false;
     }
 
 }

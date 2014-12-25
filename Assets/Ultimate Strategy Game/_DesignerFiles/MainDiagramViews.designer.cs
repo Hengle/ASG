@@ -385,10 +385,6 @@ public abstract class PlayerViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public Color _Color;
     
-    [UFGroup("View Model Properties")]
-    [UnityEngine.HideInInspector()]
-    public Boolean _MovingUnit;
-    
     public override System.Type ViewModelType {
         get {
             return typeof(PlayerViewModel);
@@ -416,7 +412,6 @@ public abstract class PlayerViewBase : ViewBase {
         player.SelectedCity = this._SelectedCity == null ? null : this._SelectedCity.ViewModelObject as CityViewModel;
         player.Faction = this._Faction == null ? null : this._Faction.ViewModelObject as FactionViewModel;
         player.Color = this._Color;
-        player.MovingUnit = this._MovingUnit;
     }
     
     public virtual void ExecuteSelectHex(Hex arg) {
@@ -453,11 +448,11 @@ public abstract class UnitStackViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public ViewBase _LeadingUnit;
+    public UnitActionState _ActionState;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Vector3 _WorldPos;
+    public ViewBase _LeadingUnit;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
@@ -492,8 +487,8 @@ public abstract class UnitStackViewBase : ViewBase {
     
     protected override void InitializeViewModel(ViewModel viewModel) {
         UnitStackViewModel unitStack = ((UnitStackViewModel)(viewModel));
+        unitStack.ActionState = this._ActionState;
         unitStack.LeadingUnit = this._LeadingUnit == null ? null : this._LeadingUnit.ViewModelObject as UnitViewModel;
-        unitStack.WorldPos = this._WorldPos;
         unitStack.MovePoints = this._MovePoints;
         unitStack.MovePointsTotal = this._MovePointsTotal;
         unitStack.Owner = this._Owner == null ? null : this._Owner.ViewModelObject as PlayerViewModel;
@@ -517,6 +512,26 @@ public abstract class UnitStackViewBase : ViewBase {
     
     public virtual void ExecuteRemoveUnitFromStack(UnitViewModel unit) {
         this.ExecuteCommand(UnitStack.RemoveUnitFromStack, unit);
+    }
+    
+    public virtual void ExecutePlanMovement() {
+        this.ExecuteCommand(UnitStack.PlanMovement);
+    }
+    
+    public virtual void ExecutePlanSettling() {
+        this.ExecuteCommand(UnitStack.PlanSettling);
+    }
+    
+    public virtual void ExecuteSettle() {
+        this.ExecuteCommand(UnitStack.Settle);
+    }
+    
+    public virtual void ExecuteEvaluateSettlingLocation(Hex arg) {
+        this.ExecuteCommand(UnitStack.EvaluateSettlingLocation, arg);
+    }
+    
+    public virtual void ExecuteEvaluateMovementPath(Hex arg) {
+        this.ExecuteCommand(UnitStack.EvaluateMovementPath, arg);
     }
 }
 
@@ -619,32 +634,6 @@ public abstract class BuildingViewBase : ViewBase {
     
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<BuildingController>());
-    }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
-    }
-}
-
-[DiagramInfoAttribute("Ultimate Strategy Game")]
-public abstract class TerrainElementViewBase : ViewBase {
-    
-    public override System.Type ViewModelType {
-        get {
-            return typeof(TerrainElementViewModel);
-        }
-    }
-    
-    public TerrainElementViewModel TerrainElement {
-        get {
-            return ((TerrainElementViewModel)(this.ViewModelObject));
-        }
-        set {
-            this.ViewModelObject = value;
-        }
-    }
-    
-    public override ViewModel CreateModel() {
-        return this.RequestViewModel(GameManager.Container.Resolve<TerrainElementController>());
     }
     
     protected override void InitializeViewModel(ViewModel viewModel) {
@@ -1233,11 +1222,6 @@ public class PlayerViewViewBase : PlayerViewBase {
     [UnityEngine.HideInInspector()]
     public bool _BindSelectedUnitStack = true;
     
-    [UFToggleGroup("MovingUnit")]
-    [UnityEngine.HideInInspector()]
-    [UFRequireInstanceMethod("MovingUnitChanged")]
-    public bool _BindMovingUnit = true;
-    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<PlayerController>());
     }
@@ -1250,10 +1234,6 @@ public class PlayerViewViewBase : PlayerViewBase {
     public virtual void SelectedUnitStackChanged(UnitStackViewModel value) {
     }
     
-    /// Subscribes to the property and is notified anytime the value changes.
-    public virtual void MovingUnitChanged(Boolean value) {
-    }
-    
     public override void Bind() {
         base.Bind();
         if (this._BindSelectedHex) {
@@ -1262,16 +1242,89 @@ public class PlayerViewViewBase : PlayerViewBase {
         if (this._BindSelectedUnitStack) {
             this.BindProperty(Player._SelectedUnitStackProperty, this.SelectedUnitStackChanged);
         }
-        if (this._BindMovingUnit) {
-            this.BindProperty(Player._MovingUnitProperty, this.MovingUnitChanged);
-        }
     }
 }
 
 public partial class PlayerView : PlayerViewViewBase {
 }
 
-public class TestViewBase : UnitStackViewBase {
+public class UnitStackViewViewBase : UnitStackViewBase {
+    
+    private IDisposable _WorldPosDisposable;
+    
+    [UFToggleGroup("LeadingUnit")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindLeadingUnit = true;
+    
+    [UFToggleGroup("Move")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindMove = true;
+    
+    [UFToggleGroup("State")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("StateChanged")]
+    public bool _BindState = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void LeadingUnitChanged(UnitViewModel value) {
+    }
+    
+    /// Invokes MoveExecuted when the Move command is executed.
+    public virtual void MoveExecuted() {
+    }
+    
+    /// Subscribes to the state machine property and executes a method for each state.
+    public virtual void StateChanged(Invert.StateMachine.State value) {
+        if (value is Idling) {
+            this.OnIdling();
+        }
+        if (value is Moving) {
+            this.OnMoving();
+        }
+    }
+    
+    public virtual void OnIdling() {
+    }
+    
+    public virtual void OnMoving() {
+    }
+    
+    public virtual void ResetWorldPos() {
+        if (_WorldPosDisposable != null) _WorldPosDisposable.Dispose();
+        _WorldPosDisposable = GetWorldPosObservable().Subscribe(UnitStack._WorldPosProperty).DisposeWith(this);
+    }
+    
+    protected virtual Vector3 CalculateWorldPos() {
+        return default(Vector3);
+    }
+    
+    protected virtual UniRx.IObservable<Vector3> GetWorldPosObservable() {
+        return this.UpdateAsObservable().Select(p => CalculateWorldPos());
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        ResetWorldPos();
+        if (this._BindLeadingUnit) {
+            this.BindProperty(UnitStack._LeadingUnitProperty, this.LeadingUnitChanged);
+        }
+        if (this._BindMove) {
+            this.BindCommandExecuted(UnitStack.Move, MoveExecuted);
+        }
+        if (this._BindState) {
+            this.BindProperty(UnitStack._StateProperty, this.StateChanged);
+        }
+    }
+}
+
+public partial class UnitStackView : UnitStackViewViewBase {
+}
+
+public class UnitStackFlagViewViewBase : UnitStackViewBase {
     
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
@@ -1282,5 +1335,71 @@ public class TestViewBase : UnitStackViewBase {
     }
 }
 
-public partial class Test : TestViewBase {
+public partial class UnitStackFlagView : UnitStackFlagViewViewBase {
+}
+
+public class UnitActionsBarViewBase : PlayerViewBase {
+    
+    [UFToggleGroup("SelectedUnitStack")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSelectedUnitStack = true;
+    
+    [UFToggleGroup("SelectedUnits")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSelectedUnits = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<PlayerController>());
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void SelectedUnitStackChanged(UnitStackViewModel value) {
+    }
+    
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public virtual void SelectedUnitsAdded(UnitViewModel item) {
+    }
+    
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public virtual void SelectedUnitsRemoved(UnitViewModel item) {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        if (this._BindSelectedUnitStack) {
+            this.BindProperty(Player._SelectedUnitStackProperty, this.SelectedUnitStackChanged);
+        }
+        if (this._BindSelectedUnits) {
+            this.BindCollection(Player._SelectedUnitsProperty, SelectedUnitsAdded, SelectedUnitsRemoved);
+        }
+    }
+}
+
+public partial class UnitActionsBar : UnitActionsBarViewBase {
+}
+
+public class UnitStackActionsViewViewBase : UnitStackViewBase {
+    
+    [UFToggleGroup("ActionState")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("ActionStateChanged")]
+    public bool _BindActionState = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void ActionStateChanged(UnitActionState value) {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        if (this._BindActionState) {
+            this.BindProperty(UnitStack._ActionStateProperty, this.ActionStateChanged);
+        }
+    }
+}
+
+public partial class UnitStackActionsView : UnitStackActionsViewViewBase {
 }

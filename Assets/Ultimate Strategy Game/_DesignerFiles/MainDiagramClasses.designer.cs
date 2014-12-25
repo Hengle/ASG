@@ -41,6 +41,14 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
     
     private Single _heightmapHeight;
     
+    private Int32 _gCost;
+    
+    private Int32 _hCost;
+    
+    private Int32 _heapIndex;
+    
+    private Hex _parent;
+    
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName){ PropertyChangedEventHandler handler = PropertyChanged; if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName)); }
     public virtual Vector2 arrayCoord {
@@ -150,6 +158,46 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
         set {
             _heightmapHeight = value;
             OnPropertyChanged("heightmapHeight");
+        }
+    }
+    
+    public virtual Int32 gCost {
+        get {
+            return this._gCost;
+        }
+        set {
+            _gCost = value;
+            OnPropertyChanged("gCost");
+        }
+    }
+    
+    public virtual Int32 hCost {
+        get {
+            return this._hCost;
+        }
+        set {
+            _hCost = value;
+            OnPropertyChanged("hCost");
+        }
+    }
+    
+    public virtual Int32 heapIndex {
+        get {
+            return this._heapIndex;
+        }
+        set {
+            _heapIndex = value;
+            OnPropertyChanged("heapIndex");
+        }
+    }
+    
+    public virtual Hex parent {
+        get {
+            return this._parent;
+        }
+        set {
+            _parent = value;
+            OnPropertyChanged("parent");
         }
     }
 }

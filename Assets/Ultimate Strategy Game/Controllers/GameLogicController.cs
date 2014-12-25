@@ -105,7 +105,6 @@ public class GameLogicController : GameLogicControllerBase
         player.Faction.Units.Add(settler);
 
         UnitStackController.AddUnitToStack(unitStack, settler);
-        Debug.Log(unitStack.LeadingUnit);
 
 
         /*

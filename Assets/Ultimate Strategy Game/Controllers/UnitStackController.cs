@@ -28,16 +28,25 @@ public class UnitStackController : UnitStackControllerBase {
         unitStack.Path.Clear();
 
         // Then assign the new one
-        List<Hex> path = Pathfinding.GetPath(unitStack.HexLocation, pathDestination, 0);
+        List<Hex> path = Pathfinding.FindPath(unitStack.HexLocation, pathDestination, TerrainManager.MaxSize);
         if (path != null) unitStack.Path.AddRange(path);
     }
 
     public override void AddUnitToStack(UnitStackViewModel unitStack, UnitViewModel unit)
     {
-        base.AddUnitToStack(unitStack, unit);
         unitStack.Units.Add(unit);
         unitStack.LeadingUnit = unitStack.Units[0];
-        Debug.Log(unitStack.LeadingUnit);
+    }
+
+    public override void PlanMovement(UnitStackViewModel unitStack)
+    {
+        unitStack.ActionState = UnitActionState.PlanningMovement;
+        unitStack.ParentPlayer._SelectedHexProperty.Subscribe(hex => EvaluateMovementPath(unitStack, hex)).DisposeWhenChanged(unitStack._ActionStateProperty);
+    }
+
+    public override void EvaluateMovementPath(UnitStackViewModel unitStack, Hex destination)
+    {
+        //unitStack.PlanedPath = Pathfinding.FindPath(unitStack.HexLocation, destination);
     }
 
 }

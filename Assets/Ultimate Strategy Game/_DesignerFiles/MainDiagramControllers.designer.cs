@@ -226,6 +226,21 @@ public abstract class UnitStackControllerBase : Controller {
     
     public virtual void RemoveUnitFromStack(UnitStackViewModel unitStack, UnitViewModel arg) {
     }
+    
+    public virtual void PlanMovement(UnitStackViewModel unitStack) {
+    }
+    
+    public virtual void PlanSettling(UnitStackViewModel unitStack) {
+    }
+    
+    public virtual void Settle(UnitStackViewModel unitStack) {
+    }
+    
+    public virtual void EvaluateSettlingLocation(UnitStackViewModel unitStack, Hex arg) {
+    }
+    
+    public virtual void EvaluateMovementPath(UnitStackViewModel unitStack, Hex arg) {
+    }
 }
 
 public abstract class FactionControllerBase : Controller {
@@ -292,25 +307,6 @@ public abstract class BuildingControllerBase : Controller {
     
     public override void Initialize(ViewModel viewModel) {
         this.InitializeBuilding(((BuildingViewModel)(viewModel)));
-    }
-}
-
-public abstract class TerrainElementControllerBase : Controller {
-    
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
-    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
-    public abstract void InitializeTerrainElement(TerrainElementViewModel terrainElement);
-    
-    public override ViewModel CreateEmpty() {
-        return new TerrainElementViewModel(this);
-    }
-    
-    public virtual TerrainElementViewModel CreateTerrainElement() {
-        return ((TerrainElementViewModel)(this.Create()));
-    }
-    
-    public override void Initialize(ViewModel viewModel) {
-        this.InitializeTerrainElement(((TerrainElementViewModel)(viewModel)));
     }
 }
 

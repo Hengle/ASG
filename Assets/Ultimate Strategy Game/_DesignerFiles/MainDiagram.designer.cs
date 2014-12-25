@@ -719,7 +719,6 @@ if (stream.DeepSerialize) {
     }
     
     protected override void ChunksCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.OldItems.OfType<ChunkViewModel>()) item.ParentTerrainManager = null;;
         foreach (var item in args.NewItems.OfType<ChunkViewModel>()) item.ParentTerrainManager = this;;
     }
 }
@@ -1168,12 +1167,10 @@ if (stream.DeepSerialize) {
     }
     
     protected override void PlayersCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.OldItems.OfType<PlayerViewModel>()) item.ParentGameLogic = null;;
         foreach (var item in args.NewItems.OfType<PlayerViewModel>()) item.ParentGameLogic = this;;
     }
     
     protected override void FactionsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.OldItems.OfType<FactionViewModel>()) item.ParentGameLogic = null;;
         foreach (var item in args.NewItems.OfType<FactionViewModel>()) item.ParentGameLogic = this;;
     }
 }
@@ -1196,8 +1193,6 @@ public class PlayerViewModelBase : ViewModel {
     public P<Color> _ColorProperty;
     
     public P<Hex> _StartingHexProperty;
-    
-    public P<Boolean> _MovingUnitProperty;
     
     public ModelCollection<UnitViewModel> _SelectedUnitsProperty;
     
@@ -1233,7 +1228,6 @@ public class PlayerViewModelBase : ViewModel {
         _FactionProperty = new P<FactionViewModel>(this, "Faction");
         _ColorProperty = new P<Color>(this, "Color");
         _StartingHexProperty = new P<Hex>(this, "StartingHex");
-        _MovingUnitProperty = new P<Boolean>(this, "MovingUnit");
         _SelectedUnitsProperty = new ModelCollection<UnitViewModel>(this, "SelectedUnits");
         _SelectedUnitsProperty.CollectionChanged += SelectedUnitsCollectionChanged;
     }
@@ -1381,21 +1375,6 @@ public partial class PlayerViewModel : PlayerViewModelBase {
         }
     }
     
-    public virtual P<Boolean> MovingUnitProperty {
-        get {
-            return this._MovingUnitProperty;
-        }
-    }
-    
-    public virtual Boolean MovingUnit {
-        get {
-            return _MovingUnitProperty.Value;
-        }
-        set {
-            _MovingUnitProperty.Value = value;
-        }
-    }
-    
     public virtual ModelCollection<UnitViewModel> SelectedUnits {
         get {
             return this._SelectedUnitsProperty;
@@ -1510,7 +1489,6 @@ public partial class PlayerViewModel : PlayerViewModelBase {
 		if (stream.DeepSerialize) stream.SerializeObject("SelectedUnitStack", this.SelectedUnitStack);
 		if (stream.DeepSerialize) stream.SerializeObject("SelectedCity", this.SelectedCity);
 		if (stream.DeepSerialize) stream.SerializeObject("Faction", this.Faction);
-        stream.SerializeBool("MovingUnit", this.MovingUnit);
         if (stream.DeepSerialize) stream.SerializeArray("SelectedUnits", this.SelectedUnits);
     }
     
@@ -1521,7 +1499,6 @@ public partial class PlayerViewModel : PlayerViewModelBase {
 		if (stream.DeepSerialize) this.SelectedUnitStack = stream.DeserializeObject<UnitStackViewModel>("SelectedUnitStack");
 		if (stream.DeepSerialize) this.SelectedCity = stream.DeserializeObject<CityViewModel>("SelectedCity");
 		if (stream.DeepSerialize) this.Faction = stream.DeserializeObject<FactionViewModel>("Faction");
-        		this.MovingUnit = stream.DeserializeBool("MovingUnit");;
 if (stream.DeepSerialize) {
         this.SelectedUnits.Clear();
         this.SelectedUnits.AddRange(stream.DeserializeObjectArray<UnitViewModel>("SelectedUnits"));
@@ -1543,7 +1520,6 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelPropertyInfo(_FactionProperty, true, false, false));
         list.Add(new ViewModelPropertyInfo(_ColorProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_StartingHexProperty, false, false, false));
-        list.Add(new ViewModelPropertyInfo(_MovingUnitProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_SelectedUnitsProperty, true, true, false));
     }
     
@@ -1559,7 +1535,6 @@ if (stream.DeepSerialize) {
     }
     
     protected override void SelectedUnitsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.OldItems.OfType<UnitViewModel>()) item.ParentPlayer = null;;
         foreach (var item in args.NewItems.OfType<UnitViewModel>()) item.ParentPlayer = this;;
     }
 }
@@ -1573,7 +1548,9 @@ public class UnitStackViewModelBase : ViewModel {
     
     private IDisposable _CalculateMovementDisposable;
     
-    public UnitStackState _StateProperty;
+    public UnitStackMovementState _StateProperty;
+    
+    public P<UnitActionState> _ActionStateProperty;
     
     public P<UnitViewModel> _LeadingUnitProperty;
     
@@ -1599,6 +1576,8 @@ public class UnitStackViewModelBase : ViewModel {
     
     public ModelCollection<Hex> _PathProperty;
     
+    public ModelCollection<Hex> _PlanedPathProperty;
+    
     protected CommandWithSenderAndArgument<UnitStackViewModel, Hex> _Move;
     
     protected CommandWithSender<UnitStackViewModel> _StopMove;
@@ -1608,6 +1587,16 @@ public class UnitStackViewModelBase : ViewModel {
     protected CommandWithSenderAndArgument<UnitStackViewModel, UnitViewModel> _AddUnitToStack;
     
     protected CommandWithSenderAndArgument<UnitStackViewModel, UnitViewModel> _RemoveUnitFromStack;
+    
+    protected CommandWithSender<UnitStackViewModel> _PlanMovement;
+    
+    protected CommandWithSender<UnitStackViewModel> _PlanSettling;
+    
+    protected CommandWithSender<UnitStackViewModel> _Settle;
+    
+    protected CommandWithSenderAndArgument<UnitStackViewModel, Hex> _EvaluateSettlingLocation;
+    
+    protected CommandWithSenderAndArgument<UnitStackViewModel, Hex> _EvaluateMovementPath;
     
     public UnitStackViewModelBase(UnitStackControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
@@ -1619,7 +1608,8 @@ public class UnitStackViewModelBase : ViewModel {
     
     public override void Bind() {
         base.Bind();
-        _StateProperty = new UnitStackState(this, "State");
+        _StateProperty = new UnitStackMovementState(this, "State");
+        _ActionStateProperty = new P<UnitActionState>(this, "ActionState");
         _LeadingUnitProperty = new P<UnitViewModel>(this, "LeadingUnit");
         _WorldPosProperty = new P<Vector3>(this, "WorldPos");
         _MovePointsProperty = new P<Int32>(this, "MovePoints");
@@ -1633,6 +1623,7 @@ public class UnitStackViewModelBase : ViewModel {
         _UnitsProperty = new ModelCollection<UnitViewModel>(this, "Units");
         _UnitsProperty.CollectionChanged += UnitsCollectionChanged;
         _PathProperty = new ModelCollection<Hex>(this, "Path");
+        _PlanedPathProperty = new ModelCollection<Hex>(this, "PlanedPath");
         this.ResetHexLocation();
         this.ResetMovementCompleted();
         this.ResetCalculateMovement();
@@ -1702,7 +1693,7 @@ public partial class UnitStackViewModel : UnitStackViewModelBase {
             base() {
     }
     
-    public virtual UnitStackState StateProperty {
+    public virtual UnitStackMovementState StateProperty {
         get {
             return this._StateProperty;
         }
@@ -1714,6 +1705,21 @@ public partial class UnitStackViewModel : UnitStackViewModelBase {
         }
         set {
             _StateProperty.Value = value;
+        }
+    }
+    
+    public virtual P<UnitActionState> ActionStateProperty {
+        get {
+            return this._ActionStateProperty;
+        }
+    }
+    
+    public virtual UnitActionState ActionState {
+        get {
+            return _ActionStateProperty.Value;
+        }
+        set {
+            _ActionStateProperty.Value = value;
         }
     }
     
@@ -1881,6 +1887,12 @@ public partial class UnitStackViewModel : UnitStackViewModelBase {
         }
     }
     
+    public virtual ModelCollection<Hex> PlanedPath {
+        get {
+            return this._PlanedPathProperty;
+        }
+    }
+    
     public virtual CommandWithSenderAndArgument<UnitStackViewModel, Hex> Move {
         get {
             return _Move;
@@ -1926,6 +1938,51 @@ public partial class UnitStackViewModel : UnitStackViewModelBase {
         }
     }
     
+    public virtual CommandWithSender<UnitStackViewModel> PlanMovement {
+        get {
+            return _PlanMovement;
+        }
+        set {
+            _PlanMovement = value;
+        }
+    }
+    
+    public virtual CommandWithSender<UnitStackViewModel> PlanSettling {
+        get {
+            return _PlanSettling;
+        }
+        set {
+            _PlanSettling = value;
+        }
+    }
+    
+    public virtual CommandWithSender<UnitStackViewModel> Settle {
+        get {
+            return _Settle;
+        }
+        set {
+            _Settle = value;
+        }
+    }
+    
+    public virtual CommandWithSenderAndArgument<UnitStackViewModel, Hex> EvaluateSettlingLocation {
+        get {
+            return _EvaluateSettlingLocation;
+        }
+        set {
+            _EvaluateSettlingLocation = value;
+        }
+    }
+    
+    public virtual CommandWithSenderAndArgument<UnitStackViewModel, Hex> EvaluateMovementPath {
+        get {
+            return _EvaluateMovementPath;
+        }
+        set {
+            _EvaluateMovementPath = value;
+        }
+    }
+    
     public virtual PlayerViewModel ParentPlayer {
         get {
             return this._ParentPlayer;
@@ -1951,11 +2008,17 @@ public partial class UnitStackViewModel : UnitStackViewModelBase {
         this.CancelMove = new CommandWithSender<UnitStackViewModel>(this, unitStack.CancelMove);
         this.AddUnitToStack = new CommandWithSenderAndArgument<UnitStackViewModel, UnitViewModel>(this, unitStack.AddUnitToStack);
         this.RemoveUnitFromStack = new CommandWithSenderAndArgument<UnitStackViewModel, UnitViewModel>(this, unitStack.RemoveUnitFromStack);
+        this.PlanMovement = new CommandWithSender<UnitStackViewModel>(this, unitStack.PlanMovement);
+        this.PlanSettling = new CommandWithSender<UnitStackViewModel>(this, unitStack.PlanSettling);
+        this.Settle = new CommandWithSender<UnitStackViewModel>(this, unitStack.Settle);
+        this.EvaluateSettlingLocation = new CommandWithSenderAndArgument<UnitStackViewModel, Hex>(this, unitStack.EvaluateSettlingLocation);
+        this.EvaluateMovementPath = new CommandWithSenderAndArgument<UnitStackViewModel, Hex>(this, unitStack.EvaluateMovementPath);
     }
     
     public override void Write(ISerializerStream stream) {
 		base.Write(stream);
         stream.SerializeString("State", this.State.Name);;
+		stream.SerializeInt("ActionState", (int)this.ActionState);
 		if (stream.DeepSerialize) stream.SerializeObject("LeadingUnit", this.LeadingUnit);
         stream.SerializeVector3("WorldPos", this.WorldPos);
         stream.SerializeInt("MovePoints", this.MovePoints);
@@ -1967,6 +2030,7 @@ public partial class UnitStackViewModel : UnitStackViewModelBase {
     public override void Read(ISerializerStream stream) {
 		base.Read(stream);
         this._StateProperty.SetState(stream.DeserializeString("State"));
+		this.ActionState = (UnitActionState)stream.DeserializeInt("ActionState");
 		if (stream.DeepSerialize) this.LeadingUnit = stream.DeserializeObject<UnitViewModel>("LeadingUnit");
         		this.WorldPos = stream.DeserializeVector3("WorldPos");;
         		this.MovePoints = stream.DeserializeInt("MovePoints");;
@@ -1986,6 +2050,7 @@ if (stream.DeepSerialize) {
     protected override void FillProperties(List<ViewModelPropertyInfo> list) {
         base.FillProperties(list);;
         list.Add(new ViewModelPropertyInfo(_StateProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_ActionStateProperty, false, false, true));
         list.Add(new ViewModelPropertyInfo(_LeadingUnitProperty, true, false, false));
         list.Add(new ViewModelPropertyInfo(_WorldPosProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_MovePointsProperty, false, false, false));
@@ -1998,6 +2063,7 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelPropertyInfo(_CalculateMovementProperty, false, false, false, true));
         list.Add(new ViewModelPropertyInfo(_UnitsProperty, true, true, false));
         list.Add(new ViewModelPropertyInfo(_PathProperty, false, true, false));
+        list.Add(new ViewModelPropertyInfo(_PlanedPathProperty, false, true, false));
     }
     
     protected override void FillCommands(List<ViewModelCommandInfo> list) {
@@ -2007,10 +2073,14 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelCommandInfo("CancelMove", CancelMove) { ParameterType = typeof(void) });
         list.Add(new ViewModelCommandInfo("AddUnitToStack", AddUnitToStack) { ParameterType = typeof(UnitViewModel) });
         list.Add(new ViewModelCommandInfo("RemoveUnitFromStack", RemoveUnitFromStack) { ParameterType = typeof(UnitViewModel) });
+        list.Add(new ViewModelCommandInfo("PlanMovement", PlanMovement) { ParameterType = typeof(void) });
+        list.Add(new ViewModelCommandInfo("PlanSettling", PlanSettling) { ParameterType = typeof(void) });
+        list.Add(new ViewModelCommandInfo("Settle", Settle) { ParameterType = typeof(void) });
+        list.Add(new ViewModelCommandInfo("EvaluateSettlingLocation", EvaluateSettlingLocation) { ParameterType = typeof(Hex) });
+        list.Add(new ViewModelCommandInfo("EvaluateMovementPath", EvaluateMovementPath) { ParameterType = typeof(Hex) });
     }
     
     protected override void UnitsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.OldItems.OfType<UnitViewModel>()) item.ParentUnitStack = null;;
         foreach (var item in args.NewItems.OfType<UnitViewModel>()) item.ParentUnitStack = this;;
     }
 }
@@ -2210,17 +2280,14 @@ if (stream.DeepSerialize) {
     }
     
     protected override void UnitsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.OldItems.OfType<UnitViewModel>()) item.ParentFaction = null;;
         foreach (var item in args.NewItems.OfType<UnitViewModel>()) item.ParentFaction = this;;
     }
     
     protected override void UnitStacksCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.OldItems.OfType<UnitStackViewModel>()) item.ParentFaction = null;;
         foreach (var item in args.NewItems.OfType<UnitStackViewModel>()) item.ParentFaction = this;;
     }
     
     protected override void CitiesCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.OldItems.OfType<CityViewModel>()) item.ParentFaction = null;;
         foreach (var item in args.NewItems.OfType<CityViewModel>()) item.ParentFaction = this;;
     }
 }
@@ -2398,12 +2465,10 @@ if (stream.DeepSerialize) {
     }
     
     protected override void BuildingsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.OldItems.OfType<BuildingViewModel>()) item.ParentCity = null;;
         foreach (var item in args.NewItems.OfType<BuildingViewModel>()) item.ParentCity = this;;
     }
     
     protected override void GarnisonCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.OldItems.OfType<UnitViewModel>()) item.ParentCity = null;;
         foreach (var item in args.NewItems.OfType<UnitViewModel>()) item.ParentCity = this;;
     }
 }
@@ -2443,56 +2508,6 @@ public partial class BuildingViewModel : BuildingViewModelBase {
         set {
             _ParentCity = value;
         }
-    }
-    
-    protected override void WireCommands(Controller controller) {
-    }
-    
-    public override void Write(ISerializerStream stream) {
-		base.Write(stream);
-    }
-    
-    public override void Read(ISerializerStream stream) {
-		base.Read(stream);
-    }
-    
-    public override void Unbind() {
-        base.Unbind();
-    }
-    
-    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
-        base.FillProperties(list);;
-    }
-    
-    protected override void FillCommands(List<ViewModelCommandInfo> list) {
-        base.FillCommands(list);;
-    }
-}
-
-[DiagramInfoAttribute("Ultimate Strategy Game")]
-public class TerrainElementViewModelBase : ViewModel {
-    
-    public TerrainElementViewModelBase(TerrainElementControllerBase controller, bool initialize = true) : 
-            base(controller, initialize) {
-    }
-    
-    public TerrainElementViewModelBase() : 
-            base() {
-    }
-    
-    public override void Bind() {
-        base.Bind();
-    }
-}
-
-public partial class TerrainElementViewModel : TerrainElementViewModelBase {
-    
-    public TerrainElementViewModel(TerrainElementControllerBase controller, bool initialize = true) : 
-            base(controller, initialize) {
-    }
-    
-    public TerrainElementViewModel() : 
-            base() {
     }
     
     protected override void WireCommands(Controller controller) {
@@ -2878,4 +2893,13 @@ public enum GameState {
     Playing,
     
     Paused,
+}
+
+public enum UnitActionState {
+    
+    None,
+    
+    PlanningMovement,
+    
+    PlanningSettling,
 }

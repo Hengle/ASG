@@ -7,10 +7,11 @@ using System.Collections.ObjectModel;
 using UnityEngine;
 
 
-public partial class Hex 
+public partial class Hex : IHeapItem<Hex>
 {
 
-    public Hex[] neighbors = new Hex[6];
+
+    public List<Hex> neighbors;
 
 
     public static Vector3[] neighborDirs = new Vector3[]{ new Vector3(+1, -1, 0), new Vector3(+1, 0, -1), new Vector3(0, +1, -1), 
@@ -21,6 +22,8 @@ public partial class Hex
                                                        new Vector3(-2, +1, +1), new Vector3(-1, -1, +2), new Vector3(+1, -2, +1) };
 
 
+
+
     public Hex(Vector2 arrayCoord, int height, float heightmapHeight, Vector3 worldPos)
     {
         this.arrayCoord = arrayCoord;
@@ -29,8 +32,39 @@ public partial class Hex
         this.worldPos = worldPos;
         this.height = height;
         this.heightmapHeight = heightmapHeight;
-        this.neighbors = new Hex[6];
+        this.neighbors = new List<Hex>();
     }
+
+    public int fCost
+    {
+        get {
+            return gCost + hCost;
+        }
+    }
+
+    public int HeapIndex
+    {
+        get {
+            return heapIndex;
+        }
+        set {
+            heapIndex = value;
+        }
+    }
+
+    public int CompareTo(Hex hexToCompare)
+    {
+        int compare = fCost.CompareTo(hexToCompare.fCost);
+        if (compare == 0)
+        {
+            compare = hCost.CompareTo(hexToCompare.hCost);
+        }
+        return -compare;
+    }
+
+
+
+
 
     public void SetPathParent(Hex parentHex)
     {

@@ -15,7 +15,7 @@ using System.Linq;
 using Invert.StateMachine;
 
 
-public class UnitStackStateBase : Invert.StateMachine.StateMachine {
+public class UnitStackMovementStateBase : Invert.StateMachine.StateMachine {
     
     private StateMachineTrigger _Idle;
     
@@ -29,7 +29,7 @@ public class UnitStackStateBase : Invert.StateMachine.StateMachine {
     
     private Moving _Moving;
     
-    public UnitStackStateBase(ViewModel vm, string propertyName) : 
+    public UnitStackMovementStateBase(ViewModel vm, string propertyName) : 
             base(vm, propertyName) {
     }
     
