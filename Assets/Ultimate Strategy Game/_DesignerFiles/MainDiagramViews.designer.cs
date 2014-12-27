@@ -243,32 +243,6 @@ public abstract class WorldManagerViewBase : ViewBase {
 }
 
 [DiagramInfoAttribute("Ultimate Strategy Game")]
-public abstract class AStarViewBase : ViewBase {
-    
-    public override System.Type ViewModelType {
-        get {
-            return typeof(AStarViewModel);
-        }
-    }
-    
-    public AStarViewModel AStar {
-        get {
-            return ((AStarViewModel)(this.ViewModelObject));
-        }
-        set {
-            this.ViewModelObject = value;
-        }
-    }
-    
-    public override ViewModel CreateModel() {
-        return this.RequestViewModel(GameManager.Container.Resolve<AStarController>());
-    }
-    
-    protected override void InitializeViewModel(ViewModel viewModel) {
-    }
-}
-
-[DiagramInfoAttribute("Ultimate Strategy Game")]
 public abstract class GameLogicViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
@@ -302,10 +276,6 @@ public abstract class GameLogicViewBase : ViewBase {
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
     public Int32 _Year;
-    
-    [UFGroup("View Model Properties")]
-    [UnityEngine.HideInInspector()]
-    public String _String1;
     
     public override string DefaultIdentifier {
         get {
@@ -342,7 +312,6 @@ public abstract class GameLogicViewBase : ViewBase {
         gameLogic.GameState = this._GameState;
         gameLogic.Season = this._Season;
         gameLogic.Year = this._Year;
-        gameLogic.String1 = this._String1;
     }
     
     public virtual void ExecuteStartGame() {
@@ -533,6 +502,10 @@ public abstract class UnitStackViewBase : ViewBase {
     public virtual void ExecuteEvaluateMovementPath(Hex arg) {
         this.ExecuteCommand(UnitStack.EvaluateMovementPath, arg);
     }
+    
+    public virtual void ExecuteNextTurnCalculation() {
+        this.ExecuteCommand(UnitStack.NextTurnCalculation);
+    }
 }
 
 [DiagramInfoAttribute("Ultimate Strategy Game")]
@@ -575,6 +548,10 @@ public abstract class FactionViewBase : ViewBase {
         faction.Food = this._Food;
         faction.Gold = this._Gold;
     }
+    
+    public virtual void ExecuteNextTurnCalculation() {
+        this.ExecuteCommand(Faction.NextTurnCalculation);
+    }
 }
 
 [DiagramInfoAttribute("Ultimate Strategy Game")]
@@ -611,6 +588,10 @@ public abstract class CityViewBase : ViewBase {
         CityViewModel city = ((CityViewModel)(viewModel));
         city.Name = this._Name;
         city.Population = this._Population;
+    }
+    
+    public virtual void ExecuteNextTurnCalculation() {
+        this.ExecuteCommand(City.NextTurnCalculation);
     }
 }
 
@@ -927,7 +908,7 @@ public class GameLogicGUIViewBase : GameLogicViewBase {
 public partial class GameLogicGUI : GameLogicGUIViewBase {
 }
 
-public class PlayerHUDViewViewBase : PlayerViewBase {
+public class PlayerUIViewBase : PlayerViewBase {
     
     [UFToggleGroup("SelectedUnitStack")]
     [UnityEngine.HideInInspector()]
@@ -976,7 +957,7 @@ public class PlayerHUDViewViewBase : PlayerViewBase {
     }
 }
 
-public partial class PlayerHUDView : PlayerHUDViewViewBase {
+public partial class PlayerUI : PlayerUIViewBase {
 }
 
 public class FactionViewViewBase : FactionViewBase {
@@ -1133,7 +1114,7 @@ public class CityViewViewBase : CityViewBase {
 public partial class CityView : CityViewViewBase {
 }
 
-public class UnitStackSlotsViewBase : PlayerViewBase {
+public class UnitStackUnitsUIViewBase : PlayerViewBase {
     
     [UFToggleGroup("SelectedUnitStack")]
     [UnityEngine.HideInInspector()]
@@ -1170,7 +1151,7 @@ public class UnitStackSlotsViewBase : PlayerViewBase {
     }
 }
 
-public partial class UnitStackSlots : UnitStackSlotsViewBase {
+public partial class UnitStackUnitsUI : UnitStackUnitsUIViewBase {
 }
 
 public class UnitSlotViewBase : UnitViewBase {
@@ -1338,7 +1319,7 @@ public class UnitStackFlagViewViewBase : UnitStackViewBase {
 public partial class UnitStackFlagView : UnitStackFlagViewViewBase {
 }
 
-public class UnitActionsBarViewBase : PlayerViewBase {
+public class UnitStackActionsUIViewBase : PlayerViewBase {
     
     [UFToggleGroup("SelectedUnitStack")]
     [UnityEngine.HideInInspector()]
@@ -1375,7 +1356,7 @@ public class UnitActionsBarViewBase : PlayerViewBase {
     }
 }
 
-public partial class UnitActionsBar : UnitActionsBarViewBase {
+public partial class UnitStackActionsUI : UnitStackActionsUIViewBase {
 }
 
 public class UnitStackActionsViewViewBase : UnitStackViewBase {
@@ -1385,6 +1366,10 @@ public class UnitStackActionsViewViewBase : UnitStackViewBase {
     [UFRequireInstanceMethod("ActionStateChanged")]
     public bool _BindActionState = true;
     
+    [UFToggleGroup("PlanedPath")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindPlanedPath = true;
+    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
     }
@@ -1393,10 +1378,21 @@ public class UnitStackActionsViewViewBase : UnitStackViewBase {
     public virtual void ActionStateChanged(UnitActionState value) {
     }
     
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public virtual void PlanedPathAdded(Hex item) {
+    }
+    
+    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
+    public virtual void PlanedPathRemoved(Hex item) {
+    }
+    
     public override void Bind() {
         base.Bind();
         if (this._BindActionState) {
             this.BindProperty(UnitStack._ActionStateProperty, this.ActionStateChanged);
+        }
+        if (this._BindPlanedPath) {
+            this.BindCollection(UnitStack._PlanedPathProperty, PlanedPathAdded, PlanedPathRemoved);
         }
     }
 }

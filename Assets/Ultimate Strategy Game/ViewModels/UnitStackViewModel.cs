@@ -32,15 +32,16 @@ public partial class UnitStackViewModel
         if (NextHexInPath == null)
             NextHexInPath = Path.First();
 
+        if (MovePoints <= 0)
+        {
+            Controller.ExecuteCommand(this.StopMove);
+            return null;
+        }
+
         if (Vector3.Distance(WorldPos, NextHexInPath.worldPos) < 0.5f)
         {
             // TODO: later calculate the cost of moving through this type of terrain
             MovePoints -= 1;
-
-            if (MovePoints <= 0)
-            {
-                
-            }
 
             NextHexInPath = Path[Path.IndexOf(HexLocation) + 1];
         }

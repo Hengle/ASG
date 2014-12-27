@@ -796,56 +796,6 @@ public partial class WorldManagerViewModel : WorldManagerViewModelBase {
 }
 
 [DiagramInfoAttribute("Ultimate Strategy Game")]
-public class AStarViewModelBase : ViewModel {
-    
-    public AStarViewModelBase(AStarControllerBase controller, bool initialize = true) : 
-            base(controller, initialize) {
-    }
-    
-    public AStarViewModelBase() : 
-            base() {
-    }
-    
-    public override void Bind() {
-        base.Bind();
-    }
-}
-
-public partial class AStarViewModel : AStarViewModelBase {
-    
-    public AStarViewModel(AStarControllerBase controller, bool initialize = true) : 
-            base(controller, initialize) {
-    }
-    
-    public AStarViewModel() : 
-            base() {
-    }
-    
-    protected override void WireCommands(Controller controller) {
-    }
-    
-    public override void Write(ISerializerStream stream) {
-		base.Write(stream);
-    }
-    
-    public override void Read(ISerializerStream stream) {
-		base.Read(stream);
-    }
-    
-    public override void Unbind() {
-        base.Unbind();
-    }
-    
-    protected override void FillProperties(List<ViewModelPropertyInfo> list) {
-        base.FillProperties(list);;
-    }
-    
-    protected override void FillCommands(List<ViewModelCommandInfo> list) {
-        base.FillCommands(list);;
-    }
-}
-
-[DiagramInfoAttribute("Ultimate Strategy Game")]
 public class GameLogicViewModelBase : ViewModel {
     
     public P<Int32> _PlayerCountProperty;
@@ -863,8 +813,6 @@ public class GameLogicViewModelBase : ViewModel {
     public P<Seasons> _SeasonProperty;
     
     public P<Int32> _YearProperty;
-    
-    public P<String> _String1Property;
     
     public ModelCollection<PlayerViewModel> _PlayersProperty;
     
@@ -894,7 +842,6 @@ public class GameLogicViewModelBase : ViewModel {
         _GameStateProperty = new P<GameState>(this, "GameState");
         _SeasonProperty = new P<Seasons>(this, "Season");
         _YearProperty = new P<Int32>(this, "Year");
-        _String1Property = new P<String>(this, "String1");
         _PlayersProperty = new ModelCollection<PlayerViewModel>(this, "Players");
         _PlayersProperty.CollectionChanged += PlayersCollectionChanged;
         _FactionsProperty = new ModelCollection<FactionViewModel>(this, "Factions");
@@ -1041,21 +988,6 @@ public partial class GameLogicViewModel : GameLogicViewModelBase {
         }
     }
     
-    public virtual P<String> String1Property {
-        get {
-            return this._String1Property;
-        }
-    }
-    
-    public virtual String String1 {
-        get {
-            return _String1Property.Value;
-        }
-        set {
-            _String1Property.Value = value;
-        }
-    }
-    
     public virtual ModelCollection<PlayerViewModel> Players {
         get {
             return this._PlayersProperty;
@@ -1112,7 +1044,6 @@ public partial class GameLogicViewModel : GameLogicViewModelBase {
 		stream.SerializeInt("GameState", (int)this.GameState);
 		stream.SerializeInt("Season", (int)this.Season);
         stream.SerializeInt("Year", this.Year);
-        stream.SerializeString("String1", this.String1);
         if (stream.DeepSerialize) stream.SerializeArray("Players", this.Players);
         if (stream.DeepSerialize) stream.SerializeArray("Factions", this.Factions);
     }
@@ -1127,7 +1058,6 @@ public partial class GameLogicViewModel : GameLogicViewModelBase {
 		this.GameState = (GameState)stream.DeserializeInt("GameState");
 		this.Season = (Seasons)stream.DeserializeInt("Season");
         		this.Year = stream.DeserializeInt("Year");;
-        		this.String1 = stream.DeserializeString("String1");;
 if (stream.DeepSerialize) {
         this.Players.Clear();
         this.Players.AddRange(stream.DeserializeObjectArray<PlayerViewModel>("Players"));
@@ -1154,7 +1084,6 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelPropertyInfo(_GameStateProperty, false, false, true));
         list.Add(new ViewModelPropertyInfo(_SeasonProperty, false, false, true));
         list.Add(new ViewModelPropertyInfo(_YearProperty, false, false, false));
-        list.Add(new ViewModelPropertyInfo(_String1Property, false, false, false));
         list.Add(new ViewModelPropertyInfo(_PlayersProperty, true, true, false));
         list.Add(new ViewModelPropertyInfo(_FactionsProperty, true, true, false));
     }
@@ -1598,6 +1527,8 @@ public class UnitStackViewModelBase : ViewModel {
     
     protected CommandWithSenderAndArgument<UnitStackViewModel, Hex> _EvaluateMovementPath;
     
+    protected CommandWithSender<UnitStackViewModel> _NextTurnCalculation;
+    
     public UnitStackViewModelBase(UnitStackControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
     }
@@ -1628,6 +1559,7 @@ public class UnitStackViewModelBase : ViewModel {
         this.ResetMovementCompleted();
         this.ResetCalculateMovement();
         this._Move.Subscribe(_StateProperty.Move);
+        this._StopMove.Subscribe(_StateProperty.CancelMove);
         this._CancelMove.Subscribe(_StateProperty.CancelMove);
         this._StateProperty.MovementCompleted.AddComputer(_MovementCompletedProperty);
     }
@@ -1983,6 +1915,15 @@ public partial class UnitStackViewModel : UnitStackViewModelBase {
         }
     }
     
+    public virtual CommandWithSender<UnitStackViewModel> NextTurnCalculation {
+        get {
+            return _NextTurnCalculation;
+        }
+        set {
+            _NextTurnCalculation = value;
+        }
+    }
+    
     public virtual PlayerViewModel ParentPlayer {
         get {
             return this._ParentPlayer;
@@ -2013,6 +1954,7 @@ public partial class UnitStackViewModel : UnitStackViewModelBase {
         this.Settle = new CommandWithSender<UnitStackViewModel>(this, unitStack.Settle);
         this.EvaluateSettlingLocation = new CommandWithSenderAndArgument<UnitStackViewModel, Hex>(this, unitStack.EvaluateSettlingLocation);
         this.EvaluateMovementPath = new CommandWithSenderAndArgument<UnitStackViewModel, Hex>(this, unitStack.EvaluateMovementPath);
+        this.NextTurnCalculation = new CommandWithSender<UnitStackViewModel>(this, unitStack.NextTurnCalculation);
     }
     
     public override void Write(ISerializerStream stream) {
@@ -2078,6 +2020,7 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelCommandInfo("Settle", Settle) { ParameterType = typeof(void) });
         list.Add(new ViewModelCommandInfo("EvaluateSettlingLocation", EvaluateSettlingLocation) { ParameterType = typeof(Hex) });
         list.Add(new ViewModelCommandInfo("EvaluateMovementPath", EvaluateMovementPath) { ParameterType = typeof(Hex) });
+        list.Add(new ViewModelCommandInfo("NextTurnCalculation", NextTurnCalculation) { ParameterType = typeof(void) });
     }
     
     protected override void UnitsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
@@ -2099,6 +2042,8 @@ public class FactionViewModelBase : ViewModel {
     public ModelCollection<UnitStackViewModel> _UnitStacksProperty;
     
     public ModelCollection<CityViewModel> _CitiesProperty;
+    
+    protected CommandWithSender<FactionViewModel> _NextTurnCalculation;
     
     public FactionViewModelBase(FactionControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
@@ -2208,6 +2153,15 @@ public partial class FactionViewModel : FactionViewModelBase {
         }
     }
     
+    public virtual CommandWithSender<FactionViewModel> NextTurnCalculation {
+        get {
+            return _NextTurnCalculation;
+        }
+        set {
+            _NextTurnCalculation = value;
+        }
+    }
+    
     public virtual GameLogicViewModel ParentGameLogic {
         get {
             return this._ParentGameLogic;
@@ -2227,6 +2181,8 @@ public partial class FactionViewModel : FactionViewModelBase {
     }
     
     protected override void WireCommands(Controller controller) {
+        var faction = controller as FactionControllerBase;
+        this.NextTurnCalculation = new CommandWithSender<FactionViewModel>(this, faction.NextTurnCalculation);
     }
     
     public override void Write(ISerializerStream stream) {
@@ -2277,6 +2233,7 @@ if (stream.DeepSerialize) {
     
     protected override void FillCommands(List<ViewModelCommandInfo> list) {
         base.FillCommands(list);;
+        list.Add(new ViewModelCommandInfo("NextTurnCalculation", NextTurnCalculation) { ParameterType = typeof(void) });
     }
     
     protected override void UnitsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
@@ -2304,6 +2261,8 @@ public class CityViewModelBase : ViewModel {
     public ModelCollection<BuildingViewModel> _BuildingsProperty;
     
     public ModelCollection<UnitViewModel> _GarnisonProperty;
+    
+    protected CommandWithSender<CityViewModel> _NextTurnCalculation;
     
     public CityViewModelBase(CityControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
@@ -2402,6 +2361,15 @@ public partial class CityViewModel : CityViewModelBase {
         }
     }
     
+    public virtual CommandWithSender<CityViewModel> NextTurnCalculation {
+        get {
+            return _NextTurnCalculation;
+        }
+        set {
+            _NextTurnCalculation = value;
+        }
+    }
+    
     public virtual PlayerViewModel ParentPlayer {
         get {
             return this._ParentPlayer;
@@ -2421,6 +2389,8 @@ public partial class CityViewModel : CityViewModelBase {
     }
     
     protected override void WireCommands(Controller controller) {
+        var city = controller as CityControllerBase;
+        this.NextTurnCalculation = new CommandWithSender<CityViewModel>(this, city.NextTurnCalculation);
     }
     
     public override void Write(ISerializerStream stream) {
@@ -2462,6 +2432,7 @@ if (stream.DeepSerialize) {
     
     protected override void FillCommands(List<ViewModelCommandInfo> list) {
         base.FillCommands(list);;
+        list.Add(new ViewModelCommandInfo("NextTurnCalculation", NextTurnCalculation) { ParameterType = typeof(void) });
     }
     
     protected override void BuildingsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {

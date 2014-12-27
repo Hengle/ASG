@@ -96,25 +96,6 @@ public abstract class WorldManagerControllerBase : Controller {
     }
 }
 
-public abstract class AStarControllerBase : Controller {
-    
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
-    [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
-    public abstract void InitializeAStar(AStarViewModel aStar);
-    
-    public override ViewModel CreateEmpty() {
-        return new AStarViewModel(this);
-    }
-    
-    public virtual AStarViewModel CreateAStar() {
-        return ((AStarViewModel)(this.Create()));
-    }
-    
-    public override void Initialize(ViewModel viewModel) {
-        this.InitializeAStar(((AStarViewModel)(viewModel)));
-    }
-}
-
 public abstract class GameLogicControllerBase : Controller {
     
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
@@ -241,6 +222,9 @@ public abstract class UnitStackControllerBase : Controller {
     
     public virtual void EvaluateMovementPath(UnitStackViewModel unitStack, Hex arg) {
     }
+    
+    public virtual void NextTurnCalculation(UnitStackViewModel unitStack) {
+    }
 }
 
 public abstract class FactionControllerBase : Controller {
@@ -265,6 +249,9 @@ public abstract class FactionControllerBase : Controller {
     public override void Initialize(ViewModel viewModel) {
         this.InitializeFaction(((FactionViewModel)(viewModel)));
     }
+    
+    public virtual void NextTurnCalculation(FactionViewModel faction) {
+    }
 }
 
 public abstract class CityControllerBase : Controller {
@@ -287,6 +274,9 @@ public abstract class CityControllerBase : Controller {
     
     public override void Initialize(ViewModel viewModel) {
         this.InitializeCity(((CityViewModel)(viewModel)));
+    }
+    
+    public virtual void NextTurnCalculation(CityViewModel city) {
     }
 }
 

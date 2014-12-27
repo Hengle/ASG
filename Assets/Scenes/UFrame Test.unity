@@ -240,7 +240,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 65408469}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cdb635c5989f2b14e8ad7b8d654ca8c0, type: 3}
+  m_Script: {fileID: 11500000, guid: f2f5c994a0a3fe64fbfd8dc768fde727, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _LogEvents: 0
@@ -260,7 +260,7 @@ MonoBehaviour:
   _BindSelectedHex: 1
   toolTip: {fileID: 232210152}
   hexDescription: {fileID: 789348980}
-  unitName: {fileID: 939117085}
+  unitName: {fileID: 242431150}
 --- !u!1 &128860815
 GameObject:
   m_ObjectHideFlags: 0
@@ -796,7 +796,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 266796535}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b279e7ca31ce7cb45996c18c8b9055aa, type: 3}
+  m_Script: {fileID: 11500000, guid: 4e3d4ac8a99e1454c8fe8ec85a25e3eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _LogEvents: 0
@@ -1643,8 +1643,8 @@ MonoBehaviour:
   _ChunkSize: 512
   _ChunkResolution: 64
   _ChunkCollisionResolution: 16
-  _TerrainWidth: 64
-  _TerrainHeight: 64
+  _TerrainWidth: 32
+  _TerrainHeight: 32
   _Detail: .75
   _AltitudeVariation: .913999975
   _HexagonSide: 30
@@ -1672,7 +1672,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
 --- !u!1 &809109562
 GameObject:
   m_ObjectHideFlags: 0
@@ -1915,7 +1915,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
 --- !u!1 &879889157
 GameObject:
   m_ObjectHideFlags: 0
@@ -1957,7 +1957,6 @@ MonoBehaviour:
   _GameState: 0
   _Season: 0
   _Year: 0
-  _String1: 
   _BindNextTurn: 1
   _BindSeason: 1
   _BindYear: 1
@@ -1977,7 +1976,7 @@ Transform:
   m_LocalScale: {x: .969574094, y: .969573915, z: .969573975}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
 --- !u!1 &884823652
 GameObject:
   m_ObjectHideFlags: 0
@@ -2017,7 +2016,7 @@ MonoBehaviour:
   _SelectedCity: {fileID: 0}
   _Faction: {fileID: 0}
   _Color: {r: 0, g: .0482757092, b: 1, a: 0}
-  _BindSelectedHex: 1
+  _BindSelectedHex: 0
   _BindSelectedUnitStack: 1
   terrain: {fileID: 807931915}
   hoverHexHeightLight: {fileID: 0}
@@ -2153,7 +2152,6 @@ MonoBehaviour:
   _GameState: 0
   _Season: 0
   _Year: 0
-  _String1: 
   _BindPlayers: 1
   _PlayersSceneFirst: 0
   _PlayersContainer: {fileID: 1209706043}
@@ -2538,7 +2536,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: m_RootOrder
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: m_Name
@@ -2550,11 +2548,11 @@ Prefab:
       objectReference: {fileID: 395672876}
     - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: _TerrainWidth
-      value: 64
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: _TerrainHeight
-      value: 64
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
       propertyPath: _PixelToHeight
@@ -2689,7 +2687,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1506413586}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79768fdc5c6737445a28e896891a9518, type: 3}
+  m_Script: {fileID: 11500000, guid: 979146295493db243abd59c52c4f3903, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _LogEvents: 0
@@ -2757,7 +2755,7 @@ GameObject:
   - 114: {fileID: 1524262302}
   - 65: {fileID: 1524262304}
   m_Layer: 5
-  m_Name: Leading Unit Panel
+  m_Name: Unit Stack Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3171,7 +3169,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: b982e78718ebff64cb09e531017184d8, type: 2}
       propertyPath: m_RootOrder
-      value: 11
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: b982e78718ebff64cb09e531017184d8, type: 2}
       propertyPath: moveSpeed
@@ -3375,7 +3373,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
 --- !u!1 &2000127406
 GameObject:
   m_ObjectHideFlags: 0

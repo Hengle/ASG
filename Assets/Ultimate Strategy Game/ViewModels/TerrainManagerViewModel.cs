@@ -10,7 +10,7 @@ public partial class TerrainManagerViewModel
     public float[,] terrainData;
     public Hex[,] hexGrid;
 
-    public int MaxSize
+    public int GridSize
     {
         get {
             return TerrainWidth * TerrainHeight;

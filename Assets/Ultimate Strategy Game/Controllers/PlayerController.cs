@@ -14,7 +14,7 @@ public class PlayerController : PlayerControllerBase
 
     public override void SelectHex(PlayerViewModel player, Hex hex)
     {
-        player.SelectedHex = hex;
+        if (hex != player.SelectedHex) player.SelectedHex = hex;
     }
 
     public override void SelectUnitStack(PlayerViewModel player, UnitStackViewModel unitStack)
@@ -34,8 +34,15 @@ public class PlayerController : PlayerControllerBase
 
     public override void DeselectAll(PlayerViewModel player)
     {
-        player.SelectUnit = null;
-        player.SelectedUnitStack = null;
+        player.SelectedUnits.Clear();
+
+        if (player.SelectedUnitStack != null)
+        {
+            player.SelectedUnitStack.ActionState = UnitActionState.None;
+            player.SelectedUnitStack = null;
+        }
+
+        
         player.SelectedCity = null;
     }
 

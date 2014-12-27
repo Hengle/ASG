@@ -7,7 +7,7 @@ using UniRx;
 using UnityEngine.UI;
 
 
-public partial class UnitActionsBar 
+public partial class UnitStackActionsUI 
 {
 
     public Button moveAction;
@@ -15,7 +15,7 @@ public partial class UnitActionsBar
 
 
     /// Subscribes to the property and is notified anytime the value changes.
-    public override void SelectedUnitStackChanged(UnitStackViewModel unitStack) 
+    public override void SelectedUnitStackChanged(UnitStackViewModel unitStack)
     {
         base.SelectedUnitStackChanged(unitStack);
 
@@ -23,32 +23,35 @@ public partial class UnitActionsBar
 
         if (unitStack != null)
         {
+            EvaluateActions();
             unitStack.MovePointsProperty.Subscribe(state => EvaluateActions()).DisposeWhenChanged(Player._SelectedUnitStackProperty, true);
         }
     }
-    
+
+
     /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public override void SelectedUnitsAdded(UnitViewModel item) {
+    public override void SelectedUnitsAdded(UnitViewModel item)
+    {
         base.SelectedUnitsAdded(item);
     }
-    
+
     /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public override void SelectedUnitsRemoved(UnitViewModel item) {
+    public override void SelectedUnitsRemoved(UnitViewModel item)
+    {
         base.SelectedUnitsRemoved(item);
     }
 
-    private void ToggleActionBar (bool value)
+    private void ToggleActionBar(bool value)
     {
         moveAction.gameObject.SetActive(value);
         settleAction.gameObject.SetActive(value);
     }
 
-    private void EvaluateActions ()
+    private void EvaluateActions()
     {
         // Deactive, then see if settler exists and activate then
         settleAction.gameObject.SetActive(false);
-
-        for (int i=0; i < Player.SelectedUnitStack.Units.Count; i++)
+        for (int i = 0; i < Player.SelectedUnitStack.Units.Count; i++)
         {
             // Movement action check
             if (Player.SelectedUnitStack.MovePoints <= 0)
@@ -57,7 +60,7 @@ public partial class UnitActionsBar
             }
             else
             {
-                //moveAction.onClick.AddListener()
+                moveAction.onClick.AddListener(() => ExecuteCommand(Player.SelectedUnitStack.PlanMovement));
                 moveAction.interactable = true;
             }
 
@@ -71,10 +74,7 @@ public partial class UnitActionsBar
                 else
                     settleAction.interactable = true;
             }
-
-
         }
-
     }
 
 }

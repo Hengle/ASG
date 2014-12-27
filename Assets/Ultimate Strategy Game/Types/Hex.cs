@@ -91,7 +91,7 @@ public partial class Hex : IHeapItem<Hex>
 
     public int GetPathScores(Hex goal)
     {
-        // if there was no previous aStar to this hex 
+        // if there was no previous pathfinding to this hex 
         if (pathParent == -1)
         {
             pathScore = 0;

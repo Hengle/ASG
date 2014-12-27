@@ -36,8 +36,6 @@ public class MainTerrainBase : SceneManager {
     
     private WorldManagerController _WorldManagerController;
     
-    private AStarController _AStarController;
-    
     private GameLogicController _GameLogicController;
     
     private PlayerController _PlayerController;
@@ -120,19 +118,6 @@ public class MainTerrainBase : SceneManager {
         }
         set {
             _WorldManagerController = value;
-        }
-    }
-    
-    [Inject()]
-    public virtual AStarController AStarController {
-        get {
-            if ((this._AStarController == null)) {
-                this._AStarController = new AStarController() { Container = Container };
-            }
-            return this._AStarController;
-        }
-        set {
-            _AStarController = value;
         }
     }
     
@@ -265,7 +250,6 @@ public class MainTerrainBase : SceneManager {
         Container.RegisterController<ChunkController>(ChunkController);
         Container.RegisterController<TerrainManagerController>(TerrainManagerController);
         Container.RegisterController<WorldManagerController>(WorldManagerController);
-        Container.RegisterController<AStarController>(AStarController);
         Container.RegisterController<GameLogicController>(GameLogicController);
         Container.RegisterController<PlayerController>(PlayerController);
         Container.RegisterController<UnitStackController>(UnitStackController);

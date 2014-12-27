@@ -29,8 +29,6 @@ public class GameLogicController : GameLogicControllerBase
         gameLogic.GameState = GameState.Playing;
         gameLogic.Season = Seasons.Spring;
 
-        Debug.Log(gameLogic.TerrainManager);
-
         // Make sure to set the tell the units what the terrain manager.
         UnitStackViewModel.terrainManager = gameLogic.TerrainManager;
 
@@ -147,6 +145,12 @@ public class GameLogicController : GameLogicControllerBase
             gameLogic.Season = Seasons.Spring;
             gameLogic.Year++;
         }
+
+        for (int i = 0; i < gameLogic.Factions.Count; i++)
+        {
+            FactionController.NextTurnCalculation(gameLogic.Factions[i]);
+        }
+
 
         Debug.Log("Turn " + gameLogic.TurnCount);
 

@@ -22,6 +22,7 @@ public partial class PlayerView
 
     public override void Update()
     {
+        base.Update();
         MouseSelect();
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
@@ -37,6 +38,7 @@ public partial class PlayerView
             Debug.DrawLine(ray.origin, hit.point);
             if (Input.GetButtonDown("Mouse0"))
             {
+                Debug.Log("Left clikced");
                 // Select Unit
                 if (hit.collider.gameObject.CompareTag("CampainUnit"))
                 {
@@ -62,10 +64,13 @@ public partial class PlayerView
             }
             if (Input.GetButtonDown("Mouse1") && Player.SelectedUnitStack != null && Player.SelectedHex != null)
             {
+                
+                ExecuteCommand(Player.SelectedUnitStack.PlanMovement);
             }
         }
-        if (Input.GetButtonUp("Mouse1") && Player.SelectedUnitStack != null && Player.SelectedHex != null)
+        if (Input.GetKeyUp(KeyCode.Mouse1) && Player.SelectedUnitStack != null && Player.SelectedHex != null)
         {
+            Debug.Log("Right click");
             ExecuteMoveUnitStack(Player.SelectedUnitStack);
         }
         /*

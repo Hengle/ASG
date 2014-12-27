@@ -7,7 +7,7 @@ using UniRx;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public partial class PlayerHUDView 
+public partial class PlayerUI 
 { 
 
     public Image toolTip;

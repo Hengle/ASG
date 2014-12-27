@@ -115,6 +115,7 @@ public class TerrainManagerController : TerrainManagerControllerBase
         int TerrainWidth = terrainManager.TerrainWidth;
 
         terrainManager.terrainData = new float[TerrainWidth + 1, TerrainWidth + 1];
+        Pathfinding.gridSize = TerrainWidth * TerrainWidth + 2;
 
         // Setup the values of the four coreners of the world
         // Later to some logic to get terrian settings from the menu

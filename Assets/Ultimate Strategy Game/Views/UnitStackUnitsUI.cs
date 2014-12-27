@@ -7,7 +7,7 @@ using UniRx;
 using UnityEngine.UI;
 
 
-public partial class UnitStackSlots {
+public partial class UnitStackUnitsUI {
 
     public RectTransform unitSlotsContainer;
     public GameObject unitSlotPrefab;
@@ -25,9 +25,6 @@ public partial class UnitStackSlots {
     /// Subscribes to the property and is notified anytime the value changes.
     public override void SelectedUnitStackChanged(UnitStackViewModel value) 
     {
-        //ToggleShowSlots(value != null);
-
-      
         if (value == null)
         {
             for (int i = 0; i < unitSlots.Count; i++)
