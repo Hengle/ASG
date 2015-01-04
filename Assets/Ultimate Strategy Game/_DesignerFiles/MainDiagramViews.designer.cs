@@ -263,6 +263,10 @@ public abstract class GameLogicViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
+    public ViewBase _HumanFaction;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
     public ViewBase _TerrainManager;
     
     [UFGroup("View Model Properties")]
@@ -308,6 +312,7 @@ public abstract class GameLogicViewBase : ViewBase {
         gameLogic.TurnCount = this._TurnCount;
         gameLogic.CurrentPlayer = this._CurrentPlayer == null ? null : this._CurrentPlayer.ViewModelObject as PlayerViewModel;
         gameLogic.HumanPlayer = this._HumanPlayer == null ? null : this._HumanPlayer.ViewModelObject as PlayerViewModel;
+        gameLogic.HumanFaction = this._HumanFaction == null ? null : this._HumanFaction.ViewModelObject as FactionViewModel;
         gameLogic.TerrainManager = this._TerrainManager == null ? null : this._TerrainManager.ViewModelObject as TerrainManagerViewModel;
         gameLogic.GameState = this._GameState;
         gameLogic.Season = this._Season;
@@ -341,6 +346,14 @@ public abstract class PlayerViewBase : ViewBase {
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
     public ViewBase _SelectedUnitStack;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _HoverUnitStack;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _HoverCity;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
@@ -378,6 +391,8 @@ public abstract class PlayerViewBase : ViewBase {
         player.Name = this._Name;
         player.IsHuman = this._IsHuman;
         player.SelectedUnitStack = this._SelectedUnitStack == null ? null : this._SelectedUnitStack.ViewModelObject as UnitStackViewModel;
+        player.HoverUnitStack = this._HoverUnitStack == null ? null : this._HoverUnitStack.ViewModelObject as UnitStackViewModel;
+        player.HoverCity = this._HoverCity == null ? null : this._HoverCity.ViewModelObject as CityViewModel;
         player.SelectedCity = this._SelectedCity == null ? null : this._SelectedCity.ViewModelObject as CityViewModel;
         player.Faction = this._Faction == null ? null : this._Faction.ViewModelObject as FactionViewModel;
         player.Color = this._Color;
@@ -403,6 +418,14 @@ public abstract class PlayerViewBase : ViewBase {
         this.ExecuteCommand(Player.SelectCity, city);
     }
     
+    public virtual void ExecuteSetHoverUnitStack(UnitStackViewModel unitStack) {
+        this.ExecuteCommand(Player.SetHoverUnitStack, unitStack);
+    }
+    
+    public virtual void ExecuteSetHoverCity(CityViewModel city) {
+        this.ExecuteCommand(Player.SetHoverCity, city);
+    }
+    
     public virtual void ExecuteMoveUnitStack(UnitStackViewModel unitStack) {
         this.ExecuteCommand(Player.MoveUnitStack, unitStack);
     }
@@ -417,7 +440,11 @@ public abstract class UnitStackViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public UnitActionState _ActionState;
+    public ViewBase _Owner;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Boolean _Selected;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
@@ -433,7 +460,19 @@ public abstract class UnitStackViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public ViewBase _Owner;
+    public StackState _StackState;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public PlanedAction _PlannedAction;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _UnitStackDestination;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _CityDestination;
     
     public override System.Type ViewModelType {
         get {
@@ -456,11 +495,47 @@ public abstract class UnitStackViewBase : ViewBase {
     
     protected override void InitializeViewModel(ViewModel viewModel) {
         UnitStackViewModel unitStack = ((UnitStackViewModel)(viewModel));
-        unitStack.ActionState = this._ActionState;
+        unitStack.Owner = this._Owner == null ? null : this._Owner.ViewModelObject as PlayerViewModel;
+        unitStack.Selected = this._Selected;
         unitStack.LeadingUnit = this._LeadingUnit == null ? null : this._LeadingUnit.ViewModelObject as UnitViewModel;
         unitStack.MovePoints = this._MovePoints;
         unitStack.MovePointsTotal = this._MovePointsTotal;
-        unitStack.Owner = this._Owner == null ? null : this._Owner.ViewModelObject as PlayerViewModel;
+        unitStack.StackState = this._StackState;
+        unitStack.PlannedAction = this._PlannedAction;
+        unitStack.UnitStackDestination = this._UnitStackDestination == null ? null : this._UnitStackDestination.ViewModelObject as UnitStackViewModel;
+        unitStack.CityDestination = this._CityDestination == null ? null : this._CityDestination.ViewModelObject as CityViewModel;
+    }
+    
+    public virtual void ExecuteNextTurnCalculation() {
+        this.ExecuteCommand(UnitStack.NextTurnCalculation);
+    }
+    
+    public virtual void ExecuteAddUnit(UnitViewModel unit) {
+        this.ExecuteCommand(UnitStack.AddUnit, unit);
+    }
+    
+    public virtual void ExecuteRemoveUnit(UnitViewModel unit) {
+        this.ExecuteCommand(UnitStack.RemoveUnit, unit);
+    }
+    
+    public virtual void ExecutePlanMovement() {
+        this.ExecuteCommand(UnitStack.PlanMovement);
+    }
+    
+    public virtual void ExecutePlanUnitDestination() {
+        this.ExecuteCommand(UnitStack.PlanUnitDestination);
+    }
+    
+    public virtual void ExecutePlanSettling() {
+        this.ExecuteCommand(UnitStack.PlanSettling);
+    }
+    
+    public virtual void ExecuteEvaluateMovementPath(Hex arg) {
+        this.ExecuteCommand(UnitStack.EvaluateMovementPath, arg);
+    }
+    
+    public virtual void ExecuteEvaluateSettlingLocation(Hex arg) {
+        this.ExecuteCommand(UnitStack.EvaluateSettlingLocation, arg);
     }
     
     public virtual void ExecuteMove(Hex arg) {
@@ -471,40 +546,20 @@ public abstract class UnitStackViewBase : ViewBase {
         this.ExecuteCommand(UnitStack.StopMove);
     }
     
-    public virtual void ExecuteCancelMove() {
-        this.ExecuteCommand(UnitStack.CancelMove);
-    }
-    
-    public virtual void ExecuteAddUnitToStack(UnitViewModel unit) {
-        this.ExecuteCommand(UnitStack.AddUnitToStack, unit);
-    }
-    
-    public virtual void ExecuteRemoveUnitFromStack(UnitViewModel unit) {
-        this.ExecuteCommand(UnitStack.RemoveUnitFromStack, unit);
-    }
-    
-    public virtual void ExecutePlanMovement() {
-        this.ExecuteCommand(UnitStack.PlanMovement);
-    }
-    
-    public virtual void ExecutePlanSettling() {
-        this.ExecuteCommand(UnitStack.PlanSettling);
-    }
-    
     public virtual void ExecuteSettle() {
         this.ExecuteCommand(UnitStack.Settle);
     }
     
-    public virtual void ExecuteEvaluateSettlingLocation(Hex arg) {
-        this.ExecuteCommand(UnitStack.EvaluateSettlingLocation, arg);
+    public virtual void ExecuteFoundCity(Hex arg) {
+        this.ExecuteCommand(UnitStack.FoundCity, arg);
     }
     
-    public virtual void ExecuteEvaluateMovementPath(Hex arg) {
-        this.ExecuteCommand(UnitStack.EvaluateMovementPath, arg);
+    public virtual void ExecuteCancelAction() {
+        this.ExecuteCommand(UnitStack.CancelAction);
     }
     
-    public virtual void ExecuteNextTurnCalculation() {
-        this.ExecuteCommand(UnitStack.NextTurnCalculation);
+    public virtual void ExecutePlanUnit() {
+        this.ExecuteCommand(UnitStack.PlanUnit);
     }
 }
 
@@ -565,6 +620,30 @@ public abstract class CityViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public Int32 _Population;
     
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Single _PopulationGrowth;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _Food;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _Production;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _Knowledge;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _GoldIncome;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _Happieness;
+    
     public override System.Type ViewModelType {
         get {
             return typeof(CityViewModel);
@@ -588,10 +667,36 @@ public abstract class CityViewBase : ViewBase {
         CityViewModel city = ((CityViewModel)(viewModel));
         city.Name = this._Name;
         city.Population = this._Population;
+        city.PopulationGrowth = this._PopulationGrowth;
+        city.Food = this._Food;
+        city.Production = this._Production;
+        city.Knowledge = this._Knowledge;
+        city.GoldIncome = this._GoldIncome;
+        city.Happieness = this._Happieness;
     }
     
     public virtual void ExecuteNextTurnCalculation() {
         this.ExecuteCommand(City.NextTurnCalculation);
+    }
+    
+    public virtual void ExecuteCalcPopulation() {
+        this.ExecuteCommand(City.CalcPopulation);
+    }
+    
+    public virtual void ExecuteCalcGoldIncome() {
+        this.ExecuteCommand(City.CalcGoldIncome);
+    }
+    
+    public virtual void ExecuteCalcHappieness() {
+        this.ExecuteCommand(City.CalcHappieness);
+    }
+    
+    public virtual void ExecuteCalcProduction() {
+        this.ExecuteCommand(City.CalcProduction);
+    }
+    
+    public virtual void ExecuteCalcConstruction() {
+        this.ExecuteCommand(City.CalcConstruction);
     }
 }
 
@@ -733,6 +838,149 @@ public abstract class SettlerUnitViewBase : UnitViewBase {
     
     public virtual void ExecuteSettle() {
         this.ExecuteCommand(SettlerUnit.Settle);
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class MeleeUnitViewBase : UnitViewBase {
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(MeleeUnitViewModel);
+        }
+    }
+    
+    public MeleeUnitViewModel MeleeUnit {
+        get {
+            return ((MeleeUnitViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<MeleeUnitController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+        base.InitializeViewModel(viewModel);
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class CharacterViewBase : ViewBase {
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public String _Name;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _Age;
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(CharacterViewModel);
+        }
+    }
+    
+    public CharacterViewModel Character {
+        get {
+            return ((CharacterViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<CharacterController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+        CharacterViewModel character = ((CharacterViewModel)(viewModel));
+        character.Name = this._Name;
+        character.Age = this._Age;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class CharacterUnitViewBase : UnitViewBase {
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _Character;
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(CharacterUnitViewModel);
+        }
+    }
+    
+    public CharacterUnitViewModel CharacterUnit {
+        get {
+            return ((CharacterUnitViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<CharacterUnitController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+        base.InitializeViewModel(viewModel);
+        CharacterUnitViewModel characterUnit = ((CharacterUnitViewModel)(viewModel));
+        characterUnit.Character = this._Character == null ? null : this._Character.ViewModelObject as CharacterViewModel;
+    }
+}
+
+[DiagramInfoAttribute("Ultimate Strategy Game")]
+public abstract class FogOfWarViewBase : ViewBase {
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _TerrainManager;
+    
+    public override string DefaultIdentifier {
+        get {
+            return "FogOfWar";
+        }
+    }
+    
+    public override System.Type ViewModelType {
+        get {
+            return typeof(FogOfWarViewModel);
+        }
+    }
+    
+    public FogOfWarViewModel FogOfWar {
+        get {
+            return ((FogOfWarViewModel)(this.ViewModelObject));
+        }
+        set {
+            this.ViewModelObject = value;
+        }
+    }
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<FogOfWarController>());
+    }
+    
+    protected override void InitializeViewModel(ViewModel viewModel) {
+        FogOfWarViewModel fogOfWar = ((FogOfWarViewModel)(viewModel));
+        fogOfWar.TerrainManager = this._TerrainManager == null ? null : this._TerrainManager.ViewModelObject as TerrainManagerViewModel;
+    }
+    
+    public virtual void ExecuteUpdateFOW() {
+        this.ExecuteCommand(FogOfWar.UpdateFOW);
+    }
+    
+    public virtual void ExecuteUpdateUnitView(UnitStackViewModel unitStack) {
+        this.ExecuteCommand(FogOfWar.UpdateUnitView, unitStack);
     }
 }
 
@@ -923,6 +1171,14 @@ public class PlayerUIViewBase : PlayerViewBase {
     [UFRequireInstanceMethod("SelectedHexChanged")]
     public bool _BindSelectedHex = true;
     
+    [UFToggleGroup("HoverUnitStack")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindHoverUnitStack = true;
+    
+    [UFToggleGroup("HoverCity")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindHoverCity = true;
+    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<PlayerController>());
     }
@@ -943,6 +1199,14 @@ public class PlayerUIViewBase : PlayerViewBase {
     public virtual void SelectedHexChanged(Hex value) {
     }
     
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void HoverUnitStackChanged(UnitStackViewModel value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void HoverCityChanged(CityViewModel value) {
+    }
+    
     public override void Bind() {
         base.Bind();
         if (this._BindSelectedUnitStack) {
@@ -953,6 +1217,12 @@ public class PlayerUIViewBase : PlayerViewBase {
         }
         if (this._BindSelectedHex) {
             this.BindProperty(Player._SelectedHexProperty, this.SelectedHexChanged);
+        }
+        if (this._BindHoverUnitStack) {
+            this.BindProperty(Player._HoverUnitStackProperty, this.HoverUnitStackChanged);
+        }
+        if (this._BindHoverCity) {
+            this.BindProperty(Player._HoverCityProperty, this.HoverCityChanged);
         }
     }
 }
@@ -1246,6 +1516,15 @@ public class UnitStackViewViewBase : UnitStackViewBase {
     [UFRequireInstanceMethod("StateChanged")]
     public bool _BindState = true;
     
+    [UFToggleGroup("Selected")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("SelectedChanged")]
+    public bool _BindSelected = true;
+    
+    [UFToggleGroup("Settle")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSettle = true;
+    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
     }
@@ -1274,6 +1553,14 @@ public class UnitStackViewViewBase : UnitStackViewBase {
     public virtual void OnMoving() {
     }
     
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void SelectedChanged(Boolean value) {
+    }
+    
+    /// Invokes SettleExecuted when the Settle command is executed.
+    public virtual void SettleExecuted() {
+    }
+    
     public virtual void ResetWorldPos() {
         if (_WorldPosDisposable != null) _WorldPosDisposable.Dispose();
         _WorldPosDisposable = GetWorldPosObservable().Subscribe(UnitStack._WorldPosProperty).DisposeWith(this);
@@ -1298,6 +1585,12 @@ public class UnitStackViewViewBase : UnitStackViewBase {
         }
         if (this._BindState) {
             this.BindProperty(UnitStack._StateProperty, this.StateChanged);
+        }
+        if (this._BindSelected) {
+            this.BindProperty(UnitStack._SelectedProperty, this.SelectedChanged);
+        }
+        if (this._BindSettle) {
+            this.BindCommandExecuted(UnitStack.Settle, SettleExecuted);
         }
     }
 }
@@ -1361,41 +1654,262 @@ public partial class UnitStackActionsUI : UnitStackActionsUIViewBase {
 
 public class UnitStackActionsViewViewBase : UnitStackViewBase {
     
-    [UFToggleGroup("ActionState")]
+    [UFToggleGroup("Selected")]
     [UnityEngine.HideInInspector()]
-    [UFRequireInstanceMethod("ActionStateChanged")]
-    public bool _BindActionState = true;
+    [UFRequireInstanceMethod("SelectedChanged")]
+    public bool _BindSelected = true;
     
-    [UFToggleGroup("PlanedPath")]
+    [UFToggleGroup("StackState")]
     [UnityEngine.HideInInspector()]
-    public bool _BindPlanedPath = true;
+    [UFRequireInstanceMethod("StackStateChanged")]
+    public bool _BindStackState = true;
+    
+    [UFToggleGroup("PlannedAction")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("PlannedActionChanged")]
+    public bool _BindPlannedAction = true;
+    
+    [UFToggleGroup("EvaluateSettlingLocation")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindEvaluateSettlingLocation = true;
+    
+    [UFToggleGroup("PlannedSettlingLocation")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("PlannedSettlingLocationChanged")]
+    public bool _BindPlannedSettlingLocation = true;
+    
+    [UFToggleGroup("SettlingLocation")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("SettlingLocationChanged")]
+    public bool _BindSettlingLocation = true;
+    
+    [UFToggleGroup("Path")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindPath = true;
     
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
     }
     
     /// Subscribes to the property and is notified anytime the value changes.
-    public virtual void ActionStateChanged(UnitActionState value) {
+    public virtual void SelectedChanged(Boolean value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void StackStateChanged(StackState value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void PlannedActionChanged(PlanedAction value) {
+    }
+    
+    /// Invokes EvaluateSettlingLocationExecuted when the EvaluateSettlingLocation command is executed.
+    public virtual void EvaluateSettlingLocationExecuted() {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void PlannedSettlingLocationChanged(Hex value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void SettlingLocationChanged(Hex value) {
     }
     
     /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public virtual void PlanedPathAdded(Hex item) {
+    public virtual void PathAdded(Hex item) {
     }
     
     /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public virtual void PlanedPathRemoved(Hex item) {
+    public virtual void PathRemoved(Hex item) {
     }
     
     public override void Bind() {
         base.Bind();
-        if (this._BindActionState) {
-            this.BindProperty(UnitStack._ActionStateProperty, this.ActionStateChanged);
+        if (this._BindSelected) {
+            this.BindProperty(UnitStack._SelectedProperty, this.SelectedChanged);
         }
-        if (this._BindPlanedPath) {
-            this.BindCollection(UnitStack._PlanedPathProperty, PlanedPathAdded, PlanedPathRemoved);
+        if (this._BindStackState) {
+            this.BindProperty(UnitStack._StackStateProperty, this.StackStateChanged);
+        }
+        if (this._BindPlannedAction) {
+            this.BindProperty(UnitStack._PlannedActionProperty, this.PlannedActionChanged);
+        }
+        if (this._BindEvaluateSettlingLocation) {
+            this.BindCommandExecuted(UnitStack.EvaluateSettlingLocation, EvaluateSettlingLocationExecuted);
+        }
+        if (this._BindPlannedSettlingLocation) {
+            this.BindProperty(UnitStack._PlannedSettlingLocationProperty, this.PlannedSettlingLocationChanged);
+        }
+        if (this._BindSettlingLocation) {
+            this.BindProperty(UnitStack._SettlingLocationProperty, this.SettlingLocationChanged);
+        }
+        if (this._BindPath) {
+            this.BindCollection(UnitStack._PathProperty, PathAdded, PathRemoved);
         }
     }
 }
 
 public partial class UnitStackActionsView : UnitStackActionsViewViewBase {
+}
+
+public class CityFlagViewViewBase : CityViewBase {
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<CityController>());
+    }
+    
+    public override void Bind() {
+        base.Bind();
+    }
+}
+
+public partial class CityFlagView : CityFlagViewViewBase {
+}
+
+public class CityUIViewViewBase : CityViewBase {
+    
+    [UFToggleGroup("Name")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("NameChanged")]
+    public bool _BindName = true;
+    
+    [UFToggleGroup("Happieness")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("HappienessChanged")]
+    public bool _BindHappieness = true;
+    
+    [UFToggleGroup("PopulationGrowth")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("PopulationGrowthChanged")]
+    public bool _BindPopulationGrowth = true;
+    
+    [UFToggleGroup("Population")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("PopulationChanged")]
+    public bool _BindPopulation = true;
+    
+    [UFToggleGroup("GoldIncome")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("GoldIncomeChanged")]
+    public bool _BindGoldIncome = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<CityController>());
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void NameChanged(String value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void HappienessChanged(Int32 value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void PopulationGrowthChanged(Single value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void PopulationChanged(Int32 value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void GoldIncomeChanged(Int32 value) {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        if (this._BindName) {
+            this.BindProperty(City._NameProperty, this.NameChanged);
+        }
+        if (this._BindHappieness) {
+            this.BindProperty(City._HappienessProperty, this.HappienessChanged);
+        }
+        if (this._BindPopulationGrowth) {
+            this.BindProperty(City._PopulationGrowthProperty, this.PopulationGrowthChanged);
+        }
+        if (this._BindPopulation) {
+            this.BindProperty(City._PopulationProperty, this.PopulationChanged);
+        }
+        if (this._BindGoldIncome) {
+            this.BindProperty(City._GoldIncomeProperty, this.GoldIncomeChanged);
+        }
+    }
+}
+
+public partial class CityUIView : CityUIViewViewBase {
+}
+
+public class HumanFactionUIViewViewBase : FactionViewBase {
+    
+    [UFToggleGroup("Food")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("FoodChanged")]
+    public bool _BindFood = true;
+    
+    [UFToggleGroup("Gold")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("GoldChanged")]
+    public bool _BindGold = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<FactionController>());
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void FoodChanged(Single value) {
+    }
+    
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void GoldChanged(Single value) {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        if (this._BindFood) {
+            this.BindProperty(Faction._FoodProperty, this.FoodChanged);
+        }
+        if (this._BindGold) {
+            this.BindProperty(Faction._GoldProperty, this.GoldChanged);
+        }
+    }
+}
+
+public partial class HumanFactionUIView : HumanFactionUIViewViewBase {
+}
+
+public class FogOfWarViewViewBase : FogOfWarViewBase {
+    
+    [UFToggleGroup("UpdateFOW")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindUpdateFOW = true;
+    
+    [UFToggleGroup("UpdateUnitView")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindUpdateUnitView = true;
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<FogOfWarController>());
+    }
+    
+    /// Invokes UpdateFOWExecuted when the UpdateFOW command is executed.
+    public virtual void UpdateFOWExecuted() {
+    }
+    
+    /// Invokes UpdateUnitViewExecuted when the UpdateUnitView command is executed.
+    public virtual void UpdateUnitViewExecuted() {
+    }
+    
+    public override void Bind() {
+        base.Bind();
+        if (this._BindUpdateFOW) {
+            this.BindCommandExecuted(FogOfWar.UpdateFOW, UpdateFOWExecuted);
+        }
+        if (this._BindUpdateUnitView) {
+            this.BindCommandExecuted(FogOfWar.UpdateUnitView, UpdateUnitViewExecuted);
+        }
+    }
+}
+
+public partial class FogOfWarView : FogOfWarViewViewBase {
 }

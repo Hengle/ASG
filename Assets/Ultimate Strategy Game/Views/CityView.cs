@@ -6,5 +6,15 @@ using UnityEngine;
 using UniRx;
 
 
-public partial class CityView {
+public partial class CityView 
+{
+
+    public override void Start()
+    {
+        base.Start();
+
+        transform.position = City.HexLocation.worldPos;
+
+    }
+
 }

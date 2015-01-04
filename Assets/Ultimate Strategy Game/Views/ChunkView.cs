@@ -129,7 +129,7 @@ public partial class ChunkView
                 if (x >= 0 && y >= 0)
                 {
                     terrainVal = Mathf.Round(Chunk.ParentTerrainManager.terrainData[x, y] / Chunk.ParentTerrainManager.Altitudes) * Chunk.ParentTerrainManager.Altitudes;
-                    DrawHex(texture, posX, posY, new Color(terrainVal, terrainVal, terrainVal), true);
+                    Hex.DrawHex(texture, posX, posY, new Color(terrainVal, terrainVal, terrainVal));
                 }
             }
         }
@@ -168,9 +168,9 @@ public partial class ChunkView
                 {
                     terrainVal = Mathf.Clamp(Mathf.Round(Chunk.ParentTerrainManager.terrainData[x, y] / Chunk.ParentTerrainManager.Altitudes) * Chunk.ParentTerrainManager.Altitudes / Chunk.ParentTerrainManager.Altitudes - 1, 0, 5);
                     if (Chunk.ParentTerrainManager.hexGrid[x, y].RiverStrength <= 0)
-                        DrawHex(texture, posX, posY, altitudes[(int)terrainVal], false);
+                        Hex.DrawHex(texture, posX, posY, altitudes[(int)terrainVal]);
                     else
-                        DrawHex(texture, posX, posY, Color.cyan, false);
+                        Hex.DrawHex(texture, posX, posY, Color.cyan);
 
                 }
             }
@@ -181,40 +181,7 @@ public partial class ChunkView
     }
 
 
-    void DrawHex(Texture2D texture, int centerX, int centerY, Color color, bool setEdgeValues)
-    {
-        int startX = 0, endX = 0;
 
-
-        for (int y = (int)HexProperties.height; y > 0; y--)
-        {
-
-            if (y < HexProperties.tileH) // TOP triangle
-            {
-                startX = Mathf.FloorToInt(-(y / HexProperties.tileH * HexProperties.tileR));
-                endX = Mathf.CeilToInt(y / HexProperties.tileH * HexProperties.tileR);
-            }
-            else if (y >= HexProperties.tileH && y <= HexProperties.side + HexProperties.tileH) // MIDDLE rectangle
-            {
-                startX = Mathf.FloorToInt(-HexProperties.tileR);
-                endX = Mathf.CeilToInt(HexProperties.tileR);
-            }
-            else // BOTTOM triangle
-            {
-                startX = Mathf.FloorToInt(-((HexProperties.height - y) / HexProperties.tileH * HexProperties.tileR));
-                endX = Mathf.CeilToInt(((HexProperties.height - y) / HexProperties.tileH * HexProperties.tileR));
-            }
-
-            for (int x = startX; x < endX; x++)
-            {
-                if (x + centerX >= 0 && x + centerX <= chunkSize && y + centerY >= 0 && y + centerY <= chunkSize)
-                {
-                    texture.SetPixel(x + centerX, y + centerY, color);
-                }
-
-            }
-        }
-    }
 
     private void UpdateMesh()
     {

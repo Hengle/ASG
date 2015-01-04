@@ -20,6 +20,7 @@ public partial class UnitStackUnitsUI {
         base.Start();
         GenerateUnitSlots();
         ToggleShowSlots(false);
+
     }
 
     /// Subscribes to the property and is notified anytime the value changes.
@@ -34,6 +35,13 @@ public partial class UnitStackUnitsUI {
             return;
         }
 
+        UpdateUnitStackSlots();
+        Player.SelectedUnitStack._UnitsProperty.Subscribe(units => UpdateUnitStackSlots()).DisposeWhenChanged(Player.SelectedUnitStackProperty, true);        
+
+    }
+
+    private void UpdateUnitStackSlots ()
+    {
         for (int i = 0; i < unitSlots.Count; i++)
         {
             if (i < Player.SelectedUnitStack.Units.Count)
@@ -41,16 +49,17 @@ public partial class UnitStackUnitsUI {
                 unitSlots[i].gameObject.SetActive(true);
                 unitSlots[i].Unit = Player.SelectedUnitStack.Units[i];
                 unitSlots[i].SetupBindings();
-            }else{
+            }
+            else
+            {
                 unitSlots[i].gameObject.SetActive(false);
             }
         }
-        
-
     }
 
+    /*
     /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public override void SelectedUnitsAdded(UnitViewModel item) 
+    public override void UnitsAdded(UnitViewModel item) 
     {
         for (int i = 0; i < unitSlots.Count; i++)
         {
@@ -75,7 +84,7 @@ public partial class UnitStackUnitsUI {
                 unitSlots[i].gameObject.SetActive(false);
             }
         }
-    }
+    }*/
 
     private void GenerateUnitSlots ()
     {

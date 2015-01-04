@@ -13,7 +13,7 @@ public partial class PlayerView
     public GameObject hoverHexHeightLight;
     public Vector2 hoverHexAraray;
 
-
+    private GameObject hoverObject;
 
     public override void Start()
     {
@@ -24,65 +24,120 @@ public partial class PlayerView
     {
         base.Update();
         MouseSelect();
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-        }
+    
     }
 
     void MouseSelect()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
+        
         if (Physics.Raycast(ray, out hit, 400))
         {
             Debug.DrawLine(ray.origin, hit.point);
+            hoverObject = hit.collider.gameObject;
+
+            // Hovering over gameplay objects
+            if (hoverObject.CompareTag("Terrain"))
+            {
+                ExecuteSelectHexAtPos(hit.point);
+            }
+            
+            if (hoverObject.CompareTag("City"))
+            {
+                ExecuteSetHoverCity(hoverObject.GetComponent<CityView>().City);
+            }
+            else
+            {
+                ExecuteSetHoverCity(null);
+            }
+            
+            if (hoverObject.CompareTag("CampainUnit"))
+            {
+                ExecuteSetHoverUnitStack(hoverObject.GetComponent<UnitStackView>().UnitStack);
+            }
+            else
+            {
+                ExecuteSetHoverUnitStack(null);
+            }
+
+
+            // Selecting gameplay objects
             if (Input.GetButtonDown("Mouse0"))
             {
-                Debug.Log("Left clikced");
                 // Select Unit
-                if (hit.collider.gameObject.CompareTag("CampainUnit"))
+                if (hoverObject.CompareTag("CampainUnit"))
                 {
-                    ExecuteSelectUnitStack(hit.collider.gameObject.GetComponent<UnitStackView>().UnitStack);
+                    ExecuteSelectUnitStack(hoverObject.GetComponent<UnitStackView>().UnitStack);
                     return;
                 }
                 // Select City
-                if (hit.collider.gameObject.CompareTag("City"))
+                if (hoverObject.CompareTag("City"))
                 {
-                    ExecuteSelectCity(hit.collider.gameObject.GetComponent<CityView>().City);
+                    ExecuteSelectCity(hoverObject.GetComponent<CityView>().City);
                     return;
                 }
+
+                // Settle city
+                if (hoverObject.CompareTag("Terrain") && Player.SelectedUnitStack != null && Player.SelectedUnitStack.PlannedSettlingLocation != null)
+                {
+                    ExecuteCommand(Player.SelectedUnitStack.Settle);
+                    return;
+                }
+
                 // Deselect Unit
-                if (hit.collider.gameObject.CompareTag("Terrain"))
+                if (hoverObject.CompareTag("Terrain"))
                 {
                     ExecuteDeselectAll();
                     return;
                 }
             }
-            else
+
+
+
+
+            
+            // Evaluate terrain movement
+            if (Input.GetButton("Mouse1") && Player.SelectedUnitStack != null && hit.collider.gameObject.CompareTag("Terrain") && Player.SelectedUnitStack.PlannedAction != PlanedAction.Move)
             {
-                ExecuteSelectHexAtPos(hit.point);
-            }
-            if (Input.GetButtonDown("Mouse1") && Player.SelectedUnitStack != null && Player.SelectedHex != null)
-            {
-                
                 ExecuteCommand(Player.SelectedUnitStack.PlanMovement);
+                return;
             }
+            /*
+            // Evaluate city 
+            if (Input.GetButton("Mouse1") && hit.collider.gameObject.CompareTag("City") && Player.SelectedUnitStack.PlannedAction != PlanedAction.None)
+            {
+                ExecuteCommand(Player.SelectedUnitStack.EvaluateMovementPath);
+            }
+
+            if (Input.GetButton("Mouse1") && hit.collider.gameObject.CompareTag("CampainUnit") && Player.SelectedUnitStack.PlannedAction != PlanedAction.)
+            {
+                //ExecuteCommand(Player.SelectedUnitStack.EvaluateMovementPath);
+            }
+             * */
+
+
+
+            if (Input.GetKeyUp(KeyCode.Mouse1) && Player.SelectedUnitStack != null && Player.HoverUnitStack != null)
+            {
+                //ExecuteCommand(Player.SelectedUnitStack.UnitDestiantion);
+            }
+
+            if (Input.GetKeyUp(KeyCode.Mouse1) && Player.SelectedUnitStack != null && Player.HoverCity != null)
+            {
+                //ExecuteCommand(Player.SelectedUnitStack.CityDestination);
+            }
+
+            if (Input.GetKeyUp(KeyCode.Mouse1) && Player.SelectedUnitStack != null && Player.SelectedHex != null)
+            {
+                ExecuteCommand(Player.SelectedUnitStack.Move, Player.SelectedHex);
+            }
+
+
+
         }
-        if (Input.GetKeyUp(KeyCode.Mouse1) && Player.SelectedUnitStack != null && Player.SelectedHex != null)
-        {
-            Debug.Log("Right click");
-            ExecuteMoveUnitStack(Player.SelectedUnitStack);
-        }
-        /*
-        if (hoverHex != null)
-        {
-        hoverHexHeightLight.transform.position = hoverHex.worldPos;
-        }
-        else
-        {
-        hoverHexHeightLight.transform.position = Vector3.up * -100;
-        }
-        */
+
+ 
     }
 
   

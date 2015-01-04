@@ -49,6 +49,10 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
     
     private Hex _parent;
     
+    private Boolean _Visible;
+    
+    private Boolean _Explored;
+    
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName){ PropertyChangedEventHandler handler = PropertyChanged; if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName)); }
     public virtual Vector2 arrayCoord {
@@ -198,6 +202,26 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
         set {
             _parent = value;
             OnPropertyChanged("parent");
+        }
+    }
+    
+    public virtual Boolean Visible {
+        get {
+            return this._Visible;
+        }
+        set {
+            _Visible = value;
+            OnPropertyChanged("Visible");
+        }
+    }
+    
+    public virtual Boolean Explored {
+        get {
+            return this._Explored;
+        }
+        set {
+            _Explored = value;
+            OnPropertyChanged("Explored");
         }
     }
 }

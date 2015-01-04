@@ -8,12 +8,33 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public partial class PlayerUI 
-{ 
+{
 
     public Image toolTip;
-    public Text hexDescription;
+    public Text toolTipDescription;
 
     public Text unitName;
+    
+
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void HoverUnitStackChanged(UnitStackViewModel unitStack) 
+    {
+        if (unitStack != null)
+        {
+            toolTipDescription.text = unitStack.LeadingUnit.Name;
+        }
+    }
+
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void HoverCityChanged(CityViewModel city) 
+    {
+        if (city != null)
+        {
+            toolTipDescription.text = city.Name + "\n" + city.Population;
+        }
+    }
+ 
+
 
 
     /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
@@ -48,7 +69,8 @@ public partial class PlayerUI
         {
             if (toolTip.gameObject.activeSelf == false)
                 toolTip.gameObject.SetActive(true);
-            hexDescription.text = hex.terrainType + "\n" + hex.arrayCoord;
+
+            toolTipDescription.text = hex.terrainType + "\n" + hex.arrayCoord;
         }
         else
         {

@@ -8,21 +8,30 @@ using UniRx;
 
 public partial class UnitStackView
 { 
-    public float movementSpeed;
+ 
+    public float moveSpeed;
+
+    public GameObject selectionEffect;
 
 
-    // make sure to cashe the transform
     private Transform _transform;
+
 
     public override void Start()
     {
         base.Start();
+
         _transform = transform;
         _transform.position = UnitStack.HexLocation.worldPos;
     }
 
 
-    /// Subscribes to the state machine property and executes a method for each state.
+    public override void SelectedChanged(Boolean value)
+    {
+        selectionEffect.SetActive(value);
+    }
+
+
     public override void StateChanged(Invert.StateMachine.State value)
     {
         base.StateChanged(value);
@@ -36,15 +45,16 @@ public partial class UnitStackView
     public override void OnMoving()
     {
         base.OnMoving();
-        Observable.EveryFixedUpdate().Subscribe(state => Moving()).DisposeWhenChanged(UnitStack.StateProperty, true);
+        Observable.EveryFixedUpdate().Subscribe(state => MoveToDestination()).DisposeWhenChanged(UnitStack.StateProperty, true);
     }
 
 
-    public void Moving()
+    public void MoveToDestination()
     {
         if (UnitStack.NextHexInPath != null)
-            _transform.position = Vector3.MoveTowards(_transform.position, UnitStack.NextHexInPath.worldPos, movementSpeed * Time.fixedDeltaTime);
-
+        {
+            _transform.position = Vector3.MoveTowards(_transform.position, UnitStack.NextHexInPath.worldPos + Vector3.up * 0.6f, moveSpeed * Time.fixedDeltaTime);
+        }
     }
 
 
@@ -52,24 +62,4 @@ public partial class UnitStackView
     {
         return PositionAsObservable;
     }
-
-
-    public override void MoveExecuted()
-    {
-    }
-
-
-    /*Obserbale.EveryFixedUpdate().Subscribe(l => function).DisposeWhenChanged(a property);
- *  
- * 
- *         this.BindProperty(Unit.Health, health => ExecuteCancelMove(target)).DisposeWhenChanged(Unit.Health);
-
- * 
-     * Observable.Interval(TimeSpan.FromSeconds(2.0f))
-    .Subscribe(_ => HarvestResource(player))
-    //.Subscribe(_ => player.WoodCount++)
-    .DisposeWhenChanged(player.CurrentActionProperty);
- * 
- */
-
 }

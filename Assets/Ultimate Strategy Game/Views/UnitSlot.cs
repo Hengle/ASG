@@ -15,13 +15,15 @@ public partial class UnitSlot
 
 
     /// Subscribes to the property and is notified anytime the value changes.
-    public override void UnitCountChanged(Int32 value) {
+    public override void UnitCountChanged(Int32 value) 
+    {
         base.UnitCountChanged(value);
         unitCount.text = value.ToString();
     }
     
     /// Subscribes to the property and is notified anytime the value changes.
-    public override void UnitCountMaxChanged(Int32 value) {
+    public override void UnitCountMaxChanged(Int32 value) 
+    {
         base.UnitCountMaxChanged(value);
         //unitCountMax.text = value.ToString();
     }

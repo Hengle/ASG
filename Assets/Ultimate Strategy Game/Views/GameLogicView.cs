@@ -35,6 +35,13 @@ public partial class GameLogicView
     /// This binding will add or remove views based on an element/viewmodel collection.
     public override ViewBase CreateFactionsView(FactionViewModel item) 
     {
+        // We already have created the human players UI
+        if (item == GameLogic.HumanFaction)
+        {
+            return null;
+        }
+
+
         ViewBase factionView = InstantiateView(factionPrefab, item, Vector3.zero, Quaternion.identity);
         factionView.gameObject.name = "_" + item.Name;
 

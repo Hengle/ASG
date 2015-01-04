@@ -15,6 +15,9 @@ public class GameLogicController : GameLogicControllerBase
     [Inject]
     public SettlerUnitController SettlerUnitController { get; set; }
 
+    [Inject]
+    public MeleeUnitController MeleeUnitController { get; set; }
+
 
     public override void InitializeGameLogic(GameLogicViewModel gameLogic) {
     }
@@ -44,14 +47,23 @@ public class GameLogicController : GameLogicControllerBase
     {
         base.SetupPlayers(gameLogic);
 
+        Hex startingHex = null;
+
         // Add human player
         if (gameLogic.HumanPlayer == null)
             gameLogic.HumanPlayer = new PlayerViewModel(PlayerController);
         
         gameLogic.CurrentPlayer = gameLogic.HumanPlayer;
         gameLogic.Players.Add(gameLogic.HumanPlayer);
+        gameLogic.Factions.Add(gameLogic.HumanFaction);
 
-        Hex startingHex = null;
+        startingHex = TerrainManagerController.GetStartingLocation(TerrainManager);
+
+        gameLogic.HumanPlayer.StartingHex = startingHex;
+        GiveStarterUnits(gameLogic.HumanPlayer);
+
+
+        FactionViewModel faction;
 
         for (int p = 0; p < gameLogic.PlayerCount; p++)
         {
@@ -62,7 +74,7 @@ public class GameLogicController : GameLogicControllerBase
                 IsHuman = false
             };
 
-            var faction = new FactionViewModel(FactionController) { 
+            faction = new FactionViewModel(FactionController) { 
                 Name = player.Name + "'s faction"  
             };
             player.Faction = faction;
@@ -81,28 +93,40 @@ public class GameLogicController : GameLogicControllerBase
     private void GiveStarterUnits (PlayerViewModel player)
     {
 
-        // Spawn the settle
         SettlerUnitViewModel settler = new SettlerUnitViewModel(SettlerUnitController)
         {
             Name = "Settler",
-            UnitCount = 400,
-            UnitCountMax = 500
+            Owner = player,
+            Population = 850,
+            UnitCount = 40,
+            UnitCountMax = 50,
+            ParentFaction = player.Faction
         };
 
-
-
+        // Spawn the settle
+        MeleeUnitViewModel meleeUnit = new MeleeUnitViewModel(MeleeUnitController)
+        {
+            Name = "Melee Unit",
+            Owner = player,
+            UnitCount = 80,
+            UnitCountMax = 80,
+            ParentFaction = player.Faction
+        };
 
         var unitStack = new UnitStackViewModel(UnitStackController)
         {
             Owner = player,
             HexLocation = player.StartingHex,
+            ParentFaction = player.Faction
         };
 
 
         player.Faction.UnitStacks.Add(unitStack);
         player.Faction.Units.Add(settler);
+        player.Faction.Units.Add(meleeUnit);
 
-        UnitStackController.AddUnitToStack(unitStack, settler);
+        UnitStackController.AddUnit(unitStack, settler);
+        UnitStackController.AddUnit(unitStack, meleeUnit);
 
 
         /*

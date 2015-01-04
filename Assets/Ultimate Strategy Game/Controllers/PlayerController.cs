@@ -17,9 +17,26 @@ public class PlayerController : PlayerControllerBase
         if (hex != player.SelectedHex) player.SelectedHex = hex;
     }
 
+    public override void SetHoverUnitStack(PlayerViewModel player, UnitStackViewModel unitStack)
+    {
+        if (player.HoverUnitStack != unitStack)
+        {
+            player.HoverUnitStack = unitStack;
+        }
+    }
+
+    public override void SetHoverCity(PlayerViewModel player, CityViewModel city)
+    {
+        if (player.HoverCity != city)
+        {
+            player.HoverCity = city;
+        }
+    }
+
     public override void SelectUnitStack(PlayerViewModel player, UnitStackViewModel unitStack)
     {
         player.SelectedUnitStack = unitStack;
+        player.SelectedUnitStack.Selected = true;
     }
 
     public override void SelectUnit(PlayerViewModel player, UnitViewModel unit)
@@ -38,11 +55,16 @@ public class PlayerController : PlayerControllerBase
 
         if (player.SelectedUnitStack != null)
         {
-            player.SelectedUnitStack.ActionState = UnitActionState.None;
+            player.SelectedUnitStack.Selected = false;
+            if (player.SelectedUnitStack.PathDestination == null)
+            {
+                player.SelectedUnitStack.PlannedAction = PlanedAction.None;
+            }
+
             player.SelectedUnitStack = null;
         }
 
-        
+    
         player.SelectedCity = null;
     }
 
@@ -50,10 +72,4 @@ public class PlayerController : PlayerControllerBase
     {
         ExecuteCommand(player.SelectHex, Hex.GetHexAtPos(TerrainManager, pos));
     }
-
-    public override void MoveUnitStack(PlayerViewModel player, UnitStackViewModel unitStack)
-    {
-        ExecuteCommand(unitStack.Move, player.SelectedHex);
-    }
-
 }

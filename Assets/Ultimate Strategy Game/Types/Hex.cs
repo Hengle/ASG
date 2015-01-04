@@ -263,4 +263,40 @@ public partial class Hex : IHeapItem<Hex>
         return hex;
     }
 
+
+    public static void DrawHex(Texture2D texture, int centerX, int centerY, Color color)
+    {
+        int startX = 0, endX = 0;
+
+
+        for (int y = (int)HexProperties.height; y > 0; y--)
+        {
+
+            if (y < HexProperties.tileH) // TOP triangle
+            {
+                startX = Mathf.FloorToInt(-(y / HexProperties.tileH * HexProperties.tileR));
+                endX = Mathf.CeilToInt(y / HexProperties.tileH * HexProperties.tileR);
+            }
+            else if (y >= HexProperties.tileH && y <= HexProperties.side + HexProperties.tileH) // MIDDLE rectangle
+            {
+                startX = Mathf.FloorToInt(-HexProperties.tileR);
+                endX = Mathf.CeilToInt(HexProperties.tileR);
+            }
+            else // BOTTOM triangle
+            {
+                startX = Mathf.FloorToInt(-((HexProperties.height - y) / HexProperties.tileH * HexProperties.tileR));
+                endX = Mathf.CeilToInt(((HexProperties.height - y) / HexProperties.tileH * HexProperties.tileR));
+            }
+
+            for (int x = startX; x < endX; x++)
+            {
+                if (x + centerX >= 0 && x + centerX <= texture.width && y + centerY >= 0 && y + centerY <= texture.height)
+                {
+                    texture.SetPixel(x + centerX, y + centerY, color);
+                }
+
+            }
+        }
+    }
+
 }

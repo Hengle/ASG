@@ -8,72 +8,130 @@ using UniRx;
 
 public partial class UnitStackActionsView 
 { 
+ 
+    public static GameObject settleLocation;
+    public GameObject settleLocationPrefab;
+
+
     public LineRenderer lineRenderer;
 
-    /// Subscribes to the property and is notified anytime the value changes.
-    public override void ActionStateChanged(UnitActionState value) 
+
+    public override void Awake()
     {
-        base.ActionStateChanged(value);
+        base.Awake();
+
+        // Spawn one static settle location prefab for the whole game at the start
+        // only if it has not been spawned yet.
+        if (settleLocation == null)
+        {
+            settleLocation = Instantiate(settleLocationPrefab) as GameObject;
+        }
+    }
 
 
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void SelectedChanged(Boolean value)
+    {
+        ToggleShowMovementPath(value);
+    }
+
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void PlannedSettlingLocationChanged(Hex hex)
+    {
+        if (hex != null)
+        {
+            if (!settleLocation.activeSelf)
+            {
+                settleLocation.SetActive(true);
+            }
+            settleLocation.transform.position = hex.worldPos;
+        }
+        else
+        {
+            if (settleLocation.activeSelf)
+            {
+                settleLocation.SetActive(false);
+            }
+        }
+    }
+
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void SettlingLocationChanged(Hex hex)
+    {
+        if (hex != null)
+        {
+            settleLocation.SetActive(true);
+            settleLocation.transform.position = hex.worldPos;
+        }
+    }
+
+
+    /// Invokes EvaluateSettlingLocationExecuted when the EvaluateSettlingLocation command is executed.
+    public override void EvaluateSettlingLocationExecuted()
+    {
+        base.EvaluateSettlingLocationExecuted();
+    }
+
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void PlannedActionChanged(PlanedAction value)
+    {
         switch (value)
         {
-            case UnitActionState.None:
-                ToggleShowMovementPath(false);
-                break;
+            case PlanedAction.None:
 
-            case UnitActionState.PlanningMovement:
-                ToggleShowMovementPath(true);
-                UpdateMovementPath();
                 break;
-
-            case UnitActionState.PlanningSettling:
+            case PlanedAction.Move:
                 break;
-
+            case PlanedAction.Settle:
+                ToggleShowSettleLocation(false);
+                break;
             default:
                 break;
         }
     }
 
-    private void ShowMovementPath()
+
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void StackStateChanged(StackState value)
     {
-        //UnitStack.ParentPlayer._SelectedHexProperty.Subscribe(hex => UpdateMovementPath()).DisposeWhenChanged(UnitStack._ActionStateProperty);
+        base.StackStateChanged(value);
     }
 
+  
     private void ToggleShowMovementPath(bool value)
     {
         lineRenderer.gameObject.SetActive(value);
     }
 
+    private void ToggleShowSettleLocation(bool value)
+    {
+        if (settleLocation) settleLocation.SetActive(value);
+    }
+
     private void UpdateMovementPath ()
     {
         // Set the verts of the line to match the planned path
-        if (UnitStack.PlanedPath != null)
+        if (UnitStack.Path != null)
         {
-            lineRenderer.SetVertexCount(UnitStack.PlanedPath.Count);
+            lineRenderer.SetVertexCount(UnitStack.Path.Count);
             lineRenderer.SetColors(Color.green, Color.red);
 
-            for (int h = 0; h < UnitStack.PlanedPath.Count; h++)
+            for (int h = 0; h < UnitStack.Path.Count; h++)
             {
-                lineRenderer.SetPosition(h, UnitStack.PlanedPath[h].worldPos);
+                lineRenderer.SetPosition(h, UnitStack.Path[h].worldPos);
             }
         }
-
-        
     }
 
-    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public override void PlanedPathAdded(Hex item)
+
+
+    public override void PathAdded(Hex item)
     {
-        base.PlanedPathAdded(item);
         UpdateMovementPath();
     }
 
-    /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
-    public override void PlanedPathRemoved(Hex item)
+    public override void PathRemoved(Hex item)
     {
-        base.PlanedPathRemoved(item);
         UpdateMovementPath();
     }
-
 }

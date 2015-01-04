@@ -13,6 +13,12 @@ public partial class UnitStackActionsUI
     public Button moveAction;
     public Button settleAction;
 
+    public override void Start()
+    {
+        base.Start();
+        SetupButtonBindings();
+    }
+
 
     /// Subscribes to the property and is notified anytime the value changes.
     public override void SelectedUnitStackChanged(UnitStackViewModel unitStack)
@@ -25,6 +31,7 @@ public partial class UnitStackActionsUI
         {
             EvaluateActions();
             unitStack.MovePointsProperty.Subscribe(state => EvaluateActions()).DisposeWhenChanged(Player._SelectedUnitStackProperty, true);
+            unitStack._UnitsProperty.Subscribe(state => EvaluateActions()).DisposeWhenChanged(Player._SelectedUnitStackProperty, true);
         }
     }
 
@@ -51,6 +58,7 @@ public partial class UnitStackActionsUI
     {
         // Deactive, then see if settler exists and activate then
         settleAction.gameObject.SetActive(false);
+
         for (int i = 0; i < Player.SelectedUnitStack.Units.Count; i++)
         {
             // Movement action check
@@ -60,21 +68,41 @@ public partial class UnitStackActionsUI
             }
             else
             {
-                moveAction.onClick.AddListener(() => ExecuteCommand(Player.SelectedUnitStack.PlanMovement));
                 moveAction.interactable = true;
             }
+
 
             // Settle action check
             if (settleAction.IsActive() == false && Player.SelectedUnitStack.Units[i].GetType() == typeof(SettlerUnitViewModel))
             {
+                Debug.Log("Found settler");
                 settleAction.gameObject.SetActive(true);
 
                 if (Player.SelectedUnitStack.MovePoints <= 0)
+                {
                     settleAction.interactable = false;
+                }
                 else
+                {
                     settleAction.interactable = true;
+                }
             }
         }
+    }
+
+    private void SetupButtonBindings ()
+    {
+        moveAction.onClick.AddListener(() => PlanMovement());
+        settleAction.onClick.AddListener(() => PlanSettling());
+    }
+
+    private void PlanMovement ()
+    {
+        ExecuteCommand(Player.SelectedUnitStack.PlanMovement);
+    }
+    private void PlanSettling()
+    {
+        ExecuteCommand(Player.SelectedUnitStack.PlanSettling);
     }
 
 }

@@ -26,6 +26,8 @@ public sealed partial class MainTerrainSettings {
 // </summary>
 public class MainTerrainBase : SceneManager {
     
+    private FogOfWarViewModel _FogOfWar;
+    
     private TerrainManagerViewModel _TerrainManager;
     
     private GameLogicViewModel _GameLogic;
@@ -35,6 +37,8 @@ public class MainTerrainBase : SceneManager {
     private TerrainManagerController _TerrainManagerController;
     
     private WorldManagerController _WorldManagerController;
+    
+    private FogOfWarController _FogOfWarController;
     
     private GameLogicController _GameLogicController;
     
@@ -54,7 +58,26 @@ public class MainTerrainBase : SceneManager {
     
     private SettlerUnitController _SettlerUnitController;
     
+    private MeleeUnitController _MeleeUnitController;
+    
+    private CharacterController _CharacterController;
+    
+    private CharacterUnitController _CharacterUnitController;
+    
     public MainTerrainSettings _MainTerrainSettings = new MainTerrainSettings();
+    
+    [Inject("FogOfWar")]
+    public virtual FogOfWarViewModel FogOfWar {
+        get {
+            if ((this._FogOfWar == null)) {
+                this._FogOfWar = CreateInstanceViewModel<FogOfWarViewModel>(FogOfWarController, "FogOfWar");
+            }
+            return this._FogOfWar;
+        }
+        set {
+            _FogOfWar = value;
+        }
+    }
     
     [Inject("TerrainManager")]
     public virtual TerrainManagerViewModel TerrainManager {
@@ -118,6 +141,19 @@ public class MainTerrainBase : SceneManager {
         }
         set {
             _WorldManagerController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual FogOfWarController FogOfWarController {
+        get {
+            if ((this._FogOfWarController == null)) {
+                this._FogOfWarController = new FogOfWarController() { Container = Container };
+            }
+            return this._FogOfWarController;
+        }
+        set {
+            _FogOfWarController = value;
         }
     }
     
@@ -238,6 +274,45 @@ public class MainTerrainBase : SceneManager {
         }
     }
     
+    [Inject()]
+    public virtual MeleeUnitController MeleeUnitController {
+        get {
+            if ((this._MeleeUnitController == null)) {
+                this._MeleeUnitController = new MeleeUnitController() { Container = Container };
+            }
+            return this._MeleeUnitController;
+        }
+        set {
+            _MeleeUnitController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual CharacterController CharacterController {
+        get {
+            if ((this._CharacterController == null)) {
+                this._CharacterController = new CharacterController() { Container = Container };
+            }
+            return this._CharacterController;
+        }
+        set {
+            _CharacterController = value;
+        }
+    }
+    
+    [Inject()]
+    public virtual CharacterUnitController CharacterUnitController {
+        get {
+            if ((this._CharacterUnitController == null)) {
+                this._CharacterUnitController = new CharacterUnitController() { Container = Container };
+            }
+            return this._CharacterUnitController;
+        }
+        set {
+            _CharacterUnitController = value;
+        }
+    }
+    
     // <summary>
     // This method is the first method to be invoked when the scene first loads. Anything registered here with 'Container' will effectively 
     // be injected on controllers, and instances defined on a subsystem.And example of this would be Container.RegisterInstance<IDataRepository>(new CodeRepository()). Then any property with 
@@ -245,11 +320,13 @@ public class MainTerrainBase : SceneManager {
     // </summary>
     public override void Setup() {
         base.Setup();
+        Container.RegisterViewModel<FogOfWarViewModel>(FogOfWar,"FogOfWar");
         Container.RegisterViewModel<TerrainManagerViewModel>(TerrainManager,"TerrainManager");
         Container.RegisterViewModel<GameLogicViewModel>(GameLogic,"GameLogic");
         Container.RegisterController<ChunkController>(ChunkController);
         Container.RegisterController<TerrainManagerController>(TerrainManagerController);
         Container.RegisterController<WorldManagerController>(WorldManagerController);
+        Container.RegisterController<FogOfWarController>(FogOfWarController);
         Container.RegisterController<GameLogicController>(GameLogicController);
         Container.RegisterController<PlayerController>(PlayerController);
         Container.RegisterController<UnitStackController>(UnitStackController);
@@ -259,7 +336,11 @@ public class MainTerrainBase : SceneManager {
         Container.RegisterController<AIPlayerController>(AIPlayerController);
         Container.RegisterController<UnitController>(UnitController);
         Container.RegisterController<SettlerUnitController>(SettlerUnitController);
+        Container.RegisterController<MeleeUnitController>(MeleeUnitController);
+        Container.RegisterController<CharacterController>(CharacterController);
+        Container.RegisterController<CharacterUnitController>(CharacterUnitController);
         this.Container.InjectAll();
+        FogOfWarController.Initialize(FogOfWar);
         TerrainManagerController.Initialize(TerrainManager);
         GameLogicController.Initialize(GameLogic);
     }

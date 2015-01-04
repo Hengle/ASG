@@ -57,6 +57,8 @@ MonoBehaviour:
   unitStackPrefab: {fileID: 100000, guid: 65f0818cbd7c06441ab9332ec27f77fe, type: 2}
   settlerUnitPrefab: {fileID: 100000, guid: 65f0818cbd7c06441ab9332ec27f77fe, type: 2}
   cityPrefab: {fileID: 100000, guid: 5f51c90edd63110499a82c82b56b149c, type: 2}
+  cityUIPrefab: {fileID: 100016, guid: d7bd8d2405f2a3a4ab37ceb9ca183cee, type: 2}
+  cityUIContainer: {fileID: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
