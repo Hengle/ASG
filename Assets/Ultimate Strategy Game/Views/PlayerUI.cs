@@ -70,7 +70,7 @@ public partial class PlayerUI
             if (toolTip.gameObject.activeSelf == false)
                 toolTip.gameObject.SetActive(true);
 
-            toolTipDescription.text = hex.terrainType + "\n" + hex.arrayCoord;
+            toolTipDescription.text = hex.terrainType + "\n Height: " + hex.height + "\n" + hex.Humidity + "\n" + hex.arrayCoord;
         }
         else
         {

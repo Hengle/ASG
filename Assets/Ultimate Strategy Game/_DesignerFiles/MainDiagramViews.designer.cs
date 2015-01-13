@@ -39,6 +39,10 @@ public abstract class ChunkViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public Vector3 _WorldPos;
     
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _TerrainManager;
+    
     public override System.Type ViewModelType {
         get {
             return typeof(ChunkViewModel);
@@ -65,6 +69,7 @@ public abstract class ChunkViewBase : ViewBase {
         chunk.TerrainDataX = this._TerrainDataX;
         chunk.TerrainDataY = this._TerrainDataY;
         chunk.WorldPos = this._WorldPos;
+        chunk.TerrainManager = this._TerrainManager == null ? null : this._TerrainManager.ViewModelObject as TerrainManagerViewModel;
     }
     
     public virtual void ExecuteGenerateChunk() {
@@ -151,6 +156,18 @@ public abstract class TerrainManagerViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public Int32 _MaxRiverStrength;
     
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _MinLakeSize;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _MaxLakeSize;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _Humidity;
+    
     public override string DefaultIdentifier {
         get {
             return "TerrainManager";
@@ -195,6 +212,9 @@ public abstract class TerrainManagerViewBase : ViewBase {
         terrainManager.MinRiverHeight = this._MinRiverHeight;
         terrainManager.MinRiverStrength = this._MinRiverStrength;
         terrainManager.MaxRiverStrength = this._MaxRiverStrength;
+        terrainManager.MinLakeSize = this._MinLakeSize;
+        terrainManager.MaxLakeSize = this._MaxLakeSize;
+        terrainManager.Humidity = this._Humidity;
     }
     
     public virtual void ExecuteGenerateMap() {
@@ -945,6 +965,10 @@ public abstract class FogOfWarViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public ViewBase _TerrainManager;
     
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Single _HexBorderLegnth;
+    
     public override string DefaultIdentifier {
         get {
             return "FogOfWar";
@@ -973,6 +997,7 @@ public abstract class FogOfWarViewBase : ViewBase {
     protected override void InitializeViewModel(ViewModel viewModel) {
         FogOfWarViewModel fogOfWar = ((FogOfWarViewModel)(viewModel));
         fogOfWar.TerrainManager = this._TerrainManager == null ? null : this._TerrainManager.ViewModelObject as TerrainManagerViewModel;
+        fogOfWar.HexBorderLegnth = this._HexBorderLegnth;
     }
     
     public virtual void ExecuteUpdateFOW() {
@@ -1041,18 +1066,6 @@ public class TerrainManagerViewViewBase : TerrainManagerViewBase {
     [UnityEngine.HideInInspector()]
     public bool _BindGenerateChunks = true;
     
-    [UFToggleGroup("Chunks")]
-    [UnityEngine.HideInInspector()]
-    public bool _BindChunks = true;
-    
-    [UFGroup("Chunks")]
-    [UnityEngine.HideInInspector()]
-    public bool _ChunksSceneFirst;
-    
-    [UFGroup("Chunks")]
-    [UnityEngine.HideInInspector()]
-    public UnityEngine.Transform _ChunksContainer;
-    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<TerrainManagerController>());
     }
@@ -1065,19 +1078,6 @@ public class TerrainManagerViewViewBase : TerrainManagerViewBase {
     public virtual void GenerateChunksExecuted() {
     }
     
-    /// This binding will add or remove views based on an element/viewmodel collection.
-    public virtual ViewBase CreateChunksView(ChunkViewModel item) {
-        return this.InstantiateView(item);
-    }
-    
-    /// This binding will add or remove views based on an element/viewmodel collection.
-    public virtual void ChunksAdded(ViewBase item) {
-    }
-    
-    /// This binding will add or remove views based on an element/viewmodel collection.
-    public virtual void ChunksRemoved(ViewBase item) {
-    }
-    
     public override void Bind() {
         base.Bind();
         if (this._BindGenerateMap) {
@@ -1085,9 +1085,6 @@ public class TerrainManagerViewViewBase : TerrainManagerViewBase {
         }
         if (this._BindGenerateChunks) {
             this.BindCommandExecuted(TerrainManager.GenerateChunks, GenerateChunksExecuted);
-        }
-        if (this._BindChunks) {
-            this.BindToViewCollection( TerrainManager._ChunksProperty, viewModel=>{ return CreateChunksView(viewModel as ChunkViewModel); }, ChunksAdded, ChunksRemoved, _ChunksContainer, _ChunksSceneFirst);
         }
     }
 }

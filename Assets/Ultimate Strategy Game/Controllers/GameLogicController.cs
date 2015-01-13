@@ -36,7 +36,7 @@ public class GameLogicController : GameLogicControllerBase
         UnitStackViewModel.terrainManager = gameLogic.TerrainManager;
 
 
-        TerrainManagerController.GenerateMap(gameLogic.TerrainManager);
+        ExecuteCommand(TerrainManager.GenerateMap); // TerrainManagerController.GenerateMap(gameLogic.TerrainManager);
         
         SetupPlayers(gameLogic);
 

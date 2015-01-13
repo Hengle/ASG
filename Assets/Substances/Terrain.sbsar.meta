@@ -6,7 +6,7 @@ SubstanceImporter:
   - serializedVersion: 12
     name: Terrain
     prototypeName: TerrainTest2
-    shader: {fileID: 4, guid: 0000000000000000f000000000000000, type: 0}
+    shader: {fileID: 4800000, guid: 3954501323f24464f9e4418c78d8e8ce, type: 3}
     inputs:
     - name: $outputsize
       value:
@@ -38,7 +38,7 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: Terrain_Noise
       value:
-        scalar[0]: .25
+        scalar[0]: .448000014
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -128,6 +128,18 @@ SubstanceImporter:
           first:
             name: _Shininess
           second: .150772825
+        data:
+          first:
+            name: _Parallax
+          second: .5
+        data:
+          first:
+            name: _EdgeLength
+          second: 34.0535698
+        data:
+          first:
+            name: _Smoothness
+          second: .607142866
       colors:
         data:
           first:

@@ -11,11 +11,11 @@ public partial class UnitStackViewModel
 
     public static TerrainManagerViewModel terrainManager;
 
- 
+ /*
     public override Hex ComputeHexLocation()
     {
         return Hex.GetHexAtPos(terrainManager, this.WorldPos);
-    }
+    }*/
 
     public override Hex ComputeCalculateMovement()
     {
@@ -28,7 +28,7 @@ public partial class UnitStackViewModel
         // if arrived at settling location
         if (HexLocation == SettlingLocation)
         {
-            Debug.Log("Arrived at settlign location");
+            //Debug.Log("Arrived at settlign location");
             Controller.ExecuteCommand(this.FoundCity, SettlingLocation);
             return null;
         }
@@ -56,7 +56,7 @@ public partial class UnitStackViewModel
             NextHexInPath = Path[Path.IndexOf(HexLocation) + 1];
 
 
-            Controller.ExecuteCommand(terrainManager.ParentFogOfWar.UpdateUnitView, this);
+            //Controller.ExecuteCommand(terrainManager.ParentFogOfWar.UpdateUnitView, this);
 
         }
 

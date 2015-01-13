@@ -15,8 +15,9 @@ public class ChunkController : ChunkControllerBase {
 
     public override ChunkViewModel CreateChunk()
     {
-        return base.CreateChunk();
-        
+        ChunkViewModel chunk = base.CreateChunk();
+        chunk.TerrainManager = TerrainManager;
+        return chunk;
     }
 
 }

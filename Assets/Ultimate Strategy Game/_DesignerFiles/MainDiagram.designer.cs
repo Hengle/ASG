@@ -18,6 +18,8 @@ public class ChunkViewModelBase : ViewModel {
     
     public P<Vector3> _WorldPosProperty;
     
+    public P<TerrainManagerViewModel> _TerrainManagerProperty;
+    
     protected CommandWithSender<ChunkViewModel> _GenerateChunk;
     
     protected CommandWithSender<ChunkViewModel> _UpdateChunk;
@@ -39,12 +41,11 @@ public class ChunkViewModelBase : ViewModel {
         _TerrainDataXProperty = new P<Int32>(this, "TerrainDataX");
         _TerrainDataYProperty = new P<Int32>(this, "TerrainDataY");
         _WorldPosProperty = new P<Vector3>(this, "WorldPos");
+        _TerrainManagerProperty = new P<TerrainManagerViewModel>(this, "TerrainManager");
     }
 }
 
 public partial class ChunkViewModel : ChunkViewModelBase {
-    
-    private TerrainManagerViewModel _ParentTerrainManager;
     
     public ChunkViewModel(ChunkControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
@@ -129,6 +130,22 @@ public partial class ChunkViewModel : ChunkViewModelBase {
         }
     }
     
+    public virtual P<TerrainManagerViewModel> TerrainManagerProperty {
+        get {
+            return this._TerrainManagerProperty;
+        }
+    }
+    
+    public virtual TerrainManagerViewModel TerrainManager {
+        get {
+            return _TerrainManagerProperty.Value;
+        }
+        set {
+            _TerrainManagerProperty.Value = value;
+            if (value != null) value.ParentChunk = this;
+        }
+    }
+    
     public virtual CommandWithSender<ChunkViewModel> GenerateChunk {
         get {
             return _GenerateChunk;
@@ -156,15 +173,6 @@ public partial class ChunkViewModel : ChunkViewModelBase {
         }
     }
     
-    public virtual TerrainManagerViewModel ParentTerrainManager {
-        get {
-            return this._ParentTerrainManager;
-        }
-        set {
-            _ParentTerrainManager = value;
-        }
-    }
-    
     protected override void WireCommands(Controller controller) {
         var chunk = controller as ChunkControllerBase;
         this.GenerateChunk = new CommandWithSender<ChunkViewModel>(this, chunk.GenerateChunk);
@@ -179,6 +187,7 @@ public partial class ChunkViewModel : ChunkViewModelBase {
         stream.SerializeInt("TerrainDataX", this.TerrainDataX);
         stream.SerializeInt("TerrainDataY", this.TerrainDataY);
         stream.SerializeVector3("WorldPos", this.WorldPos);
+		if (stream.DeepSerialize) stream.SerializeObject("TerrainManager", this.TerrainManager);
     }
     
     public override void Read(ISerializerStream stream) {
@@ -188,6 +197,7 @@ public partial class ChunkViewModel : ChunkViewModelBase {
         		this.TerrainDataX = stream.DeserializeInt("TerrainDataX");;
         		this.TerrainDataY = stream.DeserializeInt("TerrainDataY");;
         		this.WorldPos = stream.DeserializeVector3("WorldPos");;
+		if (stream.DeepSerialize) this.TerrainManager = stream.DeserializeObject<TerrainManagerViewModel>("TerrainManager");
     }
     
     public override void Unbind() {
@@ -201,6 +211,7 @@ public partial class ChunkViewModel : ChunkViewModelBase {
         list.Add(new ViewModelPropertyInfo(_TerrainDataXProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_TerrainDataYProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_WorldPosProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_TerrainManagerProperty, true, false, false));
     }
     
     protected override void FillCommands(List<ViewModelCommandInfo> list) {
@@ -250,7 +261,11 @@ public class TerrainManagerViewModelBase : ViewModel {
     
     public P<Int32> _MaxRiverStrengthProperty;
     
-    public ModelCollection<ChunkViewModel> _ChunksProperty;
+    public P<Int32> _MinLakeSizeProperty;
+    
+    public P<Int32> _MaxLakeSizeProperty;
+    
+    public P<Int32> _HumidityProperty;
     
     protected CommandWithSender<TerrainManagerViewModel> _GenerateMap;
     
@@ -286,15 +301,15 @@ public class TerrainManagerViewModelBase : ViewModel {
         _MinRiverHeightProperty = new P<Single>(this, "MinRiverHeight");
         _MinRiverStrengthProperty = new P<Int32>(this, "MinRiverStrength");
         _MaxRiverStrengthProperty = new P<Int32>(this, "MaxRiverStrength");
-        _ChunksProperty = new ModelCollection<ChunkViewModel>(this, "Chunks");
-        _ChunksProperty.CollectionChanged += ChunksCollectionChanged;
-    }
-    
-    protected virtual void ChunksCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
+        _MinLakeSizeProperty = new P<Int32>(this, "MinLakeSize");
+        _MaxLakeSizeProperty = new P<Int32>(this, "MaxLakeSize");
+        _HumidityProperty = new P<Int32>(this, "Humidity");
     }
 }
 
 public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
+    
+    private ChunkViewModel _ParentChunk;
     
     private WorldManagerViewModel _ParentWorldManager;
     
@@ -580,9 +595,48 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         }
     }
     
-    public virtual ModelCollection<ChunkViewModel> Chunks {
+    public virtual P<Int32> MinLakeSizeProperty {
         get {
-            return this._ChunksProperty;
+            return this._MinLakeSizeProperty;
+        }
+    }
+    
+    public virtual Int32 MinLakeSize {
+        get {
+            return _MinLakeSizeProperty.Value;
+        }
+        set {
+            _MinLakeSizeProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Int32> MaxLakeSizeProperty {
+        get {
+            return this._MaxLakeSizeProperty;
+        }
+    }
+    
+    public virtual Int32 MaxLakeSize {
+        get {
+            return _MaxLakeSizeProperty.Value;
+        }
+        set {
+            _MaxLakeSizeProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Int32> HumidityProperty {
+        get {
+            return this._HumidityProperty;
+        }
+    }
+    
+    public virtual Int32 Humidity {
+        get {
+            return _HumidityProperty.Value;
+        }
+        set {
+            _HumidityProperty.Value = value;
         }
     }
     
@@ -610,6 +664,15 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         }
         set {
             _GetHexAtWorldPos = value;
+        }
+    }
+    
+    public virtual ChunkViewModel ParentChunk {
+        get {
+            return this._ParentChunk;
+        }
+        set {
+            _ParentChunk = value;
         }
     }
     
@@ -666,7 +729,9 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         stream.SerializeFloat("MinRiverHeight", this.MinRiverHeight);
         stream.SerializeInt("MinRiverStrength", this.MinRiverStrength);
         stream.SerializeInt("MaxRiverStrength", this.MaxRiverStrength);
-        if (stream.DeepSerialize) stream.SerializeArray("Chunks", this.Chunks);
+        stream.SerializeInt("MinLakeSize", this.MinLakeSize);
+        stream.SerializeInt("MaxLakeSize", this.MaxLakeSize);
+        stream.SerializeInt("Humidity", this.Humidity);
     }
     
     public override void Read(ISerializerStream stream) {
@@ -688,15 +753,13 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         		this.MinRiverHeight = stream.DeserializeFloat("MinRiverHeight");;
         		this.MinRiverStrength = stream.DeserializeInt("MinRiverStrength");;
         		this.MaxRiverStrength = stream.DeserializeInt("MaxRiverStrength");;
-if (stream.DeepSerialize) {
-        this.Chunks.Clear();
-        this.Chunks.AddRange(stream.DeserializeObjectArray<ChunkViewModel>("Chunks"));
-}
+        		this.MinLakeSize = stream.DeserializeInt("MinLakeSize");;
+        		this.MaxLakeSize = stream.DeserializeInt("MaxLakeSize");;
+        		this.Humidity = stream.DeserializeInt("Humidity");;
     }
     
     public override void Unbind() {
         base.Unbind();
-        _ChunksProperty.CollectionChanged -= ChunksCollectionChanged;
     }
     
     protected override void FillProperties(List<ViewModelPropertyInfo> list) {
@@ -719,7 +782,9 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelPropertyInfo(_MinRiverHeightProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_MinRiverStrengthProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_MaxRiverStrengthProperty, false, false, false));
-        list.Add(new ViewModelPropertyInfo(_ChunksProperty, true, true, false));
+        list.Add(new ViewModelPropertyInfo(_MinLakeSizeProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_MaxLakeSizeProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_HumidityProperty, false, false, false));
     }
     
     protected override void FillCommands(List<ViewModelCommandInfo> list) {
@@ -727,10 +792,6 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelCommandInfo("GenerateMap", GenerateMap) { ParameterType = typeof(void) });
         list.Add(new ViewModelCommandInfo("GenerateChunks", GenerateChunks) { ParameterType = typeof(void) });
         list.Add(new ViewModelCommandInfo("GetHexAtWorldPos", GetHexAtWorldPos) { ParameterType = typeof(Vector3) });
-    }
-    
-    protected override void ChunksCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-        foreach (var item in args.NewItems.OfType<ChunkViewModel>()) item.ParentTerrainManager = this;;
     }
 }
 
@@ -1574,8 +1635,6 @@ if (stream.DeepSerialize) {
 [DiagramInfoAttribute("Ultimate Strategy Game")]
 public class UnitStackViewModelBase : ViewModel {
     
-    private IDisposable _HexLocationDisposable;
-    
     private IDisposable _MovementCompletedDisposable;
     
     private IDisposable _CalculateMovementDisposable;
@@ -1683,18 +1742,12 @@ public class UnitStackViewModelBase : ViewModel {
         _PathProperty = new ModelCollection<Hex>(this, "Path");
         _CharactersProperty = new ModelCollection<CharacterViewModel>(this, "Characters");
         _CharactersProperty.CollectionChanged += CharactersCollectionChanged;
-        this.ResetHexLocation();
         this.ResetMovementCompleted();
         this.ResetCalculateMovement();
         this._Move.Subscribe(_StateProperty.Move);
         this._StopMove.Subscribe(_StateProperty.CancelMove);
         this._CancelAction.Subscribe(_StateProperty.CancelMove);
         this._StateProperty.MovementCompleted.AddComputer(_MovementCompletedProperty);
-    }
-    
-    public virtual void ResetHexLocation() {
-        if (_HexLocationDisposable != null) _HexLocationDisposable.Dispose();
-        _HexLocationDisposable = _HexLocationProperty.ToComputed( ComputeHexLocation, this.GetHexLocationDependents().ToArray() ).DisposeWith(this);
     }
     
     public virtual void ResetMovementCompleted() {
@@ -1711,15 +1764,6 @@ public class UnitStackViewModelBase : ViewModel {
     }
     
     protected virtual void CharactersCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {
-    }
-    
-    public virtual Hex ComputeHexLocation() {
-        return default(Hex);
-    }
-    
-    public virtual IEnumerable<IObservableProperty> GetHexLocationDependents() {
-        yield return _WorldPosProperty;
-        yield break;
     }
     
     public virtual Boolean ComputeMovementCompleted() {
@@ -2295,7 +2339,7 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelPropertyInfo(_CityDestinationProperty, true, false, false));
         list.Add(new ViewModelPropertyInfo(_PlannedSettlingLocationProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_SettlingLocationProperty, false, false, false));
-        list.Add(new ViewModelPropertyInfo(_HexLocationProperty, false, false, false, true));
+        list.Add(new ViewModelPropertyInfo(_HexLocationProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_MovementCompletedProperty, false, false, false, true));
         list.Add(new ViewModelPropertyInfo(_CalculateMovementProperty, false, false, false, true));
         list.Add(new ViewModelPropertyInfo(_UnitsProperty, true, true, false));
@@ -3617,6 +3661,8 @@ public class FogOfWarViewModelBase : ViewModel {
     
     public P<TerrainManagerViewModel> _TerrainManagerProperty;
     
+    public P<Single> _HexBorderLegnthProperty;
+    
     protected CommandWithSender<FogOfWarViewModel> _UpdateFOW;
     
     protected CommandWithSenderAndArgument<FogOfWarViewModel, UnitStackViewModel> _UpdateUnitView;
@@ -3632,6 +3678,7 @@ public class FogOfWarViewModelBase : ViewModel {
     public override void Bind() {
         base.Bind();
         _TerrainManagerProperty = new P<TerrainManagerViewModel>(this, "TerrainManager");
+        _HexBorderLegnthProperty = new P<Single>(this, "HexBorderLegnth");
     }
 }
 
@@ -3658,6 +3705,21 @@ public partial class FogOfWarViewModel : FogOfWarViewModelBase {
         set {
             _TerrainManagerProperty.Value = value;
             if (value != null) value.ParentFogOfWar = this;
+        }
+    }
+    
+    public virtual P<Single> HexBorderLegnthProperty {
+        get {
+            return this._HexBorderLegnthProperty;
+        }
+    }
+    
+    public virtual Single HexBorderLegnth {
+        get {
+            return _HexBorderLegnthProperty.Value;
+        }
+        set {
+            _HexBorderLegnthProperty.Value = value;
         }
     }
     
@@ -3688,11 +3750,13 @@ public partial class FogOfWarViewModel : FogOfWarViewModelBase {
     public override void Write(ISerializerStream stream) {
 		base.Write(stream);
 		if (stream.DeepSerialize) stream.SerializeObject("TerrainManager", this.TerrainManager);
+        stream.SerializeFloat("HexBorderLegnth", this.HexBorderLegnth);
     }
     
     public override void Read(ISerializerStream stream) {
 		base.Read(stream);
 		if (stream.DeepSerialize) this.TerrainManager = stream.DeserializeObject<TerrainManagerViewModel>("TerrainManager");
+        		this.HexBorderLegnth = stream.DeserializeFloat("HexBorderLegnth");;
     }
     
     public override void Unbind() {
@@ -3702,6 +3766,7 @@ public partial class FogOfWarViewModel : FogOfWarViewModelBase {
     protected override void FillProperties(List<ViewModelPropertyInfo> list) {
         base.FillProperties(list);;
         list.Add(new ViewModelPropertyInfo(_TerrainManagerProperty, true, false, false));
+        list.Add(new ViewModelPropertyInfo(_HexBorderLegnthProperty, false, false, false));
     }
     
     protected override void FillCommands(List<ViewModelCommandInfo> list) {
@@ -3713,11 +3778,31 @@ public partial class FogOfWarViewModel : FogOfWarViewModelBase {
 
 public enum TerrainType {
     
-    GrassLand,
+    Water,
+    
+    Lake,
+    
+    Ocean,
+    
+    DeepOcean,
+    
+    River,
+    
+    Chaparral,
+    
+    Rainforest,
     
     Forest,
     
-    Water,
+    Grassland,
+    
+    Tundra,
+    
+    Savanna,
+    
+    DesertScrub,
+    
+    Desert,
 }
 
 public enum Seasons {

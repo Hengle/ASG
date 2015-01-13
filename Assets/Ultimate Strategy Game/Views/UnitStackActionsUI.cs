@@ -75,7 +75,6 @@ public partial class UnitStackActionsUI
             // Settle action check
             if (settleAction.IsActive() == false && Player.SelectedUnitStack.Units[i].GetType() == typeof(SettlerUnitViewModel))
             {
-                Debug.Log("Found settler");
                 settleAction.gameObject.SetActive(true);
 
                 if (Player.SelectedUnitStack.MovePoints <= 0)

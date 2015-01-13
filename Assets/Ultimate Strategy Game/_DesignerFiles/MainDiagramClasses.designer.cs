@@ -33,7 +33,7 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
     
     private Int32 _pathScore;
     
-    private Int32 _Moisture;
+    private Int32 _Humidity;
     
     private Int32 _Temperature;
     
@@ -125,13 +125,13 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
         }
     }
     
-    public virtual Int32 Moisture {
+    public virtual Int32 Humidity {
         get {
-            return this._Moisture;
+            return this._Humidity;
         }
         set {
-            _Moisture = value;
-            OnPropertyChanged("Moisture");
+            _Humidity = value;
+            OnPropertyChanged("Humidity");
         }
     }
     

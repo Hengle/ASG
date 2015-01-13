@@ -12,6 +12,7 @@ public class FogOfWarController : FogOfWarControllerBase
     public override void InitializeFogOfWar(FogOfWarViewModel fogOfWar) 
     {
 
+
         //fogOfWar.TerrainManager.GenerateMap.Subscribe(g => ExecuteCommand(fogOfWar.UpdateFOW));
 
     }
@@ -26,6 +27,8 @@ public class FogOfWarController : FogOfWarControllerBase
     public override void UpdateUnitView(FogOfWarViewModel fogOfWar, UnitStackViewModel unitStack)
     {
 
+        FOWHexProperties.SetProperties(fogOfWar.HexBorderLegnth);
+
         unitStack.HexLocation.Visible = true;
         unitStack.HexLocation.Explored = true;
 
@@ -33,6 +36,13 @@ public class FogOfWarController : FogOfWarControllerBase
         {
             unitStack.HexLocation.neighbors[i].Visible = true;
             unitStack.HexLocation.neighbors[i].Explored = true;
+
+            for (int b = 0; b < unitStack.HexLocation.neighbors[i].neighbors.Count; b++)
+            {
+                unitStack.HexLocation.neighbors[i].neighbors[b].Visible = true;
+                unitStack.HexLocation.neighbors[i].neighbors[b].Explored = true;
+            }
+
         }
 
         ExecuteCommand(fogOfWar.UpdateFOW);

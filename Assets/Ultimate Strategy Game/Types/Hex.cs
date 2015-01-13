@@ -24,7 +24,7 @@ public partial class Hex : IHeapItem<Hex>
 
 
 
-    public Hex(Vector2 arrayCoord, int height, float heightmapHeight, Vector3 worldPos)
+    public Hex(Vector2 arrayCoord, int height, float heightmapHeight, Vector3 worldPos, int humidity)
     {
         this.arrayCoord = arrayCoord;
         this.cubeCoord = OffsetToCubeOddQ(arrayCoord);
@@ -33,6 +33,9 @@ public partial class Hex : IHeapItem<Hex>
         this.height = height;
         this.heightmapHeight = heightmapHeight;
         this.neighbors = new List<Hex>();
+
+        this.Humidity = humidity;
+        
     }
 
     public int fCost
@@ -232,6 +235,37 @@ public partial class Hex : IHeapItem<Hex>
         return results;
     }
 
+    
+    public static void SearchNeighbors(Hex hex, Func<Hex, bool> searchParams, List<Hex> result)
+    {
+        hex.neighbors.Where(searchParams).ToList().ForEach(t_hex =>
+        {
+            if (result.Contains(t_hex) == false)
+            {
+                result.Add(t_hex);
+                Hex.SearchNeighbors(t_hex, searchParams, result);
+            }
+        });
+    }
+
+    public static void RainfallSpread(Hex spreadHex, int range, int rainfall, List<Hex> waterTiles)
+    {
+        if (range > 0 && spreadHex.Humidity <= rainfall)
+        {
+            spreadHex.Humidity = rainfall;
+            
+            foreach(Hex hex in spreadHex.neighbors)
+            {
+                // Make sure we don't set rainfall on a water tile
+                if (hex.terrainType != TerrainType.Water && waterTiles.Contains(hex) == false) 
+                {
+                    RainfallSpread(hex, range - 1, rainfall - 1, waterTiles); 
+                } 
+
+            }
+        }
+    }
+
     public static Hex GetHexAtPos (TerrainManagerViewModel terrainManager, Vector3 pos)
     {
         float pointX = pos.x;
@@ -286,6 +320,41 @@ public partial class Hex : IHeapItem<Hex>
             {
                 startX = Mathf.FloorToInt(-((HexProperties.height - y) / HexProperties.tileH * HexProperties.tileR));
                 endX = Mathf.CeilToInt(((HexProperties.height - y) / HexProperties.tileH * HexProperties.tileR));
+            }
+
+            for (int x = startX; x < endX; x++)
+            {
+                if (x + centerX >= 0 && x + centerX <= texture.width && y + centerY >= 0 && y + centerY <= texture.height)
+                {
+                    texture.SetPixel(x + centerX, y + centerY, color);
+                }
+
+            }
+        }
+    }
+
+    public static void DrawFOWHex(Texture2D texture, int centerX, int centerY, Color color)
+    {
+        int startX = 0, endX = 0;
+
+
+        for (int y = (int)FOWHexProperties.height; y > 0; y--)
+        {
+
+            if (y < FOWHexProperties.tileH) // TOP triangle
+            {
+                startX = Mathf.FloorToInt(-(y / FOWHexProperties.tileH * FOWHexProperties.tileR));
+                endX = Mathf.CeilToInt(y / FOWHexProperties.tileH * FOWHexProperties.tileR);
+            }
+            else if (y >= FOWHexProperties.tileH && y <= FOWHexProperties.side + FOWHexProperties.tileH) // MIDDLE rectangle
+            {
+                startX = Mathf.FloorToInt(-FOWHexProperties.tileR);
+                endX = Mathf.CeilToInt(FOWHexProperties.tileR);
+            }
+            else // BOTTOM triangle
+            {
+                startX = Mathf.FloorToInt(-((FOWHexProperties.height - y) / FOWHexProperties.tileH * FOWHexProperties.tileR));
+                endX = Mathf.CeilToInt(((FOWHexProperties.height - y) / FOWHexProperties.tileH * FOWHexProperties.tileR));
             }
 
             for (int x = startX; x < endX; x++)

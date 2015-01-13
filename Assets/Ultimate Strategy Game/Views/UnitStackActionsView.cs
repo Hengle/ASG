@@ -43,6 +43,7 @@ public partial class UnitStackActionsView
             if (!settleLocation.activeSelf)
             {
                 settleLocation.SetActive(true);
+                UnitStack.PlannedActionProperty.Subscribe(_ => ToggleShowSettleLocation(false));
             }
             settleLocation.transform.position = hex.worldPos;
         }
@@ -83,7 +84,7 @@ public partial class UnitStackActionsView
             case PlanedAction.Move:
                 break;
             case PlanedAction.Settle:
-                ToggleShowSettleLocation(false);
+                //ToggleShowSettleLocation(true);
                 break;
             default:
                 break;

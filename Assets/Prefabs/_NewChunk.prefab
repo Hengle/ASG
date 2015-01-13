@@ -43,7 +43,7 @@ Renderer:
   m_LightmapIndex: 255
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
-  - {fileID: 996372036, guid: 2f50b4b96cdccd044bf05ea87a823479, type: 3}
+  - {fileID: -931091681, guid: b1b15dfe04fa5514789690cb6dcb0533, type: 3}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -93,20 +93,12 @@ MonoBehaviour:
   _TerrainDataX: 0
   _TerrainDataY: 0
   _WorldPos: {x: 0, y: 0, z: 0}
+  _TerrainManager: {fileID: 0}
   _BindGenerateChunk: 1
   _BindSaveChunkHexTexture: 1
   _BindUpdateChunk: 1
-  hexBiomeMap: {fileID: 0}
   hexHeightmap: {fileID: 0}
-  substance: {fileID: 0}
-  substanceTexture2D: {fileID: 0}
-  altitudes:
-  - {r: .0758619308, g: 0, b: 1, a: 0}
-  - {r: .823529422, g: .70309037, b: .199826986, a: 0}
-  - {r: .0410899632, g: .698529422, b: .10003265, a: 0}
-  - {r: .154937476, g: .41911763, b: .0708801821, a: 0}
-  - {r: .235294104, g: .17496717, b: .0986159071, a: 0}
-  - {r: .764705896, g: .764705896, b: .764705896, a: 0}
+  hexBiomeMap: {fileID: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

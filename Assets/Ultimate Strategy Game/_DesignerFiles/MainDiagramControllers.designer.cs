@@ -51,10 +51,10 @@ public abstract class TerrainManagerControllerBase : Controller {
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
+    [Inject] public ChunkController ChunkController {get;set;}
     [Inject] public WorldManagerController WorldManagerController {get;set;}
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public FogOfWarController FogOfWarController {get;set;}
-    [Inject] public ChunkController ChunkController {get;set;}
     public abstract void InitializeTerrainManager(TerrainManagerViewModel terrainManager);
     
     public override ViewModel CreateEmpty() {

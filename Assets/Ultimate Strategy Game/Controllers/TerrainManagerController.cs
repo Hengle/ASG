@@ -9,6 +9,9 @@ using UnityEngine;
 public class TerrainManagerController : TerrainManagerControllerBase
 {
 
+    [Inject] public ChunkController ChunkController { get; set; }
+
+
     public override void InitializeTerrainManager(TerrainManagerViewModel terrainManager)
     {
     }
@@ -22,16 +25,19 @@ public class TerrainManagerController : TerrainManagerControllerBase
         HexProperties.SetProperties(terrainManager.HexagonSide);
 
 
-        GenerateTerrainData(terrainManager);
-        TerrainDataToHexagonGrid(terrainManager);
-        SetupHexagonGridNeighbors(terrainManager);
-        GenerateRivers(terrainManager);
-        CalculateMoisture(terrainManager);
-        CalculateTemperature(terrainManager);
-        CalculateBiomes(terrainManager);
+        GenerateTerrainData        (terrainManager);
+        Debug.Log("Generated terrain");
+        TerrainDataToHexagonGrid   (terrainManager);
+        /*SetupHexagonGridNeighbors  (terrainManager);
+        GenerateOceans             (terrainManager);
+        GenerateRivers             (terrainManager);
+        CalculateHumidity          (terrainManager);
+        CalculateTemperature       (terrainManager);
+        CalculateBiomes            (terrainManager);
         
-
-        GenerateChunks(terrainManager);
+         
+        ChunkController.ExecuteCommand(terrainManager.GenerateChunks);
+        */
 
 
 
@@ -39,58 +45,20 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
     }
 
-    /* Use this later for timed mao generation
-    public IEnumerator GenerateMap(TerrainManagerViewModel terrainManager)
-    {
-        /*
-        // Don't want to generate anything less than 10x10 tiles
-        if (coreMap.Height < 10) coreMap.Height = 10;
-        if (coreMap.Width < 10) coreMap.Width = 10;
-        var tileSize = coreMap.TileSize;
-        var total = coreMap.Height * coreMap.Width;
-        var progress = 0;
-        for (int i = 0; i < coreMap.Width; i++)
-        {
-            for (int j = 0; j < coreMap.Height; j++)
-            {
-                var tileToAdd = new MapTileViewModel(MapTileController)
-                {
-                    Position = new Vector3(i * tileSize, 0, j * tileSize)
-                };
-                tileToAdd.Position = new Vector3(i * tileSize, 0, j * tileSize);
-                coreMap.VisibleTiles.Add(tileToAdd);
-                coreMap.GenerationProgress = (float)++progress / total;
-                yield return null;
-            }
-        }
-        yield break;
-         
-    }* */
-
-
 
     public override void GenerateChunks(TerrainManagerViewModel terrainManager)
     {
         int timeStart = System.Environment.TickCount;
 
-        base.GenerateChunks(terrainManager);
-        
 
-        int chunkHexCountX = (int)(terrainManager.ChunkSize / HexProperties.width);
-        int chunkHexCountY = (int)(terrainManager.ChunkSize / (HexProperties.tileH + HexProperties.side));
+        terrainManager.chunkHexCountX = (int)(terrainManager.ChunkSize / HexProperties.width);
+        terrainManager.chunkHexCountY = (int)(terrainManager.ChunkSize / (HexProperties.tileH + HexProperties.side));
 
         int chunkCountX = Mathf.CeilToInt(terrainManager.TerrainWidth * HexProperties.width / (float)terrainManager.ChunkSize);
         int chunkCountY = Mathf.CeilToInt(terrainManager.TerrainHeight * (HexProperties.tileH + HexProperties.side) / (float)terrainManager.ChunkSize);
 
 
-
-        Debug.Log("chunkHexCount X " + chunkHexCountX);
-        Debug.Log("ChunkHexCount Y " + chunkHexCountY);
-        Debug.Log("Chunk count X " + chunkCountX);
-        Debug.Log("Chunk count Y " + chunkCountY);
-        
-
-        terrainManager.Chunks.Clear();
+        terrainManager.Chunks = new ChunkViewModel[chunkCountX, chunkCountY];
         ChunkViewModel newChunk;
         for (int x = 0, v = 0; x < chunkCountX; x++)
         {
@@ -100,15 +68,16 @@ public class TerrainManagerController : TerrainManagerControllerBase
                 newChunk = ChunkController.CreateChunk();
                 newChunk.ChunkX = x;
                 newChunk.ChunkY = y;
-                newChunk.TerrainDataX = x * chunkHexCountX;
-                newChunk.TerrainDataY = y * chunkHexCountY;
+                newChunk.TerrainDataX = x * terrainManager.chunkHexCountX;
+                newChunk.TerrainDataY = y * terrainManager.chunkHexCountY;
 
-                terrainManager.Chunks.Add(newChunk);
+                terrainManager.Chunks[x, y] = newChunk;
             }
         }
 
         Debug.Log("Chunks generated: " + (System.Environment.TickCount - timeStart) + "ms");
     }
+    
 
     private void GenerateTerrainData(TerrainManagerViewModel terrainManager)
     {
@@ -137,20 +106,32 @@ public class TerrainManagerController : TerrainManagerControllerBase
     {
         Vector3 worldPos = new Vector3();
         int gameHeight;
+        
         terrainManager.hexGrid = new Hex[terrainManager.TerrainWidth, terrainManager.TerrainHeight];
+        terrainManager.waterTiles = new List<Hex>();
+        Debug.Log("started");
+
         for (int x=0; x < terrainManager.TerrainWidth; x++)
         {
             for (int y=0; y < terrainManager.TerrainHeight; y++)
             {
 
-                worldPos.x = Mathf.RoundToInt(x * 2 * HexProperties.tileR + (y % 2 == 0 ? 0 : 1) * HexProperties.tileR + HexProperties.tileR) / (float)terrainManager.PixelsPerUnit;
-                worldPos.y = Mathf.Round(terrainManager.terrainData[x, y] / terrainManager.Altitudes) * terrainManager.Altitudes * terrainManager.PixelToHeight;
-                worldPos.z = Mathf.RoundToInt(y * (HexProperties.tileH + HexProperties.side) + HexProperties.side) / (float)terrainManager.PixelsPerUnit;
-                gameHeight = (int)(Mathf.Round(terrainManager.terrainData[x, y] / terrainManager.Altitudes) * terrainManager.Altitudes / terrainManager.terrainData[x, y] / terrainManager.Altitudes - 1);
+                gameHeight = Mathf.RoundToInt(terrainManager.Altitudes * terrainManager.terrainData[x, y]);
 
-                terrainManager.hexGrid[x, y] = new Hex(new Vector2(x, y), gameHeight, terrainManager.terrainData[x, y], worldPos);
+                worldPos.x = Mathf.RoundToInt(x * 2 * HexProperties.tileR + (y % 2 == 0 ? 0 : 1) * HexProperties.tileR + HexProperties.tileR) / (float)terrainManager.PixelsPerUnit;
+                worldPos.y = (gameHeight / terrainManager.Altitudes) * terrainManager.PixelToHeight;
+                worldPos.z = Mathf.RoundToInt(y * (HexProperties.tileH + HexProperties.side) + HexProperties.side) / (float)terrainManager.PixelsPerUnit;
+
+
+                terrainManager.hexGrid[x, y] = new Hex(new Vector2(x, y), (int)Mathf.Clamp(gameHeight, 1, terrainManager.Altitudes), gameHeight / terrainManager.Altitudes, worldPos, terrainManager.Humidity);
+                
+                if (gameHeight == 1)
+                {
+                    terrainManager.waterTiles.Add(terrainManager.hexGrid[x, y]);
+                }
+
             }
-        }
+        } Debug.Log("Finished");
     }
 
     public void SetupHexagonGridNeighbors(TerrainManagerViewModel terrainManager)
@@ -176,6 +157,69 @@ public class TerrainManagerController : TerrainManagerControllerBase
         }
         Debug.Log("Setting up hex neighbors: " + (System.Environment.TickCount - timeStart) + "ms");
     }
+
+    public void GenerateOceans(TerrainManagerViewModel terrainManager)
+    {
+        List<Hex> seaLevelHexes = new List<Hex>(terrainManager.waterTiles);
+        List<Hex> scannedHexes = new List<Hex>();
+        
+        while (seaLevelHexes.Count > 0)
+        {
+
+            scannedHexes.Clear();
+            scannedHexes.Add(seaLevelHexes[0]);
+            
+
+            Hex.SearchNeighbors(scannedHexes[0], p_hex => p_hex.height == 1, scannedHexes);
+
+            // if the area of water is less that the minimum lake size 
+            if (scannedHexes.Count < terrainManager.MinLakeSize)
+            {
+                FlattenArea(scannedHexes, terrainManager);
+            }
+            else if (scannedHexes.Count < terrainManager.MaxLakeSize) // make lake
+            {
+                GenerateLake(scannedHexes, terrainManager);
+            }
+            else                                                      // make ocean
+            {
+                GenerateOcean(scannedHexes, terrainManager); 
+            }
+
+
+            foreach (Hex w_hex in scannedHexes)
+            {
+                seaLevelHexes.Remove(w_hex);
+            }
+        }
+    }
+
+    public void FlattenArea(List<Hex> hexes, TerrainManagerViewModel terrainManager)
+    {
+        for (int i = 0; i < hexes.Count; i++)
+        {
+            hexes[i].height = 2;
+            hexes[i].heightmapHeight = hexes[i].height / terrainManager.Altitudes;
+            terrainManager.waterTiles.Remove(hexes[i]);
+        }
+    }
+
+    public void GenerateLake(List<Hex> hexes, TerrainManagerViewModel terrainManager)
+    {
+        for (int i = 0; i < hexes.Count; i++)
+        {
+            hexes[i].terrainType = TerrainType.Water;
+        }
+    }
+
+    public void GenerateOcean(List<Hex> hexes, TerrainManagerViewModel terrainManager)
+    {
+        for (int i = 0; i < hexes.Count; i++)
+        {
+            hexes[i].terrainType = TerrainType.Water;
+        }
+    }
+
 
     public void GenerateRivers(TerrainManagerViewModel terrainManager)
     {
@@ -225,6 +269,8 @@ public class TerrainManagerController : TerrainManagerControllerBase
                 nextHex = nextHex.neighbors[(int)UnityEngine.Random.Range(0, 5)];
 
                 nextHex.RiverStrength = riverStrength;
+                nextHex.terrainType = TerrainType.Water;
+                terrainManager.waterTiles.Add(nextHex);
                 Debug.Log("Flowing " + nextHex.arrayCoord);
 
                 riverStrength--;
@@ -237,9 +283,17 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
     }
 
-    public void CalculateMoisture(TerrainManagerViewModel terrainManager)
+    public void CalculateHumidity(TerrainManagerViewModel terrainManager)
     {
-
+        for (int i = 0; i < terrainManager.waterTiles.Count; i++)
+        {
+            Hex.RainfallSpread(terrainManager.waterTiles[i], 10, 10, terrainManager.waterTiles);
+        }
+        // loop through rivers
+        //for (int i = 0; i < terrainManager.seaLevelHexes.Count; i++)
+        //{
+        //    Hex.RainfallSpread(terrainManager.seaLevelHexes[i], 10, 10, terrainManager.seaLevelHexes);
+        //}
     }
 
     public void CalculateTemperature(TerrainManagerViewModel terrainManager)

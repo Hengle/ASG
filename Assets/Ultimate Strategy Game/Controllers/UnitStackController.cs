@@ -14,7 +14,15 @@ public class UnitStackController : UnitStackControllerBase {
 
     public override void InitializeUnitStack(UnitStackViewModel unitStack)
     {
+        // Calculate hex
+        unitStack.WorldPosProperty.Subscribe(pos => CalculateHexLocation(unitStack, pos));
 
+        // make sure to later dispose of this command somehow
+        unitStack._HexLocationProperty.Subscribe(hex => ExecuteCommand(FogOfWar.UpdateUnitView, unitStack));
+
+
+
+        // If the unit is not selected the player cannot plan actions with it!
         unitStack.SelectedProperty.Subscribe(selected =>
         {
             if (selected == false)
@@ -24,6 +32,16 @@ public class UnitStackController : UnitStackControllerBase {
         });
     }
 
+    public void CalculateHexLocation(UnitStackViewModel unitStack, Vector3 pos)
+    {
+        // Make sure that we only assign a hex value if 
+        // our position is in a new hex
+        Hex hex = Hex.GetHexAtPos(TerrainManager, pos);
+        if (unitStack.HexLocation != hex)
+        {
+            unitStack.HexLocation = hex;
+        }
+    }
 
     public override void NextTurnCalculation(UnitStackViewModel unitStack)
     {
