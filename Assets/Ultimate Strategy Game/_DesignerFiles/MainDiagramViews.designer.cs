@@ -168,6 +168,30 @@ public abstract class TerrainManagerViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public Int32 _Humidity;
     
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _Temperature;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _HumidySpreadDecrease;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public AnimationCurve _TemperatureSpread;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public AnimationCurve _HeightTemperature;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public AnimationCurve _HumidityTemperature;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Biome[] _Biomes;
+    
     public override string DefaultIdentifier {
         get {
             return "TerrainManager";
@@ -215,6 +239,12 @@ public abstract class TerrainManagerViewBase : ViewBase {
         terrainManager.MinLakeSize = this._MinLakeSize;
         terrainManager.MaxLakeSize = this._MaxLakeSize;
         terrainManager.Humidity = this._Humidity;
+        terrainManager.Temperature = this._Temperature;
+        terrainManager.HumidySpreadDecrease = this._HumidySpreadDecrease;
+        terrainManager.TemperatureSpread = this._TemperatureSpread;
+        terrainManager.HeightTemperature = this._HeightTemperature;
+        terrainManager.HumidityTemperature = this._HumidityTemperature;
+        terrainManager.Biomes = this._Biomes;
     }
     
     public virtual void ExecuteGenerateMap() {
@@ -1056,42 +1086,6 @@ public class ChunkViewViewBase : ChunkViewBase {
 public partial class ChunkView : ChunkViewViewBase {
 }
 
-public class TerrainManagerViewViewBase : TerrainManagerViewBase {
-    
-    [UFToggleGroup("GenerateMap")]
-    [UnityEngine.HideInInspector()]
-    public bool _BindGenerateMap = true;
-    
-    [UFToggleGroup("GenerateChunks")]
-    [UnityEngine.HideInInspector()]
-    public bool _BindGenerateChunks = true;
-    
-    public override ViewModel CreateModel() {
-        return this.RequestViewModel(GameManager.Container.Resolve<TerrainManagerController>());
-    }
-    
-    /// Invokes GenerateMapExecuted when the GenerateMap command is executed.
-    public virtual void GenerateMapExecuted() {
-    }
-    
-    /// Invokes GenerateChunksExecuted when the GenerateChunks command is executed.
-    public virtual void GenerateChunksExecuted() {
-    }
-    
-    public override void Bind() {
-        base.Bind();
-        if (this._BindGenerateMap) {
-            this.BindCommandExecuted(TerrainManager.GenerateMap, GenerateMapExecuted);
-        }
-        if (this._BindGenerateChunks) {
-            this.BindCommandExecuted(TerrainManager.GenerateChunks, GenerateChunksExecuted);
-        }
-    }
-}
-
-public partial class TerrainManagerView : TerrainManagerViewViewBase {
-}
-
 public class GameLogicGUIViewBase : GameLogicViewBase {
     
     [UFToggleGroup("NextTurn")]
@@ -1909,4 +1903,18 @@ public class FogOfWarViewViewBase : FogOfWarViewBase {
 }
 
 public partial class FogOfWarView : FogOfWarViewViewBase {
+}
+
+public class TerrainMangerViewBase : TerrainManagerViewBase {
+    
+    public override ViewModel CreateModel() {
+        return this.RequestViewModel(GameManager.Container.Resolve<TerrainManagerController>());
+    }
+    
+    public override void Bind() {
+        base.Bind();
+    }
+}
+
+public partial class TerrainManger : TerrainMangerViewBase {
 }

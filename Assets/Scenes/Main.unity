@@ -912,7 +912,7 @@ MonoBehaviour:
   _overrideViewModel: 1
   _resolveName: FogOfWar
   _Save: 1
-  _TerrainManager: {fileID: 807931915}
+  _TerrainManager: {fileID: 0}
   _HexBorderLegnth: 7.5
   _BindUpdateFOW: 1
   _BindUpdateUnitView: 1
@@ -1279,14 +1279,14 @@ MonoBehaviour:
   _Start: {fileID: 609779570}
   _StartupScene: 
   _Fog: 0
-  _FogColor: {r: .345588207, g: .345588207, b: .345588207, a: 0}
-  _FogMode: 0
-  _FogDensity: 0
+  _FogColor: {r: .5, g: .5, b: .5, a: 1}
+  _FogMode: 3
+  _FogDensity: .00999999978
   _LinearFogStart: 0
-  _LinearFogEnd: 0
-  _AmbientLight: {r: .397058845, g: .397058845, b: .397058845, a: 0}
-  _HaloStrength: 0
-  _FlareStrength: 0
+  _LinearFogEnd: 300
+  _AmbientLight: {r: .617647052, g: .617647052, b: .617647052, a: 1}
+  _HaloStrength: .5
+  _FlareStrength: 1
   _SkyboxMaterial: {fileID: 0}
 --- !u!4 &434615880
 Transform:
@@ -1902,11 +1902,10 @@ CanvasRenderer:
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 100000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-  m_PrefabInternal: {fileID: 1329833404}
+  m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 807931916}
-  - 114: {fileID: 807931915}
   m_Layer: 0
   m_Name: _TerrainManager
   m_TagString: Untagged
@@ -1914,71 +1913,18 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &807931915
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a,
-    type: 2}
-  m_PrefabInternal: {fileID: 1329833404}
-  m_GameObject: {fileID: 807931914}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff8ca969ee67cba468934073e10a3ca4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _LogEvents: 0
-  _forceResolveViewModel: 1
-  _InjectView: 1
-  _overrideViewModel: 1
-  _resolveName: TerrainManager
-  _Save: 1
-  _TerrainSeed: 0
-  _RandomizeSeed: 0
-  _PixelsPerUnit: 16
-  _PixelToHeight: 6
-  _Altitudes: 6
-  _ChunkSize: 512
-  _ChunkResolution: 64
-  _ChunkCollisionResolution: 16
-  _TerrainWidth: 16
-  _TerrainHeight: 16
-  _Detail: .75
-  _AltitudeVariation: .913999975
-  _HexagonSide: 30
-  _RiverCount: 0
-  _MinRiverHeight: 5
-  _MinRiverStrength: 8
-  _MaxRiverStrength: 8
-  _MinLakeSize: 6
-  _MaxLakeSize: 20
-  _Humidity: 3
-  _BindGenerateMap: 1
-  _BindGenerateChunks: 1
-  chunkPrefab: {fileID: 100000, guid: b70ba7a23b97ce7498ce4016b4b88904, type: 2}
-  terrainHeightMap: {fileID: 0}
-  displayHexNodes: 0
-  displayHexPath: 0
-  temp: {fileID: 0}
-  temp2: {fileID: 0}
-  colors:
-  - {r: .0344824791, g: 0, b: 1, a: 0}
-  - {r: 1, g: .765517235, b: 0, a: 0}
-  - {r: 0, g: 1, b: .0896549225, a: 0}
-  - {r: .0384888947, g: .507352948, b: 0, a: 0}
-  - {r: .41911763, g: .309619933, b: .0739619285, a: 0}
-  - {r: .647058845, g: .647058845, b: .647058845, a: 0}
 --- !u!4 &807931916
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-  m_PrefabInternal: {fileID: 1329833404}
+  m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 807931914}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
 --- !u!1 &809109562
 GameObject:
   m_ObjectHideFlags: 0
@@ -2372,7 +2318,7 @@ MonoBehaviour:
   _CurrentPlayer: {fileID: 0}
   _HumanPlayer: {fileID: 0}
   _HumanFaction: {fileID: 0}
-  _TerrainManager: {fileID: 807931915}
+  _TerrainManager: {fileID: 0}
   _GameState: 0
   _Season: 0
   _Year: 0
@@ -2439,7 +2385,7 @@ MonoBehaviour:
   _Color: {r: 1, g: 0, b: 0, a: 0}
   _BindSelectedHex: 0
   _BindSelectedUnitStack: 1
-  terrain: {fileID: 807931915}
+  terrain: {fileID: 0}
   hoverHexHeightLight: {fileID: 0}
   hoverHexAraray: {x: 0, y: 0}
 --- !u!4 &884823654
@@ -2547,7 +2493,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
 --- !u!114 &1030759273
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2570,7 +2516,7 @@ MonoBehaviour:
   _CurrentPlayer: {fileID: 0}
   _HumanPlayer: {fileID: 884823653}
   _HumanFaction: {fileID: 2121042457}
-  _TerrainManager: {fileID: 807931915}
+  _TerrainManager: {fileID: 0}
   _GameState: 0
   _Season: 0
   _Year: 0
@@ -3123,346 +3069,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1277286249}
---- !u!1001 &1329833404
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.size
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.size
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_RootOrder
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_Name
-      value: _TerrainManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _ChunksContainer
-      value: 
-      objectReference: {fileID: 395672876}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _TerrainWidth
-      value: 16
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _TerrainHeight
-      value: 16
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _PixelToHeight
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _InjectView
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: displayHexNodes
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _PixelsPerUnit
-      value: 16
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _Altitudes
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _ChunkResolution
-      value: 64
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _Detail
-      value: .75
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _RiverCount
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _MinRiverHeight
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _MinRiverStrength
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _MaxRiverStrength
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _forceResolveViewModel
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _resolveName
-      value: TerrainManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _Save
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _HexagonSide
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _MinLakeSize
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _MaxLakeSize
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _DefaultRainfallValue
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _ChunkSize
-      value: 512
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[0].name
-      value: Water
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[0].color.r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[0].color.g
-      value: .00689673424
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[0].color.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[1].name
-      value: Grassland
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[2].name
-      value: Forest
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[1].color.r
-      value: .241379261
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[1].color.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[1].color.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[2].color.r
-      value: .0898072496
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[2].color.g
-      value: .566176474
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[2].color.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[3].name
-      value: Deep Forest
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[3].color.r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[3].color.g
-      value: .301470578
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[3].color.b
-      value: .027028393
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[4].name
-      value: Hills
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[4].color.g
-      value: .367393494
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[4].color.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[5].name
-      value: Mountans
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[5].color.g
-      value: .647058845
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[5].color.b
-      value: .647058845
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[4].color.r
-      value: .507352948
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[5].color.r
-      value: .647058845
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[0].color.rgba
-      value: 16717568
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[1].color.rgba
-      value: 65320
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[2].color.rgba
-      value: 888064
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[3].color.rgba
-      value: 20227
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[4].color.rgba
-      value: 1920617
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: biomeColors.Array.data[5].color.rgba
-      value: 9474192
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[0].r
-      value: .0344824791
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[0].g
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[0].b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[1].r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[1].g
-      value: .765517235
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[1].b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[2].r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[2].g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[2].b
-      value: .0896549225
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[3].r
-      value: .0384888947
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[3].g
-      value: .507352948
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[3].b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[4].r
-      value: .41911763
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[4].g
-      value: .309619933
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[4].b
-      value: .0739619285
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[5].r
-      value: .647058845
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[5].g
-      value: .647058845
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: colors.Array.data[5].b
-      value: .647058845
-      objectReference: {fileID: 0}
-    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: _Humidity
-      value: 3
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-  m_RootGameObject: {fileID: 807931914}
-  m_IsPrefabParent: 0
-  m_IsExploded: 1
 --- !u!1 &1455711240
 GameObject:
   m_ObjectHideFlags: 0
@@ -4092,7 +3698,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: b982e78718ebff64cb09e531017184d8, type: 2}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: b982e78718ebff64cb09e531017184d8, type: 2}
       propertyPath: moveSpeed

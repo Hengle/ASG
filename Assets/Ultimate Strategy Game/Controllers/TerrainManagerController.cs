@@ -9,7 +9,7 @@ using UnityEngine;
 public class TerrainManagerController : TerrainManagerControllerBase
 {
 
-    [Inject] public ChunkController ChunkController { get; set; }
+    //[Inject] public ChunkController ChunkController { get; set; }
 
 
     public override void InitializeTerrainManager(TerrainManagerViewModel terrainManager)
@@ -18,38 +18,31 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
     public override void GenerateMap(TerrainManagerViewModel terrainManager)
     {
-        base.GenerateMap(terrainManager);
-        int timeStart = System.Environment.TickCount;
+        Timer.Start("Generating map");
 
         // Make sure to calculate the Hexagon dimensions before we do any logic
         HexProperties.SetProperties(terrainManager.HexagonSide);
 
 
         GenerateTerrainData        (terrainManager);
-        Debug.Log("Generated terrain");
         TerrainDataToHexagonGrid   (terrainManager);
-        /*SetupHexagonGridNeighbors  (terrainManager);
-        GenerateOceans             (terrainManager);
+        SetupHexagonGridNeighbors  (terrainManager);
+        CalculateWaterPools             (terrainManager);
         GenerateRivers             (terrainManager);
         CalculateHumidity          (terrainManager);
         CalculateTemperature       (terrainManager);
         CalculateBiomes            (terrainManager);
         
-         
+        
         ChunkController.ExecuteCommand(terrainManager.GenerateChunks);
-        */
 
-
-
-        Debug.Log("Terrain generated: " + (System.Environment.TickCount - timeStart) + "ms");
-
+        Timer.End();
     }
 
 
     public override void GenerateChunks(TerrainManagerViewModel terrainManager)
     {
-        int timeStart = System.Environment.TickCount;
-
+        Timer.Start("Generating chunks");
 
         terrainManager.chunkHexCountX = (int)(terrainManager.ChunkSize / HexProperties.width);
         terrainManager.chunkHexCountY = (int)(terrainManager.ChunkSize / (HexProperties.tileH + HexProperties.side));
@@ -75,7 +68,7 @@ public class TerrainManagerController : TerrainManagerControllerBase
             }
         }
 
-        Debug.Log("Chunks generated: " + (System.Environment.TickCount - timeStart) + "ms");
+        Timer.End();
     }
     
 
@@ -104,18 +97,18 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
     public void TerrainDataToHexagonGrid(TerrainManagerViewModel terrainManager)
     {
+        Timer.Start("Terrain to hex grid");
+
         Vector3 worldPos = new Vector3();
         int gameHeight;
         
         terrainManager.hexGrid = new Hex[terrainManager.TerrainWidth, terrainManager.TerrainHeight];
         terrainManager.waterTiles = new List<Hex>();
-        Debug.Log("started");
-
+        
         for (int x=0; x < terrainManager.TerrainWidth; x++)
         {
             for (int y=0; y < terrainManager.TerrainHeight; y++)
             {
-
                 gameHeight = Mathf.RoundToInt(terrainManager.Altitudes * terrainManager.terrainData[x, y]);
 
                 worldPos.x = Mathf.RoundToInt(x * 2 * HexProperties.tileR + (y % 2 == 0 ? 0 : 1) * HexProperties.tileR + HexProperties.tileR) / (float)terrainManager.PixelsPerUnit;
@@ -123,28 +116,34 @@ public class TerrainManagerController : TerrainManagerControllerBase
                 worldPos.z = Mathf.RoundToInt(y * (HexProperties.tileH + HexProperties.side) + HexProperties.side) / (float)terrainManager.PixelsPerUnit;
 
 
-                terrainManager.hexGrid[x, y] = new Hex(new Vector2(x, y), (int)Mathf.Clamp(gameHeight, 1, terrainManager.Altitudes), gameHeight / terrainManager.Altitudes, worldPos, terrainManager.Humidity);
-                
+                terrainManager.hexGrid[x, y] = new Hex(new Vector2(x, y), 
+                                                       (int)Mathf.Clamp(gameHeight, 1, terrainManager.Altitudes), 
+                                                       gameHeight / terrainManager.Altitudes, 
+                                                       worldPos, 
+                                                       terrainManager.Humidity,
+                                                       (int)terrainManager.TemperatureSpread.Evaluate(y / (float)terrainManager.TerrainHeight));
+                //Debug.Log(terrainManager.TemperatureSpread.Evaluate((float)y / (float)terrainManager.TerrainHeight));
                 if (gameHeight == 1)
                 {
                     terrainManager.waterTiles.Add(terrainManager.hexGrid[x, y]);
                 }
 
             }
-        } Debug.Log("Finished");
+        }
+
+        Timer.End();
     }
 
     public void SetupHexagonGridNeighbors(TerrainManagerViewModel terrainManager)
     {
-        int timeStart = System.Environment.TickCount;
+        Timer.Start("Setup neighbors");
 
         Vector3 arrayPos;
         for (int y = 0; y < terrainManager.hexGrid.GetLength(1); y++)
         {
             for (int x = 0; x < terrainManager.hexGrid.GetLength(0); x++)
             {
-                // Setup hex neighbors !!! DOEN"T WORK PROERLY!
-                for (int n = 0; n < 6; n++)
+                for (int n = 0; n < 6 && terrainManager.hexGrid[x, y] != null; n++)
                 {
                     arrayPos = Hex.CubeToOffsetOddQ(terrainManager.hexGrid[x, y].cubeCoord + Hex.neighborDirs[n]);
 
@@ -155,11 +154,14 @@ public class TerrainManagerController : TerrainManagerControllerBase
                 }
             }
         }
-        Debug.Log("Setting up hex neighbors: " + (System.Environment.TickCount - timeStart) + "ms");
+
+        Timer.End();
     }
 
-    public void GenerateOceans(TerrainManagerViewModel terrainManager)
+    public void CalculateWaterPools(TerrainManagerViewModel terrainManager)
     {
+        Timer.Start("Calculating water pools");
+
         List<Hex> seaLevelHexes = new List<Hex>(terrainManager.waterTiles);
         List<Hex> scannedHexes = new List<Hex>();
         
@@ -192,6 +194,8 @@ public class TerrainManagerController : TerrainManagerControllerBase
                 seaLevelHexes.Remove(w_hex);
             }
         }
+
+        Timer.End();
     }
 
     public void FlattenArea(List<Hex> hexes, TerrainManagerViewModel terrainManager)
@@ -223,6 +227,8 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
     public void GenerateRivers(TerrainManagerViewModel terrainManager)
     {
+        Timer.Start("Generating rivers");
+
         int totalRivers = 0;
         int riverStrength = 0;
         int randomX, randomY;
@@ -269,7 +275,7 @@ public class TerrainManagerController : TerrainManagerControllerBase
                 nextHex = nextHex.neighbors[(int)UnityEngine.Random.Range(0, 5)];
 
                 nextHex.RiverStrength = riverStrength;
-                nextHex.terrainType = TerrainType.Water;
+                //nextHex.terrainType = TerrainType.Water;
                 terrainManager.waterTiles.Add(nextHex);
                 Debug.Log("Flowing " + nextHex.arrayCoord);
 
@@ -279,21 +285,23 @@ public class TerrainManagerController : TerrainManagerControllerBase
             nextHex = null;
         }
 
-        Debug.Log("River iterations " + iterations);
-
+        Timer.End();
     }
 
     public void CalculateHumidity(TerrainManagerViewModel terrainManager)
     {
+        Timer.Start("Calculating humidity");
+
         for (int i = 0; i < terrainManager.waterTiles.Count; i++)
         {
-            Hex.RainfallSpread(terrainManager.waterTiles[i], 10, 10, terrainManager.waterTiles);
+            Hex.HumiditySpread(terrainManager.waterTiles[i], 30, 80, terrainManager.HumidySpreadDecrease, terrainManager.waterTiles);
         }
         // loop through rivers
         //for (int i = 0; i < terrainManager.seaLevelHexes.Count; i++)
         //{
         //    Hex.RainfallSpread(terrainManager.seaLevelHexes[i], 10, 10, terrainManager.seaLevelHexes);
         //}
+        Timer.End();
     }
 
     public void CalculateTemperature(TerrainManagerViewModel terrainManager)
@@ -303,7 +311,18 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
     public void CalculateBiomes(TerrainManagerViewModel terrainManager)
     {
+        Timer.Start("Calculating biomeList");
 
+        for (int x = 0; x < terrainManager.TerrainWidth; x++)
+        {
+            for (int y = 0; y < terrainManager.TerrainHeight; y++)
+            {
+                if (terrainManager.hexGrid[x, y].terrainType == TerrainType.None)
+                    terrainManager.hexGrid[x, y].terrainType = TerrainType.Grassland;
+            }
+        }
+
+        Timer.End();
     }
 
     public Hex GetStartingLocation (TerrainManagerViewModel terrainManager)
@@ -320,10 +339,10 @@ public class TerrainManagerController : TerrainManagerControllerBase
             hex = terrainManager.hexGrid[randomX, randomY];
 
             // If the hex an invalid spawning location get a new one!
-            if (hex.terrainType == TerrainType.Water || hex.RiverStrength > 0)
-            {
-                hex = null;
-            }
+            //if (hex.terrainType == TerrainType.Water || hex.RiverStrength > 0)
+            //{
+            //    hex = null;
+            //}
         }
 
         return hex;
@@ -333,12 +352,11 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
     private void DiamondSquare(float[,] terrainData, int xbegin, int ybegin, int xend, int yend, float randomRange, float randomDiminish)
     {
+        Timer.Start("Diamond square");
 
         float sum, randomNow = randomRange;
         int squareSize = xend - xbegin; // Length of x
         int x0, y0, x1, y1;
-
-        int diamondTimer = System.Environment.TickCount;
 
         while (squareSize > 1)
         {
@@ -423,6 +441,6 @@ public class TerrainManagerController : TerrainManagerControllerBase
             randomNow *= randomDiminish; // Decrease the randomization
         }
 
-        Debug.Log("Diamond Square: " + ((System.Environment.TickCount - diamondTimer) / 100f) + "ms");
+        Timer.End();
     }
 }

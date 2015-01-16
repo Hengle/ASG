@@ -278,3 +278,56 @@ public partial class TerrainSettings : System.ComponentModel.INotifyPropertyChan
         }
     }
 }
+
+public partial class Biome : System.ComponentModel.INotifyPropertyChanged {
+    
+    private Int32 _maxHumidity;
+    
+    private Int32 _maxTemp;
+    
+    private Color _color;
+    
+    private Vector2 _pos;
+    
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected virtual void OnPropertyChanged(string propertyName){ PropertyChangedEventHandler handler = PropertyChanged; if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName)); }
+    public virtual Int32 maxHumidity {
+        get {
+            return this._maxHumidity;
+        }
+        set {
+            _maxHumidity = value;
+            OnPropertyChanged("maxHumidity");
+        }
+    }
+    
+    public virtual Int32 maxTemp {
+        get {
+            return this._maxTemp;
+        }
+        set {
+            _maxTemp = value;
+            OnPropertyChanged("maxTemp");
+        }
+    }
+    
+    public virtual Color color {
+        get {
+            return this._color;
+        }
+        set {
+            _color = value;
+            OnPropertyChanged("color");
+        }
+    }
+    
+    public virtual Vector2 pos {
+        get {
+            return this._pos;
+        }
+        set {
+            _pos = value;
+            OnPropertyChanged("pos");
+        }
+    }
+}

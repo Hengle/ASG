@@ -24,7 +24,7 @@ public partial class Hex : IHeapItem<Hex>
 
 
 
-    public Hex(Vector2 arrayCoord, int height, float heightmapHeight, Vector3 worldPos, int humidity)
+    public Hex(Vector2 arrayCoord, int height, float heightmapHeight, Vector3 worldPos, int humidity, int temperature)
     {
         this.arrayCoord = arrayCoord;
         this.cubeCoord = OffsetToCubeOddQ(arrayCoord);
@@ -35,7 +35,7 @@ public partial class Hex : IHeapItem<Hex>
         this.neighbors = new List<Hex>();
 
         this.Humidity = humidity;
-        
+        this.Temperature = temperature;
     }
 
     public int fCost
@@ -248,18 +248,18 @@ public partial class Hex : IHeapItem<Hex>
         });
     }
 
-    public static void RainfallSpread(Hex spreadHex, int range, int rainfall, List<Hex> waterTiles)
+    public static void HumiditySpread(Hex spreadHex, int range, int humidity, int humidityDecrease, List<Hex> waterTiles)
     {
-        if (range > 0 && spreadHex.Humidity <= rainfall)
+        if (range > 0 && spreadHex.Humidity < humidity)
         {
-            spreadHex.Humidity = rainfall;
+            spreadHex.Humidity = humidity;
             
             foreach(Hex hex in spreadHex.neighbors)
             {
                 // Make sure we don't set rainfall on a water tile
-                if (hex.terrainType != TerrainType.Water && waterTiles.Contains(hex) == false) 
+                if (hex.terrainType != TerrainType.Water)  //  && waterTiles.Contains(hex) == false
                 {
-                    RainfallSpread(hex, range - 1, rainfall - 1, waterTiles); 
+                    HumiditySpread(hex, range - 1, humidity - humidityDecrease, humidityDecrease, waterTiles); 
                 } 
 
             }

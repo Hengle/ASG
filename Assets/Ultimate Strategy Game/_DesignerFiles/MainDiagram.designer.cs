@@ -267,6 +267,18 @@ public class TerrainManagerViewModelBase : ViewModel {
     
     public P<Int32> _HumidityProperty;
     
+    public P<Int32> _TemperatureProperty;
+    
+    public P<Int32> _HumidySpreadDecreaseProperty;
+    
+    public P<AnimationCurve> _TemperatureSpreadProperty;
+    
+    public P<AnimationCurve> _HeightTemperatureProperty;
+    
+    public P<AnimationCurve> _HumidityTemperatureProperty;
+    
+    public P<Biome[]> _BiomesProperty;
+    
     protected CommandWithSender<TerrainManagerViewModel> _GenerateMap;
     
     protected CommandWithSender<TerrainManagerViewModel> _GenerateChunks;
@@ -304,6 +316,12 @@ public class TerrainManagerViewModelBase : ViewModel {
         _MinLakeSizeProperty = new P<Int32>(this, "MinLakeSize");
         _MaxLakeSizeProperty = new P<Int32>(this, "MaxLakeSize");
         _HumidityProperty = new P<Int32>(this, "Humidity");
+        _TemperatureProperty = new P<Int32>(this, "Temperature");
+        _HumidySpreadDecreaseProperty = new P<Int32>(this, "HumidySpreadDecrease");
+        _TemperatureSpreadProperty = new P<AnimationCurve>(this, "TemperatureSpread");
+        _HeightTemperatureProperty = new P<AnimationCurve>(this, "HeightTemperature");
+        _HumidityTemperatureProperty = new P<AnimationCurve>(this, "HumidityTemperature");
+        _BiomesProperty = new P<Biome[]>(this, "Biomes");
     }
 }
 
@@ -640,6 +658,96 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         }
     }
     
+    public virtual P<Int32> TemperatureProperty {
+        get {
+            return this._TemperatureProperty;
+        }
+    }
+    
+    public virtual Int32 Temperature {
+        get {
+            return _TemperatureProperty.Value;
+        }
+        set {
+            _TemperatureProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Int32> HumidySpreadDecreaseProperty {
+        get {
+            return this._HumidySpreadDecreaseProperty;
+        }
+    }
+    
+    public virtual Int32 HumidySpreadDecrease {
+        get {
+            return _HumidySpreadDecreaseProperty.Value;
+        }
+        set {
+            _HumidySpreadDecreaseProperty.Value = value;
+        }
+    }
+    
+    public virtual P<AnimationCurve> TemperatureSpreadProperty {
+        get {
+            return this._TemperatureSpreadProperty;
+        }
+    }
+    
+    public virtual AnimationCurve TemperatureSpread {
+        get {
+            return _TemperatureSpreadProperty.Value;
+        }
+        set {
+            _TemperatureSpreadProperty.Value = value;
+        }
+    }
+    
+    public virtual P<AnimationCurve> HeightTemperatureProperty {
+        get {
+            return this._HeightTemperatureProperty;
+        }
+    }
+    
+    public virtual AnimationCurve HeightTemperature {
+        get {
+            return _HeightTemperatureProperty.Value;
+        }
+        set {
+            _HeightTemperatureProperty.Value = value;
+        }
+    }
+    
+    public virtual P<AnimationCurve> HumidityTemperatureProperty {
+        get {
+            return this._HumidityTemperatureProperty;
+        }
+    }
+    
+    public virtual AnimationCurve HumidityTemperature {
+        get {
+            return _HumidityTemperatureProperty.Value;
+        }
+        set {
+            _HumidityTemperatureProperty.Value = value;
+        }
+    }
+    
+    public virtual P<Biome[]> BiomesProperty {
+        get {
+            return this._BiomesProperty;
+        }
+    }
+    
+    public virtual Biome[] Biomes {
+        get {
+            return _BiomesProperty.Value;
+        }
+        set {
+            _BiomesProperty.Value = value;
+        }
+    }
+    
     public virtual CommandWithSender<TerrainManagerViewModel> GenerateMap {
         get {
             return _GenerateMap;
@@ -732,6 +840,8 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         stream.SerializeInt("MinLakeSize", this.MinLakeSize);
         stream.SerializeInt("MaxLakeSize", this.MaxLakeSize);
         stream.SerializeInt("Humidity", this.Humidity);
+        stream.SerializeInt("Temperature", this.Temperature);
+        stream.SerializeInt("HumidySpreadDecrease", this.HumidySpreadDecrease);
     }
     
     public override void Read(ISerializerStream stream) {
@@ -756,6 +866,8 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         		this.MinLakeSize = stream.DeserializeInt("MinLakeSize");;
         		this.MaxLakeSize = stream.DeserializeInt("MaxLakeSize");;
         		this.Humidity = stream.DeserializeInt("Humidity");;
+        		this.Temperature = stream.DeserializeInt("Temperature");;
+        		this.HumidySpreadDecrease = stream.DeserializeInt("HumidySpreadDecrease");;
     }
     
     public override void Unbind() {
@@ -785,6 +897,12 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         list.Add(new ViewModelPropertyInfo(_MinLakeSizeProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_MaxLakeSizeProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_HumidityProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_TemperatureProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_HumidySpreadDecreaseProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_TemperatureSpreadProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_HeightTemperatureProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_HumidityTemperatureProperty, false, false, false));
+        list.Add(new ViewModelPropertyInfo(_BiomesProperty, false, false, false));
     }
     
     protected override void FillCommands(List<ViewModelCommandInfo> list) {
@@ -3777,6 +3895,8 @@ public partial class FogOfWarViewModel : FogOfWarViewModelBase {
 }
 
 public enum TerrainType {
+    
+    None,
     
     Water,
     
