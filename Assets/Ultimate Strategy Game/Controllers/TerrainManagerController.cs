@@ -294,7 +294,7 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
         for (int i = 0; i < terrainManager.waterTiles.Count; i++)
         {
-            Hex.HumiditySpread(terrainManager.waterTiles[i], 30, 80, terrainManager.HumidySpreadDecrease, terrainManager.waterTiles);
+            Hex.HumiditySpread(terrainManager.waterTiles[i], 3, 50, terrainManager.HumidySpreadDecrease, terrainManager.waterTiles);
         }
         // loop through rivers
         //for (int i = 0; i < terrainManager.seaLevelHexes.Count; i++)
@@ -306,7 +306,14 @@ public class TerrainManagerController : TerrainManagerControllerBase
 
     public void CalculateTemperature(TerrainManagerViewModel terrainManager)
     {
-
+        for (int x = 0; x < terrainManager.TerrainWidth; x++)
+        {
+            for (int y = 0; y < terrainManager.TerrainHeight; y++)
+            {
+                terrainManager.hexGrid[x, y].Temperature -= (int)terrainManager.HumidityTemperature.Evaluate(terrainManager.hexGrid[x, y].Humidity);
+                terrainManager.hexGrid[x, y].Temperature -= (int)terrainManager.HeightTemperature.Evaluate(terrainManager.hexGrid[x, y].height);
+            }
+        }
     }
 
     public void CalculateBiomes(TerrainManagerViewModel terrainManager)

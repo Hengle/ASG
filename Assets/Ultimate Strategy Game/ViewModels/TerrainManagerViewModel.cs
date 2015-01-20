@@ -23,13 +23,7 @@ public partial class TerrainManagerViewModel
 
     
     //public List<Biome> biomes;
-    /*[System.Serializable]
-    public class Biome
-    {
-        public int temperature;
-        public int humidity;
-        public Color color;
-    }*/
+
 
 
     public int GridSize

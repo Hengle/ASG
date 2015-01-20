@@ -20,4 +20,10 @@ public class ChunkController : ChunkControllerBase {
         return chunk;
     }
 
+    public override void SaveChunkHexTexture(ChunkViewModel chunk)
+    {
+        base.SaveChunkHexTexture(chunk);
+        Debug.Log("exec save");
+    }
+
 }

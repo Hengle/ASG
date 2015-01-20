@@ -33,9 +33,9 @@ public partial class ChunkView
         GenerateTextures();
         UpdateMesh();
         UpdateCollisions();
-        //vertices = null;
-        //normals = null;
-        //uv = null;
+        vertices = null;
+        normals = null;
+        uv = null;
     }
 
     public override void UpdateChunkExecuted()
@@ -56,7 +56,7 @@ public partial class ChunkView
         substance.RebuildTexturesImmediately();
 
         // Get the newly generated substance heightmap
-        ProceduralTexture substanceTexture = substance.GetGeneratedTexture("terrain_heightmap");
+        ProceduralTexture substanceTexture = substance.GetGeneratedTexture("Terrain_heightmap");
 
         // Convert it to a Texture2D
         substanceTexture2D = new Texture2D(substanceTexture.width, substanceTexture.height, TextureFormat.ARGB32, false);
@@ -314,13 +314,20 @@ public partial class ChunkView
         }
     }
 
-    /// Invokes SaveChunkhexHeightmapExecuted when the SaveChunkhexHeightmap command is executed.
-    public override void ExecuteSaveChunkHexTexture()
+    public override void SaveChunkHexTextureExecuted()
     {
-        base.ExecuteSaveChunkHexTexture();
-        byte[] data = hexHeightmap.EncodeToPNG();
-        File.WriteAllBytes(Application.dataPath + "/chunk.png", data);
+        Debug.Log("Saving chunk");
+        // Set the substance input textures
+        substance.SetProceduralTexture("biome_map", hexBiomeMap);
+        substance.SetProceduralTexture("heightmap", hexHeightmap);
+        substance.RebuildTexturesImmediately();
+        
+        /*base.ExecuteSaveChunkHexTexture();
+        byte[] data = hexBiomeMap.EncodeToPNG();
+        File.WriteAllBytes(Application.dataPath + "/chunk.png", data);*/
     }
+
+ 
 
     /*   0 
      * 3   1

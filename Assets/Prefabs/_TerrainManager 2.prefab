@@ -36,15 +36,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff8ca969ee67cba468934073e10a3ca4, type: 3}
+  m_Script: {fileID: 11500000, guid: 8956280516d67604cb41c6d63cdac4f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _LogEvents: 0
   _forceResolveViewModel: 1
-  _InjectView: 1
+  _InjectView: 0
   _overrideViewModel: 1
   _resolveName: TerrainManager
-  _Save: 1
+  _Save: 0
   _TerrainSeed: 0
   _RandomizeSeed: 0
   _PixelsPerUnit: 16
@@ -53,8 +53,8 @@ MonoBehaviour:
   _ChunkSize: 512
   _ChunkResolution: 64
   _ChunkCollisionResolution: 16
-  _TerrainWidth: 128
-  _TerrainHeight: 128
+  _TerrainWidth: 64
+  _TerrainHeight: 64
   _Detail: .75
   _AltitudeVariation: .913999975
   _HexagonSide: 30
@@ -65,80 +65,85 @@ MonoBehaviour:
   _MinLakeSize: 6
   _MaxLakeSize: 20
   _Humidity: 0
-  _Temperature: 25
-  _HumidySpreadDecrease: 2
+  _Temperature: 0
+  _HumidySpreadDecrease: 17
   _TemperatureSpread:
     serializedVersion: 2
     m_Curve:
-    - time: 0
-      value: -10.2068291
-      inSlope: 56.6055946
-      outSlope: 56.6055946
+    - time: .00192870398
+      value: -10.0914631
+      inSlope: 423.832611
+      outSlope: 423.832611
       tangentMode: 0
-    - time: .0440381281
-      value: .00197017193
-      inSlope: 77.0885544
-      outSlope: 77.0885544
-      tangentMode: 0
-    - time: .419830769
-      value: 29.8231678
-      inSlope: 100.430573
-      outSlope: 100.430573
-      tangentMode: 0
-    - time: .497493953
-      value: 40.0620766
-      inSlope: -1.32252359
-      outSlope: -1.32252359
-      tangentMode: 0
-    - time: .560825944
-      value: 30.3277378
-      inSlope: -116.596222
-      outSlope: -116.596222
-      tangentMode: 0
-    - time: .957349002
-      value: -.0491008461
-      inSlope: -104.4011
-      outSlope: -104.4011
-      tangentMode: 0
-    - time: 1
-      value: -10.2068291
-      inSlope: -264.20047
-      outSlope: -264.20047
+    - time: .054258965
+      value: 5.0170269
+      inSlope: 113.64222
+      outSlope: 125.451569
+      tangentMode: 1
+    - time: .467079401
+      value: 39.539196
+      inSlope: 45.29953
+      outSlope: 19.5204487
+      tangentMode: 1
+    - time: .501252949
+      value: 39.907711
+      inSlope: 6.68311024
+      outSlope: 4.29948282
+      tangentMode: 1
+    - time: .540146887
+      value: 39.6337662
+      inSlope: .248518482
+      outSlope: -40.4548645
+      tangentMode: 1
+    - time: .948659539
+      value: 5.28605843
+      inSlope: -125.639664
+      outSlope: -143.313416
+      tangentMode: 1
+    - time: .999319017
+      value: -9.86627007
+      inSlope: -437.448608
+      outSlope: -437.448608
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
   _HeightTemperature:
     serializedVersion: 2
     m_Curve:
-    - time: -.0111768367
-      value: .00400801562
-      inSlope: 1.30869186
-      outSlope: 1.30869186
+    - time: -.00104275288
+      value: .00173611077
+      inSlope: -.0320636481
+      outSlope: -.0320636481
       tangentMode: 10
-    - time: 3.82502198
-      value: 5.02440977
-      inSlope: 1.58983648
-      outSlope: 1.58983648
+    - time: 2.03274608
+      value: -.0634745806
+      inSlope: .112208523
+      outSlope: .112208523
       tangentMode: 0
-    - time: 6.0309124
-      value: 10.0716877
-      inSlope: 2.28809094
-      outSlope: 2.28809094
+    - time: 2.1128912
+      value: -.0468098186
+      inSlope: 2.39812517
+      outSlope: 2.39812517
+      tangentMode: 0
+    - time: 6.01454163
+      value: 9.94784737
+      inSlope: 2.56164861
+      outSlope: 2.56164861
       tangentMode: 10
     m_PreInfinity: 2
     m_PostInfinity: 2
   _HumidityTemperature:
     serializedVersion: 2
     m_Curve:
-    - time: .21420604
-      value: .154508591
-      inSlope: .50463587
-      outSlope: .50463587
+    - time: -.0374947377
+      value: .00186841644
+      inSlope: .100310296
+      outSlope: .100310296
       tangentMode: 10
-    - time: 98.2800446
-      value: 49.6420517
-      inSlope: .50463587
-      outSlope: .50463587
+    - time: 100.033501
+      value: 10.04002
+      inSlope: .100310296
+      outSlope: .100310296
       tangentMode: 10
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -148,60 +153,54 @@ MonoBehaviour:
   terrainHeightMap: {fileID: 0}
   displayHexNodes: 0
   displayHexPath: 0
-  temp: {fileID: 0}
-  temp2: {fileID: 0}
   colors:
-  - {r: .0344824791, g: 0, b: 1, a: 0}
-  - {r: 1, g: .765517235, b: 0, a: 0}
-  - {r: 0, g: 1, b: .0896549225, a: 0}
-  - {r: .0384888947, g: .507352948, b: 0, a: 0}
-  - {r: .41911763, g: .309619933, b: .0739619285, a: 0}
-  - {r: .647058845, g: .647058845, b: .647058845, a: 0}
+  - {r: .117241383, g: 0, b: 1, a: 0}
+  - {r: .903448343, g: 1, b: 0, a: 0}
+  - {r: 0, g: 1, b: .00689649582, a: 0}
+  - {r: .0663793162, g: .566176474, b: 0, a: 0}
+  - {r: .470588207, g: .301825553, b: 0, a: 0}
+  - {r: .551470578, g: .551470578, b: .551470578, a: 0}
   biomes:
+  - name: 
+    minTemp: 100
+    minHum: 100
+    color: {r: 0, g: 0, b: 0, a: 0}
   - name: Jungle
-    minTemperature: 30
-    minHumidity: 80
-    color: {r: 0, g: .278431386, b: 0, a: 0}
-  - name: Tropical Forest
-    minTemperature: 30
-    minHumidity: 40
-    color: {r: .372549027, g: .478431374, b: .0980392173, a: 0}
+    minTemp: 30
+    minHum: 40
+    color: {r: 0, g: .242647052, b: 0, a: 0}
+  - name: Forest
+    minTemp: 30
+    minHum: 15
+    color: {r: .392662287, g: .544117689, b: 0, a: 0}
   - name: Desert
-    minTemperature: 30
-    minHumidity: 0
+    minTemp: 15
+    minHum: 0
     color: {r: .929411769, g: .850980401, b: .505882382, a: 0}
-  - name: Temperate Rain Forest
-    minTemperature: 20
-    minHumidity: 70
+  - name: 'Temperate Rainforest '
+    minTemp: 10
+    minHum: 35
     color: {r: .345098048, g: .505882382, b: .34117648, a: 0}
   - name: Temperate Forest
-    minTemperature: 20
-    minHumidity: 40
-    color: {r: .274509817, g: .75686276, b: 0, a: 0}
-  - name: Savana
-    minTemperature: 20
-    minHumidity: 20
-    color: {r: .850980401, g: .898039222, b: .596078455, a: 0}
-  - name: Shrubland
-    minTemperature: 20
-    minHumidity: 5
-    color: {r: .819607854, g: .772549033, b: .513725519, a: 0}
-  - name: Grassland
-    minTemperature: 5
-    minHumidity: 10
-    color: {r: .639215708, g: .87843138, b: .388235301, a: 0}
-  - name: Boreal Forest
-    minTemperature: 10
-    minHumidity: 20
-    color: {r: .0941176489, g: .372549027, b: .290196091, a: 0}
-  - name: Boreaf Forest
-    minTemperature: 5
-    minHumidity: 10
-    color: {r: .376470596, g: .509803951, b: .411764711, a: 0}
+    minTemp: 10
+    minHum: 15
+    color: {r: .587625682, g: 1, b: .352941155, a: 0}
+  - name: Grass Land
+    minTemp: 10
+    minHum: 5
+    color: {r: .815916896, g: .852941155, b: .181877181, a: 0}
+  - name: Alpine Tundra
+    minTemp: 0
+    minHum: 10
+    color: {r: .228427753, g: .477941155, b: .294475406, a: 0}
+  - name: Tundra
+    minTemp: 0
+    minHum: 0
+    color: {r: .316176474, g: .316176474, b: .316176474, a: 0}
   - name: Arctic
-    minTemperature: -10
-    minHumidity: 0
-    color: {r: 1, g: .738461494, b: .738461494, a: 0}
+    minTemp: -50
+    minHum: 0
+    color: {r: .852941155, g: .852941155, b: .852941155, a: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

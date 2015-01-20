@@ -188,10 +188,6 @@ public abstract class TerrainManagerViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public AnimationCurve _HumidityTemperature;
     
-    [UFGroup("View Model Properties")]
-    [UnityEngine.HideInInspector()]
-    public Biome[] _Biomes;
-    
     public override string DefaultIdentifier {
         get {
             return "TerrainManager";
@@ -244,7 +240,6 @@ public abstract class TerrainManagerViewBase : ViewBase {
         terrainManager.TemperatureSpread = this._TemperatureSpread;
         terrainManager.HeightTemperature = this._HeightTemperature;
         terrainManager.HumidityTemperature = this._HumidityTemperature;
-        terrainManager.Biomes = this._Biomes;
     }
     
     public virtual void ExecuteGenerateMap() {
@@ -1905,16 +1900,38 @@ public class FogOfWarViewViewBase : FogOfWarViewBase {
 public partial class FogOfWarView : FogOfWarViewViewBase {
 }
 
-public class TerrainMangerViewBase : TerrainManagerViewBase {
+public class TerrainManagerViewViewBase : TerrainManagerViewBase {
+    
+    [UFToggleGroup("GenerateMap")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindGenerateMap = true;
+    
+    [UFToggleGroup("GenerateChunks")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindGenerateChunks = true;
     
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<TerrainManagerController>());
     }
     
+    /// Invokes GenerateMapExecuted when the GenerateMap command is executed.
+    public virtual void GenerateMapExecuted() {
+    }
+    
+    /// Invokes GenerateChunksExecuted when the GenerateChunks command is executed.
+    public virtual void GenerateChunksExecuted() {
+    }
+    
     public override void Bind() {
         base.Bind();
+        if (this._BindGenerateMap) {
+            this.BindCommandExecuted(TerrainManager.GenerateMap, GenerateMapExecuted);
+        }
+        if (this._BindGenerateChunks) {
+            this.BindCommandExecuted(TerrainManager.GenerateChunks, GenerateChunksExecuted);
+        }
     }
 }
 
-public partial class TerrainManger : TerrainMangerViewBase {
+public partial class TerrainManagerView : TerrainManagerViewViewBase {
 }

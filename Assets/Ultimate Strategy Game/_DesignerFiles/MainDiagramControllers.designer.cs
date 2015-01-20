@@ -18,8 +18,8 @@ using UnityEngine;
 
 public abstract class ChunkControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public TerrainManagerController TerrainManagerController {get;set;}
     public abstract void InitializeChunk(ChunkViewModel chunk);
@@ -48,8 +48,8 @@ public abstract class ChunkControllerBase : Controller {
 
 public abstract class TerrainManagerControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public ChunkController ChunkController {get;set;}
     [Inject] public WorldManagerController WorldManagerController {get;set;}
@@ -81,8 +81,8 @@ public abstract class TerrainManagerControllerBase : Controller {
 
 public abstract class WorldManagerControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public TerrainManagerController TerrainManagerController {get;set;}
     public abstract void InitializeWorldManager(WorldManagerViewModel worldManager);
@@ -102,8 +102,8 @@ public abstract class WorldManagerControllerBase : Controller {
 
 public abstract class GameLogicControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public FactionController FactionController {get;set;}
@@ -134,8 +134,8 @@ public abstract class GameLogicControllerBase : Controller {
 
 public abstract class PlayerControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
@@ -186,8 +186,8 @@ public abstract class PlayerControllerBase : Controller {
 
 public abstract class UnitStackControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
@@ -255,8 +255,8 @@ public abstract class UnitStackControllerBase : Controller {
 
 public abstract class FactionControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public PlayerController PlayerController {get;set;}
@@ -283,8 +283,8 @@ public abstract class FactionControllerBase : Controller {
 
 public abstract class CityControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
@@ -326,8 +326,8 @@ public abstract class CityControllerBase : Controller {
 
 public abstract class BuildingControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public CityController CityController {get;set;}
     public abstract void InitializeBuilding(BuildingViewModel building);
@@ -368,8 +368,8 @@ public abstract class AIPlayerControllerBase : PlayerController {
 
 public abstract class UnitControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
@@ -431,8 +431,8 @@ public abstract class MeleeUnitControllerBase : UnitController {
 
 public abstract class CharacterControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public UnitStackController UnitStackController {get;set;}
     [Inject] public CharacterController CharacterController {get;set;}
@@ -473,8 +473,8 @@ public abstract class CharacterUnitControllerBase : UnitController {
 
 public abstract class FogOfWarControllerBase : Controller {
     
-    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("FogOfWar")] public FogOfWarViewModel FogOfWar { get; set; }
+    [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public TerrainManagerController TerrainManagerController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}

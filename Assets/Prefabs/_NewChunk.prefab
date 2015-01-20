@@ -12,6 +12,7 @@ GameObject:
   - 33: {fileID: 3300000}
   - 64: {fileID: 6400000}
   - 114: {fileID: 11400000}
+  - 205: {fileID: 20500000}
   m_Layer: 0
   m_Name: _NewChunk
   m_TagString: Terrain
@@ -26,7 +27,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100000}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 182.862808, y: 3.03405571, z: 74.16642}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -43,7 +44,7 @@ Renderer:
   m_LightmapIndex: 255
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
-  - {fileID: -931091681, guid: b1b15dfe04fa5514789690cb6dcb0533, type: 3}
+  - {fileID: 996372036, guid: 2f50b4b96cdccd044bf05ea87a823479, type: 3}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -99,6 +100,23 @@ MonoBehaviour:
   _BindUpdateChunk: 1
   hexHeightmap: {fileID: 0}
   hexBiomeMap: {fileID: 0}
+--- !u!205 &20500000
+LODGroup:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
+  m_Size: 1
+  m_ScreenRelativeTransitionHeight: 0
+  m_LODs:
+  - screenRelativeHeight: .300000012
+    renderers: []
+  - screenRelativeHeight: .300000012
+    renderers: []
+  - screenRelativeHeight: .300000012
+    renderers: []
+  m_Enabled: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

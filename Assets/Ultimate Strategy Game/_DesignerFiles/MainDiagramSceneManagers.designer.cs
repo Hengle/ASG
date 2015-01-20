@@ -26,9 +26,9 @@ public sealed partial class MainTerrainSettings {
 // </summary>
 public class MainTerrainBase : SceneManager {
     
-    private FogOfWarViewModel _FogOfWar;
-    
     private TerrainManagerViewModel _TerrainManager;
+    
+    private FogOfWarViewModel _FogOfWar;
     
     private GameLogicViewModel _GameLogic;
     
@@ -66,19 +66,6 @@ public class MainTerrainBase : SceneManager {
     
     public MainTerrainSettings _MainTerrainSettings = new MainTerrainSettings();
     
-    [Inject("FogOfWar")]
-    public virtual FogOfWarViewModel FogOfWar {
-        get {
-            if ((this._FogOfWar == null)) {
-                this._FogOfWar = CreateInstanceViewModel<FogOfWarViewModel>(FogOfWarController, "FogOfWar");
-            }
-            return this._FogOfWar;
-        }
-        set {
-            _FogOfWar = value;
-        }
-    }
-    
     [Inject("TerrainManager")]
     public virtual TerrainManagerViewModel TerrainManager {
         get {
@@ -89,6 +76,19 @@ public class MainTerrainBase : SceneManager {
         }
         set {
             _TerrainManager = value;
+        }
+    }
+    
+    [Inject("FogOfWar")]
+    public virtual FogOfWarViewModel FogOfWar {
+        get {
+            if ((this._FogOfWar == null)) {
+                this._FogOfWar = CreateInstanceViewModel<FogOfWarViewModel>(FogOfWarController, "FogOfWar");
+            }
+            return this._FogOfWar;
+        }
+        set {
+            _FogOfWar = value;
         }
     }
     
@@ -320,8 +320,8 @@ public class MainTerrainBase : SceneManager {
     // </summary>
     public override void Setup() {
         base.Setup();
-        Container.RegisterViewModel<FogOfWarViewModel>(FogOfWar,"FogOfWar");
         Container.RegisterViewModel<TerrainManagerViewModel>(TerrainManager,"TerrainManager");
+        Container.RegisterViewModel<FogOfWarViewModel>(FogOfWar,"FogOfWar");
         Container.RegisterViewModel<GameLogicViewModel>(GameLogic,"GameLogic");
         Container.RegisterController<ChunkController>(ChunkController);
         Container.RegisterController<TerrainManagerController>(TerrainManagerController);
@@ -340,8 +340,8 @@ public class MainTerrainBase : SceneManager {
         Container.RegisterController<CharacterController>(CharacterController);
         Container.RegisterController<CharacterUnitController>(CharacterUnitController);
         this.Container.InjectAll();
-        FogOfWarController.Initialize(FogOfWar);
         TerrainManagerController.Initialize(TerrainManager);
+        FogOfWarController.Initialize(FogOfWar);
         GameLogicController.Initialize(GameLogic);
     }
     

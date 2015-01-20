@@ -277,8 +277,6 @@ public class TerrainManagerViewModelBase : ViewModel {
     
     public P<AnimationCurve> _HumidityTemperatureProperty;
     
-    public P<Biome[]> _BiomesProperty;
-    
     protected CommandWithSender<TerrainManagerViewModel> _GenerateMap;
     
     protected CommandWithSender<TerrainManagerViewModel> _GenerateChunks;
@@ -321,7 +319,6 @@ public class TerrainManagerViewModelBase : ViewModel {
         _TemperatureSpreadProperty = new P<AnimationCurve>(this, "TemperatureSpread");
         _HeightTemperatureProperty = new P<AnimationCurve>(this, "HeightTemperature");
         _HumidityTemperatureProperty = new P<AnimationCurve>(this, "HumidityTemperature");
-        _BiomesProperty = new P<Biome[]>(this, "Biomes");
     }
 }
 
@@ -733,21 +730,6 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         }
     }
     
-    public virtual P<Biome[]> BiomesProperty {
-        get {
-            return this._BiomesProperty;
-        }
-    }
-    
-    public virtual Biome[] Biomes {
-        get {
-            return _BiomesProperty.Value;
-        }
-        set {
-            _BiomesProperty.Value = value;
-        }
-    }
-    
     public virtual CommandWithSender<TerrainManagerViewModel> GenerateMap {
         get {
             return _GenerateMap;
@@ -902,7 +884,6 @@ public partial class TerrainManagerViewModel : TerrainManagerViewModelBase {
         list.Add(new ViewModelPropertyInfo(_TemperatureSpreadProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_HeightTemperatureProperty, false, false, false));
         list.Add(new ViewModelPropertyInfo(_HumidityTemperatureProperty, false, false, false));
-        list.Add(new ViewModelPropertyInfo(_BiomesProperty, false, false, false));
     }
     
     protected override void FillCommands(List<ViewModelCommandInfo> list) {
@@ -3898,31 +3879,25 @@ public enum TerrainType {
     
     None,
     
-    Water,
-    
-    Lake,
-    
-    Ocean,
-    
-    DeepOcean,
-    
-    River,
-    
-    Chaparral,
-    
-    Rainforest,
+    Jungle,
     
     Forest,
     
+    Desert,
+    
+    TemperatRainforest,
+    
+    TemperateForest,
+    
     Grassland,
+    
+    AlpineTundra,
     
     Tundra,
     
-    Savanna,
+    Arctic,
     
-    DesertScrub,
-    
-    Desert,
+    Water,
 }
 
 public enum Seasons {

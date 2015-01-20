@@ -6,7 +6,7 @@ SubstanceImporter:
   - serializedVersion: 12
     name: Terrain
     prototypeName: TerrainTest2
-    shader: {fileID: 4800000, guid: 3954501323f24464f9e4418c78d8e8ce, type: 3}
+    shader: {fileID: 4, guid: 0000000000000000f000000000000000, type: 0}
     inputs:
     - name: $outputsize
       value:
@@ -29,51 +29,16 @@ SubstanceImporter:
         scalar[2]: 0
         scalar[3]: 0
         texture: {instanceID: 0}
-    - name: Blur_Intensity
-      value:
-        scalar[0]: 3
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: Terrain_Noise
-      value:
-        scalar[0]: .448000014
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: Normal_Intensity
-      value:
-        scalar[0]: .779999971
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: Hexagon_Heights
+    - name: biome_map
       value:
         scalar[0]: 0
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
         texture: {instanceID: 0}
-    - name: biome_data
+    - name: heightmap
       value:
         scalar[0]: 0
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: hexagon_heightmap
-      value:
-        scalar[0]: 0
-        scalar[1]: 0
-        scalar[2]: 0
-        scalar[3]: 0
-        texture: {instanceID: 0}
-    - name: biome_blur
-      value:
-        scalar[0]: 4
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -94,10 +59,171 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: Specular_Power
       value:
-        scalar[0]: .125
-        scalar[1]: .125
-        scalar[2]: .120999999
-        scalar[3]: .128999993
+        scalar[0]: .140000001
+        scalar[1]: .140000001
+        scalar[2]: .150000006
+        scalar[3]: .150000006
+        texture: {instanceID: 0}
+    - name: grassland_biome
+      value:
+        scalar[0]: 0
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {fileID: 2800000, guid: 27c56bd80de6c004bb931e4edca39742, type: 3}
+    - name: desert_biome
+      value:
+        scalar[0]: 0
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {fileID: 2800000, guid: 2cfd257e7d23b5c488042dc1d1d9f66a, type: 3}
+    - name: tundra_biome
+      value:
+        scalar[0]: 0
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {fileID: 2800000, guid: a8467da7fbe2aff4fb5241b510cc9dad, type: 3}
+    - name: arctic_biome
+      value:
+        scalar[0]: 0
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {fileID: 2800000, guid: cb113255da7ad214e93cb591a1e71cc0, type: 3}
+    - name: grassland_mask
+      value:
+        scalar[0]: .811764717
+        scalar[1]: .850980401
+        scalar[2]: .180392161
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: desert_mask
+      value:
+        scalar[0]: .925490201
+        scalar[1]: .847058833
+        scalar[2]: .501960814
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: tundra_mask
+      value:
+        scalar[0]: .31764707
+        scalar[1]: .31764707
+        scalar[2]: .31764707
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: arctic_mask
+      value:
+        scalar[0]: .850980401
+        scalar[1]: .850980401
+        scalar[2]: .850980401
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: ocean_mask
+      value:
+        scalar[0]: 0
+        scalar[1]: 0
+        scalar[2]: 1
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: water_biome
+      value:
+        scalar[0]: 0
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {fileID: 2800000, guid: 064dc8e4e1c59da47a58454f8c385bc5, type: 3}
+    - name: ocean_blur
+      value:
+        scalar[0]: .331
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: ocean_border_randomization
+      value:
+        scalar[0]: .273999989
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: ocean_border_opacity
+      value:
+        scalar[0]: 1
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: texture_height_blur
+      value:
+        scalar[0]: 5
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: texture_height_blend
+      value:
+        scalar[0]: .400000006
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: ocean_edge_detail
+      value:
+        scalar[0]: 64
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: ocean_edge_blur
+      value:
+        scalar[0]: 4
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: ocean_edge_intensity
+      value:
+        scalar[0]: 5
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: tundra_tiling
+      value:
+        scalar[0]: 8
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 8
+        texture: {instanceID: 0}
+    - name: jungle_biome
+      value:
+        scalar[0]: 0
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {fileID: 2800000, guid: 171d757d948586f488852ae0fb2c6b31, type: 3}
+    - name: forest_biome
+      value:
+        scalar[0]: 0
+        scalar[1]: 0
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {fileID: 2800000, guid: a56038cb0db403b45a496bcf8ba73686, type: 3}
+    - name: jungle_mask
+      value:
+        scalar[0]: 0
+        scalar[1]: .243137255
+        scalar[2]: 0
+        scalar[3]: 0
+        texture: {instanceID: 0}
+    - name: forest_mask
+      value:
+        scalar[0]: .392156869
+        scalar[1]: .541176498
+        scalar[2]: 0
+        scalar[3]: 0
         texture: {instanceID: 0}
     materialInformation:
       serializedVersion: 5
@@ -105,7 +231,7 @@ SubstanceImporter:
       scale: {x: 1, y: 1}
       generateMipmaps: 1
       generateAllOutputs: 1
-      animationUpdateRate: 0
+      animationUpdateRate: 42
     materialProperties:
       serializedVersion: 2
       texEnvs:
@@ -127,19 +253,7 @@ SubstanceImporter:
         data:
           first:
             name: _Shininess
-          second: .150772825
-        data:
-          first:
-            name: _Parallax
-          second: .5
-        data:
-          first:
-            name: _EdgeLength
-          second: 34.0535698
-        data:
-          first:
-            name: _Smoothness
-          second: .607142866
+          second: .0300000031
       colors:
         data:
           first:
@@ -148,7 +262,7 @@ SubstanceImporter:
         data:
           first:
             name: _SpecColor
-          second: {r: .235294104, g: .229614586, b: .211072654, a: 1}
+          second: {r: .16911763, g: .16911763, b: .16911763, a: 1}
     textureParameters:
     - name: Terrain_diffuse
       alphaSource: 5
@@ -166,6 +280,26 @@ SubstanceImporter:
       aniso: 1
       wrapMode: 0
     - name: Terrain_HeightMap
+      alphaSource: 0
+      filterMode: 1
+      aniso: 1
+      wrapMode: 0
+    - name: Terrain_normal
+      alphaSource: 0
+      filterMode: 1
+      aniso: 1
+      wrapMode: 0
+    - name: Terrain_specular
+      alphaSource: 0
+      filterMode: 1
+      aniso: 1
+      wrapMode: 0
+    - name: Terrain_heightmap
+      alphaSource: 0
+      filterMode: 1
+      aniso: 1
+      wrapMode: 0
+    - name: Terrain_tesselation
       alphaSource: 0
       filterMode: 1
       aniso: 1
