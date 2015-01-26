@@ -23,6 +23,7 @@ public partial class PlayerView
     public override void Update()
     {
         base.Update();
+
         MouseSelect();
     
     }
@@ -32,10 +33,12 @@ public partial class PlayerView
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         
-        if (Physics.Raycast(ray, out hit, 400))
+        if (Physics.Raycast(ray, out hit, 500))
         {
             Debug.DrawLine(ray.origin, hit.point);
             hoverObject = hit.collider.gameObject;
+
+            //Debug.Log("Htting");
 
             // Hovering over gameplay objects
             if (hoverObject.CompareTag("Terrain"))
@@ -55,6 +58,7 @@ public partial class PlayerView
             if (hoverObject.CompareTag("CampainUnit"))
             {
                 ExecuteSetHoverUnitStack(hoverObject.GetComponent<UnitStackView>().UnitStack);
+                Debug.Log("Selecting unit stack");
             }
             else
             {
@@ -66,11 +70,13 @@ public partial class PlayerView
             if (Input.GetButtonDown("Mouse0"))
             {
                 // Select Unit
-                if (hoverObject.CompareTag("CampainUnit"))
+                if (hoverObject.tag == "CampainUnit")
                 {
                     ExecuteSelectUnitStack(hoverObject.GetComponent<UnitStackView>().UnitStack);
+                    Debug.Log("Selecting unit stack");
                     return;
                 }
+
                 // Select City
                 if (hoverObject.CompareTag("City"))
                 {

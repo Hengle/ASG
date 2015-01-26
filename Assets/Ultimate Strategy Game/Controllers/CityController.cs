@@ -30,5 +30,14 @@ public class CityController : CityControllerBase {
 
     }
 
+    public override void AddUnit(CityViewModel city, UnitViewModel unit)
+    {
+        city.Units.Add(unit);
+    }
+
+    public override void RemovUnit(CityViewModel city, UnitViewModel unit)
+    {
+        city.Units.Remove(unit);
+    }
 
 }

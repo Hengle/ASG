@@ -66,7 +66,48 @@ public partial class Hex : IHeapItem<Hex>
     }
 
 
+    public bool HasLandTiles ()
+    {
+        for (int i = 0; i < this.neighbors.Count; i++)
+        {
+            if (this.neighbors[i].terrainType != TerrainType.Water)
+                return true;
+        }
+        return false;
+    }
 
+    public bool HasWaterTiles()
+    {
+        for (int i = 0; i < this.neighbors.Count; i++)
+        {
+            if (this.neighbors[i].terrainType == TerrainType.Water)
+                return true;
+        }
+        return false;
+    }
+
+    public int WaterTileCount()
+    {
+        int count = 0;
+        for (int i = 0; i < this.neighbors.Count; i++)
+        {
+            if (this.neighbors[i].terrainType == TerrainType.Water)
+                count++;
+        }
+        return count;
+    }
+
+    public Hex GetHeighestNeighbor()
+    {
+        Hex heighestNeighbor = this;
+        for (int i = 0; i < this.neighbors.Count; i++)
+        {
+            if (this.neighbors[i].height > heighestNeighbor.height)
+                heighestNeighbor = this.neighbors[i];
+        }
+
+        return heighestNeighbor;
+    }
 
 
     public void SetPathParent(Hex parentHex)
@@ -103,7 +144,7 @@ public partial class Hex : IHeapItem<Hex>
         {
             // Get the score of the parent hex
             int parentScore = neighbors[pathParent].pathScore;
-            int score = (int)this.Distance(this.cubeCoord, goal.cubeCoord);
+            int score = (int)Hex.Distance(this.cubeCoord, goal.cubeCoord);
 
             // Do score logic here
             // score = calculate hight differences
@@ -185,7 +226,7 @@ public partial class Hex : IHeapItem<Hex>
 
 
 
-    public float Distance(Vector3 hex1, Vector3 hex2)
+    public static float Distance(Vector3 hex1, Vector3 hex2)
     {
         return (Mathf.Abs(hex1.x - hex2.x) + Mathf.Abs(hex1.y - hex2.y) + Mathf.Abs(hex1.z - hex2.z)) / 2;
     }
@@ -235,7 +276,7 @@ public partial class Hex : IHeapItem<Hex>
         return results;
     }
 
-    
+
     public static void SearchNeighbors(Hex hex, Func<Hex, bool> searchParams, List<Hex> result)
     {
         hex.neighbors.Where(searchParams).ToList().ForEach(t_hex =>
@@ -245,6 +286,21 @@ public partial class Hex : IHeapItem<Hex>
                 result.Add(t_hex);
                 Hex.SearchNeighbors(t_hex, searchParams, result);
             }
+        });
+    }
+
+    public static void SearchNeighbors(Hex hex, int range, Func<Hex, bool> searchParams, List<Hex> result)
+    {
+        if (range <= 0)
+            return;
+
+        hex.neighbors.Where(searchParams).ToList().ForEach(t_hex =>
+        {
+            if (result.Contains(t_hex) == false)
+            {
+                result.Add(t_hex);
+            }
+            Hex.SearchNeighbors(t_hex, range - 1, searchParams, result);
         });
     }
 
@@ -265,6 +321,8 @@ public partial class Hex : IHeapItem<Hex>
             }
         }
     }
+
+
 
     public static Hex GetHexAtPos (TerrainManagerViewModel terrainManager, Vector3 pos)
     {

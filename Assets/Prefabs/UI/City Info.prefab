@@ -289,7 +289,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: .16911763, g: .16911763, b: .16911763, a: .509803951}
+    m_NormalColor: {r: .16911763, g: .16911763, b: .16911763, a: .709803939}
     m_HighlightedColor: {r: .168627456, g: .168627456, b: .168627456, a: 1}
     m_PressedColor: {r: .168627456, g: .168627456, b: .168627456, a: 1}
     m_DisabledColor: {r: .854901969, g: .764705896, b: .619607866, a: .501960814}
@@ -466,13 +466,13 @@ MonoBehaviour:
   _Food: 0
   _Production: 0
   _Knowledge: 0
-  _Gold: 0
-  _People: 0
+  _GoldIncome: 0
   _Happieness: 0
   _BindName: 1
-  _BindPeople: 1
   _BindHappieness: 1
-  _BindGold: 1
+  _BindPopulationGrowth: 0
+  _BindPopulation: 1
+  _BindGoldIncome: 1
   cityName: {fileID: 11400016}
   cityPopulation: {fileID: 11400006}
   cityGoldIncome: {fileID: 11400018}

@@ -251,6 +251,9 @@ public abstract class UnitStackControllerBase : Controller {
     
     public virtual void PlanUnit(UnitStackViewModel unitStack) {
     }
+    
+    public virtual void DestroyStack(UnitStackViewModel unitStack) {
+    }
 }
 
 public abstract class FactionControllerBase : Controller {
@@ -321,6 +324,12 @@ public abstract class CityControllerBase : Controller {
     }
     
     public virtual void CalcConstruction(CityViewModel city) {
+    }
+    
+    public virtual void AddUnit(CityViewModel city, UnitViewModel arg) {
+    }
+    
+    public virtual void RemovUnit(CityViewModel city, UnitViewModel arg) {
     }
 }
 

@@ -171,11 +171,7 @@ LODGroup:
   m_Size: 1
   m_ScreenRelativeTransitionHeight: 0
   m_LODs:
-  - screenRelativeHeight: .300000012
-    renderers: []
-  - screenRelativeHeight: .300000012
-    renderers: []
-  - screenRelativeHeight: .300000012
+  - screenRelativeHeight: .359297276
     renderers: []
   m_Enabled: 1
 --- !u!114 &22750283
@@ -996,7 +992,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &281353507
 Renderer:
   m_ObjectHideFlags: 0
@@ -1034,7 +1030,7 @@ MonoBehaviour:
   _overrideViewModel: 1
   _resolveName: FogOfWar
   _Save: 1
-  _TerrainManager: {fileID: 0}
+  _TerrainManager: {fileID: 807931915}
   _HexBorderLegnth: 7.5
   _BindUpdateFOW: 1
   _BindUpdateUnitView: 1
@@ -1329,6 +1325,90 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 14
+--- !u!1001 &352171872
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: m_RootOrder
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: m_Name
+      value: _TerrainManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: _TerrainWidth
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: _TerrainHeight
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: water
+      value: 
+      objectReference: {fileID: 504599071}
+    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: _RiverCount
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: _MaxRiverStrength
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: _MinRiverStrength
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: biomes.Array.data[1].minTemp
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: biomes.Array.data[2].minTemp
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+      propertyPath: biomes.Array.data[2].minHum
+      value: 5
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
+  m_RootGameObject: {fileID: 807931914}
+  m_IsPrefabParent: 0
+  m_IsExploded: 1
 --- !u!1 &395672875
 GameObject:
   m_ObjectHideFlags: 0
@@ -1609,6 +1689,62 @@ RectTransform:
   m_AnchoredPosition: {x: -.000237703323, y: .00027680397}
   m_SizeDelta: {x: -5.30000019, y: -7.0999999}
   m_Pivot: {x: .5, y: .5}
+--- !u!1 &504599071
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 504599075}
+  - 33: {fileID: 504599074}
+  - 23: {fileID: 504599072}
+  m_Layer: 0
+  m_Name: Water
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!23 &504599072
+Renderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 504599071}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_LightmapIndex: 255
+  m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
+  m_Materials:
+  - {fileID: 2100000, guid: 5ee948a526bb06d47bcc281b427b90e1, type: 2}
+  m_SubsetIndices: 
+  m_StaticBatchRoot: {fileID: 0}
+  m_UseLightProbes: 0
+  m_LightProbeAnchor: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+--- !u!33 &504599074
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 504599071}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &504599075
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 504599071}
+  m_LocalRotation: {x: .707105994, y: 0, z: 0, w: .707107604}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 50, y: 50, z: 50}
+  m_Children: []
+  m_Father: {fileID: 807931916}
+  m_RootOrder: 0
 --- !u!1 &509477759
 GameObject:
   m_ObjectHideFlags: 0
@@ -2024,7 +2160,7 @@ CanvasRenderer:
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 100000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-  m_PrefabInternal: {fileID: 1688660031}
+  m_PrefabInternal: {fileID: 352171872}
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 807931916}
@@ -2041,7 +2177,7 @@ MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 11400000, guid: e6e1885184a27f046afa64e20174822a,
     type: 2}
-  m_PrefabInternal: {fileID: 1688660031}
+  m_PrefabInternal: {fileID: 352171872}
   m_GameObject: {fileID: 807931914}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -2067,10 +2203,10 @@ MonoBehaviour:
   _Detail: .75
   _AltitudeVariation: .913999975
   _HexagonSide: 30
-  _RiverCount: 0
+  _RiverCount: 10
   _MinRiverHeight: 5
-  _MinRiverStrength: 8
-  _MaxRiverStrength: 8
+  _MinRiverStrength: 10
+  _MaxRiverStrength: 20
   _MinLakeSize: 6
   _MaxLakeSize: 20
   _Humidity: 0
@@ -2162,6 +2298,7 @@ MonoBehaviour:
   terrainHeightMap: {fileID: 0}
   displayHexNodes: 0
   displayHexPath: 0
+  substance: {fileID: 0}
   colors:
   - {r: .117241383, g: 0, b: 1, a: 0}
   - {r: .903448343, g: 1, b: 0, a: 0}
@@ -2175,15 +2312,15 @@ MonoBehaviour:
     minHum: 100
     color: {r: 0, g: 0, b: 0, a: 0}
   - name: Jungle
-    minTemp: 30
+    minTemp: 20
     minHum: 40
     color: {r: 0, g: .242647052, b: 0, a: 0}
   - name: Forest
-    minTemp: 30
-    minHum: 15
+    minTemp: 15
+    minHum: 5
     color: {r: .392662287, g: .544117689, b: 0, a: 0}
   - name: Desert
-    minTemp: 15
+    minTemp: 20
     minHum: 0
     color: {r: .929411769, g: .850980401, b: .505882382, a: 0}
   - name: 'Temperate Rainforest '
@@ -2192,14 +2329,14 @@ MonoBehaviour:
     color: {r: .345098048, g: .505882382, b: .34117648, a: 0}
   - name: Temperate Forest
     minTemp: 10
-    minHum: 15
+    minHum: 10
     color: {r: .587625682, g: 1, b: .352941155, a: 0}
   - name: Grass Land
     minTemp: 10
     minHum: 5
     color: {r: .815916896, g: .852941155, b: .181877181, a: 0}
   - name: Alpine Tundra
-    minTemp: 0
+    minTemp: -5
     minHum: 10
     color: {r: .228427753, g: .477941155, b: .294475406, a: 0}
   - name: Tundra
@@ -2210,16 +2347,18 @@ MonoBehaviour:
     minTemp: -50
     minHum: 0
     color: {r: .852941155, g: .852941155, b: .852941155, a: 0}
+  water: {fileID: 504599071}
 --- !u!4 &807931916
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-  m_PrefabInternal: {fileID: 1688660031}
+  m_PrefabInternal: {fileID: 352171872}
   m_GameObject: {fileID: 807931914}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 504599075}
   m_Father: {fileID: 0}
   m_RootOrder: 9
 --- !u!1 &809109562
@@ -2541,7 +2680,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: .0588235259, g: .0588235259, b: .0588235259, a: .0196078438}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: .0196078438}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -3875,54 +4014,6 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1639589824}
---- !u!1001 &1688660031
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_RootOrder
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-      propertyPath: m_Name
-      value: _TerrainManager
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: e6e1885184a27f046afa64e20174822a, type: 2}
-  m_RootGameObject: {fileID: 807931914}
-  m_IsPrefabParent: 0
-  m_IsExploded: 1
 --- !u!1 &1704972291
 GameObject:
   m_ObjectHideFlags: 0
@@ -4096,6 +4187,18 @@ Prefab:
     - target: {fileID: 2000000, guid: b982e78718ebff64cb09e531017184d8, type: 2}
       propertyPath: m_CullingMask.m_Bits
       value: 4294966527
+      objectReference: {fileID: 0}
+    - target: {fileID: 2000000, guid: b982e78718ebff64cb09e531017184d8, type: 2}
+      propertyPath: m_BackGroundColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2000000, guid: b982e78718ebff64cb09e531017184d8, type: 2}
+      propertyPath: m_BackGroundColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2000000, guid: b982e78718ebff64cb09e531017184d8, type: 2}
+      propertyPath: m_BackGroundColor.b
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b982e78718ebff64cb09e531017184d8, type: 2}
@@ -4584,7 +4687,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2030812319}
-  m_LocalRotation: {x: .408217937, y: -.234569728, z: .109381661, w: .875426114}
+  m_LocalRotation: {x: -.397131264, y: .309975564, z: -.14454399, w: -.851650715}
   m_LocalPosition: {x: 80.3313522, y: -4.5, z: 94.1110992}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []

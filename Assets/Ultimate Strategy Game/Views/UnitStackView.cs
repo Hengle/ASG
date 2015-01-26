@@ -51,15 +51,22 @@ public partial class UnitStackView
 
     public void MoveToDestination()
     {
-        if (UnitStack.NextHexInPath != null)
+        if (_transform && UnitStack.NextHexInPath != null)
         {
             _transform.position = Vector3.MoveTowards(_transform.position, UnitStack.NextHexInPath.worldPos + Vector3.up * 0.6f, moveSpeed * Time.fixedDeltaTime);
         }
     }
 
+    public override void DestroyStackExecuted()
+    {
+        Destroy(this.gameObject);
+    }
 
     protected override IObservable<Vector3> GetWorldPosObservable()
     {
-        return PositionAsObservable;
+        return PositionAsObservable;    
     }
+
+
+
 }

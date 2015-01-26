@@ -230,14 +230,22 @@ public class TerrainManagerController : TerrainManagerControllerBase
         Timer.Start("Generating rivers");
 
         int totalRivers = 0;
-        int riverStrength = 0;
-        int randomX, randomY;
-        Hex nextHex = null;
         int iterations = 0;
 
+
+
+        Hex nextRiverHex = null;
+        int riverStrength = 0;
+        int direction = 0;
+        int directionChangeChance = 0;
+
+
+        //if (terrainManager.waterTiles.Count == 0) return;
+
         // Keep creating rivers unitStack we are done
-        while (totalRivers < terrainManager.RiverCount && iterations <= 100)
+        while (totalRivers < terrainManager.RiverCount)
         {
+            /*
             // Get a new hex of the minimum height
             while (nextHex == null && iterations <= 100)
             {
@@ -254,35 +262,61 @@ public class TerrainManagerController : TerrainManagerControllerBase
                     Debug.Log("Started river " + nextHex.arrayCoord);
                     
                 }               
+            }*/
+
+            // Get a new hex of the minimum height
+            while (nextRiverHex == null)
+            {
+                nextRiverHex = terrainManager.hexGrid[(int)UnityEngine.Random.Range(0, terrainManager.TerrainWidth), (int)UnityEngine.Random.Range(0, terrainManager.TerrainHeight)];
+
+                if (terrainManager.waterTiles.Contains(nextRiverHex) || terrainManager.riverTiles.Contains(nextRiverHex))
+                {
+                    nextRiverHex = null;
+                    continue;
+                }
+
+                totalRivers++;
+
+                riverStrength = (int)UnityEngine.Random.Range(terrainManager.MinRiverStrength, terrainManager.MaxRiverStrength);
+                
+                nextRiverHex.terrainType = TerrainType.River;
+                nextRiverHex.RiverStrength = riverStrength;
+                direction = (int)UnityEngine.Random.Range(0, 5); 
+
             }
+
 
             while (riverStrength > 0)
             {
-                /* Got down the path fo the lowest neighbor height
-                for (int n = 0; n < 6; n++)
+
+                if (directionChangeChance > 2)
                 {
-                    if (nextHex.neighbors[n] != null && nextHex.neighbors[n].heightmapHeight < nextHex.heightmapHeight)
-                    {
-                        nextHex = nextHex.neighbors[n];
-                        break;
-                    }else{
-                        if (n == 5)
-                            nextHex = nextHex.neighbors[(int)UnityEngine.Random.Range(0, 5)];
-                    }
-                    
-                }*/
+                    direction += (int)(UnityEngine.Random.Range(-1, 1));
+                    directionChangeChance = 0;
+                }
 
-                nextHex = nextHex.neighbors[(int)UnityEngine.Random.Range(0, 5)];
+                if (direction > 5)
+                    direction = 0;
 
-                nextHex.RiverStrength = riverStrength;
-                //nextHex.terrainType = TerrainType.Water;
-                terrainManager.waterTiles.Add(nextHex);
-                Debug.Log("Flowing " + nextHex.arrayCoord);
+                if (direction < 0)
+                    direction = 5;
 
+                if (nextRiverHex.neighbors.Count - 1 < direction)
+                    break;
+
+                nextRiverHex = nextRiverHex.neighbors[direction];
+
+
+                nextRiverHex.RiverStrength = riverStrength;
+
+                nextRiverHex.terrainType = TerrainType.River;
+                terrainManager.riverTiles.Add(nextRiverHex);
+
+                directionChangeChance++;
                 riverStrength--;
             }
 
-            nextHex = null;
+            nextRiverHex = null;
         }
 
         Timer.End();
@@ -297,10 +331,25 @@ public class TerrainManagerController : TerrainManagerControllerBase
             Hex.HumiditySpread(terrainManager.waterTiles[i], 3, 50, terrainManager.HumidySpreadDecrease, terrainManager.waterTiles);
         }
         // loop through rivers
-        //for (int i = 0; i < terrainManager.seaLevelHexes.Count; i++)
-        //{
-        //    Hex.RainfallSpread(terrainManager.seaLevelHexes[i], 10, 10, terrainManager.seaLevelHexes);
-        //}
+        for (int i = 0; i < terrainManager.riverTiles.Count; i++)
+        {
+            Hex.HumiditySpread(terrainManager.riverTiles[i], 15, 30, 3, terrainManager.riverTiles);
+        }
+
+        int randomHumiditySpread = 10;
+        int humMin = 5;
+        int humMax = 30;
+        int rangeMin = 4;
+        int rangeMax = 30;
+
+
+
+        for (int i = 0; i < randomHumiditySpread; i++)
+        {
+            Hex.HumiditySpread(terrainManager.GetRandomLandTile(), UnityEngine.Random.Range(rangeMin, rangeMax), UnityEngine.Random.Range(humMin, humMax), 3, terrainManager.riverTiles);
+        }
+
+
         Timer.End();
     }
 

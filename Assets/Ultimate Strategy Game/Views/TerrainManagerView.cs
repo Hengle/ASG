@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UniRx;
+using UnityThreading;
+
 
 
 public partial class TerrainManagerView
@@ -12,6 +14,7 @@ public partial class TerrainManagerView
     public GameObject chunkPrefab;
 
 
+    private int createdElements;
 
     public Texture2D terrainHeightMap;
 
@@ -32,6 +35,7 @@ public partial class TerrainManagerView
     RenderTexture renderTexture;
     Material material;
 
+    public ProceduralMaterial substance;
 
     public Color[] colors;
 
@@ -46,11 +50,17 @@ public partial class TerrainManagerView
         public Color color;
     }
 
+    public GameObject water;
+
 
 
     public override void Start()
     {
         base.Start();
+
+        Debug.Log(SystemInfo.processorCount);
+        Debug.Log(ThreadBase.AvailableProcessors);
+
 
         // create material for GL rendering //
         material = new Material(Shader.Find("GUI/Text Shader"));
@@ -58,6 +68,10 @@ public partial class TerrainManagerView
         material.shader.hideFlags = HideFlags.HideAndDontSave;
     }
 
+    public void Test ()
+    {
+        Debug.Log("Testing");
+    }
 
 
     /// Invokes GenerateMapExecuted when the GenerateMap command is executed.
@@ -77,11 +91,21 @@ public partial class TerrainManagerView
         ChunkView.collisionResolution = TerrainManager.ChunkCollisionResolution;
         ChunkView.pixelsPerUnit = TerrainManager.PixelsPerUnit;
 
+        GenerateWater();
         GenerateChunkTextures();
 
         StartCoroutine(TimedChunkGeneration());
-
+        Debug.Log(Hex.Distance(TerrainManager.hexGrid[0, 0].worldPos, TerrainManager.hexGrid[0, 1].worldPos));
     }
+
+    private void GenerateWater ()
+    {
+        float size = TerrainManager.TerrainWidth * HexProperties.width / TerrainManager.PixelsPerUnit;
+
+        water.transform.position = new Vector3(size / 2, 1.3f, size / 2);
+        water.transform.localScale = new Vector3(size, size, size);
+    }
+
 
     private IEnumerator TimedChunkGeneration()
     {
@@ -92,12 +116,13 @@ public partial class TerrainManagerView
 
         for (int x = 0; x < TerrainManager.Chunks.GetLength(0); x++)
         {
+          
             for (int y = 0; y < TerrainManager.Chunks.GetLength(1); y++)
             {
 
                 chunkPos = new Vector3(TerrainManager.Chunks[x, y].ChunkX * (TerrainManager.ChunkSize / TerrainManager.PixelsPerUnit),
-                                       0,
-                                       TerrainManager.Chunks[x, y].ChunkY * (TerrainManager.ChunkSize / TerrainManager.PixelsPerUnit));
+                                        0,
+                                        TerrainManager.Chunks[x, y].ChunkY * (TerrainManager.ChunkSize / TerrainManager.PixelsPerUnit));
 
                 var chunkObj = InstantiateView(chunkPrefab, TerrainManager.Chunks[x, y], chunkPos, Quaternion.identity);
                 chunks[x, y] = chunkObj.gameObject;
@@ -111,10 +136,13 @@ public partial class TerrainManagerView
 
                 ExecuteCommand(TerrainManager.Chunks[x, y].GenerateChunk);
 
+
                 yield return null;
 
             }
+            
         }
+
         StitchChunks();
         yield return null;
     }
@@ -314,6 +342,7 @@ public partial class TerrainManagerView
         GL.Begin(GL.TRIANGLES);
         GL.Color(Color.red);
 
+
         for (int x = dataX; x <= dataX + chunkHexCountX + chunkX && x < TerrainManager.TerrainWidth; x++)
         {
             for (int y = dataY; y <= dataY + chunkHexCountY + chunkY && y < TerrainManager.TerrainHeight; y++)
@@ -326,8 +355,8 @@ public partial class TerrainManagerView
 
 
 
-                
-                if (TerrainManager.hexGrid[x, y].terrainType == TerrainType.Water)
+
+                if (TerrainManager.hexGrid[x, y].terrainType == TerrainType.Water || TerrainManager.hexGrid[x, y].terrainType == TerrainType.River)
                 {
                     GL.Color(Color.blue);
                     //GL.Color(new Color(colors[TerrainManager.hexGrid[x, y].height - 1].r, colors[TerrainManager.hexGrid[x, y].height - 1].g, colors[TerrainManager.hexGrid[x, y].height - 1].b));

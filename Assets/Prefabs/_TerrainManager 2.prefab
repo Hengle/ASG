@@ -174,7 +174,7 @@ MonoBehaviour:
     minHum: 15
     color: {r: .392662287, g: .544117689, b: 0, a: 0}
   - name: Desert
-    minTemp: 15
+    minTemp: 20
     minHum: 0
     color: {r: .929411769, g: .850980401, b: .505882382, a: 0}
   - name: 'Temperate Rainforest '
@@ -183,14 +183,14 @@ MonoBehaviour:
     color: {r: .345098048, g: .505882382, b: .34117648, a: 0}
   - name: Temperate Forest
     minTemp: 10
-    minHum: 15
+    minHum: 10
     color: {r: .587625682, g: 1, b: .352941155, a: 0}
   - name: Grass Land
     minTemp: 10
     minHum: 5
     color: {r: .815916896, g: .852941155, b: .181877181, a: 0}
   - name: Alpine Tundra
-    minTemp: 0
+    minTemp: -5
     minHum: 10
     color: {r: .228427753, g: .477941155, b: .294475406, a: 0}
   - name: Tundra

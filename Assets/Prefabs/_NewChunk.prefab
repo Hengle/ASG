@@ -110,11 +110,7 @@ LODGroup:
   m_Size: 1
   m_ScreenRelativeTransitionHeight: 0
   m_LODs:
-  - screenRelativeHeight: .300000012
-    renderers: []
-  - screenRelativeHeight: .300000012
-    renderers: []
-  - screenRelativeHeight: .300000012
+  - screenRelativeHeight: .359297276
     renderers: []
   m_Enabled: 1
 --- !u!1001 &100100000

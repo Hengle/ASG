@@ -26,7 +26,7 @@ public partial class FactionView
     /// This binding will add or remove views based on an element/viewmodel collection.
     public override ViewBase CreateUnitStacksView(UnitStackViewModel item) 
     {
-        var unitStack = InstantiateView(unitStackPrefab, item, item.HexLocation.worldPos, Quaternion.identity);
+        var unitStack = InstantiateView(unitStackPrefab, item, item.HexLocation.worldPos + Vector3.up * 0.6f, Quaternion.identity);
 
         // Use the properties used in the inspector
         unitStack.InitializeData(item);

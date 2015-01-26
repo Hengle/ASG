@@ -133,7 +133,7 @@ SubstanceImporter:
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
-        texture: {fileID: 2800000, guid: 064dc8e4e1c59da47a58454f8c385bc5, type: 3}
+        texture: {fileID: 2800000, guid: 71fb97b8a48261041bb0fc7b573c4765, type: 3}
     - name: ocean_blur
       value:
         scalar[0]: .331
@@ -164,7 +164,7 @@ SubstanceImporter:
         texture: {instanceID: 0}
     - name: texture_height_blend
       value:
-        scalar[0]: .400000006
+        scalar[0]: .416000009
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
@@ -210,7 +210,7 @@ SubstanceImporter:
         scalar[1]: 0
         scalar[2]: 0
         scalar[3]: 0
-        texture: {fileID: 2800000, guid: a56038cb0db403b45a496bcf8ba73686, type: 3}
+        texture: {fileID: 2800000, guid: 227e61866e587554d8ce63c75bbd9f8f, type: 3}
     - name: jungle_mask
       value:
         scalar[0]: 0

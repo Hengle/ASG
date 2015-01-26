@@ -60,9 +60,23 @@ public class UnitStackController : UnitStackControllerBase {
     public override void RemoveUnit(UnitStackViewModel unitStack, UnitViewModel unit)
     {
         unitStack.Units.Remove(unit);
+
+        if (unitStack.Units.Count == 0)
+        {
+            ExecuteCommand(unitStack.DestroyStack, unitStack);
+            return;
+        }
+
         unitStack.LeadingUnit = unitStack.Units[0];
     }
 
+    public override void DestroyStack(UnitStackViewModel unitStack)
+    {
+        for (int i = 0; i < unitStack.Units.Count; i++)
+        {
+            ExecuteCommand(unitStack.RemoveUnit, unitStack.Units[i]);
+        }
+    }
 
     public override void PlanMovement(UnitStackViewModel unitStack)
     {
@@ -189,6 +203,7 @@ public class UnitStackController : UnitStackControllerBase {
            }
         }
 
+        // Create city data
         CityViewModel city = new CityViewModel(CityController)
         {
             Name = "City " + (int)UnityEngine.Random.Range(0, 100),
@@ -198,14 +213,23 @@ public class UnitStackController : UnitStackControllerBase {
             PopulationGrowth = 0.02f,
             HexLocation = settleHex
         };
+        // Remove the settler once the city has been founded
+        ExecuteCommand(unitStack.RemoveUnit, settler);           
+
+
+        // Move all units from stack into the city
+        for (int i = 0; i < unitStack.Units.Count; i++)
+        {
+            ExecuteCommand(city.AddUnit, unitStack.Units[i]);           
+        }
+
 
         unitStack.ParentFaction.Cities.Add(city);
 
         unitStack.StackState = StackState.Idling;
         unitStack.SettlingLocation = null;
         unitStack.PlannedSettlingLocation = null;
-
-        ExecuteCommand(unitStack.RemoveUnit, settler);
+        ExecuteCommand(unitStack.DestroyStack, unitStack);
     }
 
 

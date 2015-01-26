@@ -519,6 +519,10 @@ public abstract class UnitStackViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public ViewBase _CityDestination;
     
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _ViewRange;
+    
     public override System.Type ViewModelType {
         get {
             return typeof(UnitStackViewModel);
@@ -549,6 +553,7 @@ public abstract class UnitStackViewBase : ViewBase {
         unitStack.PlannedAction = this._PlannedAction;
         unitStack.UnitStackDestination = this._UnitStackDestination == null ? null : this._UnitStackDestination.ViewModelObject as UnitStackViewModel;
         unitStack.CityDestination = this._CityDestination == null ? null : this._CityDestination.ViewModelObject as CityViewModel;
+        unitStack.ViewRange = this._ViewRange;
     }
     
     public virtual void ExecuteNextTurnCalculation() {
@@ -605,6 +610,10 @@ public abstract class UnitStackViewBase : ViewBase {
     
     public virtual void ExecutePlanUnit() {
         this.ExecuteCommand(UnitStack.PlanUnit);
+    }
+    
+    public virtual void ExecuteDestroyStack() {
+        this.ExecuteCommand(UnitStack.DestroyStack);
     }
 }
 
@@ -742,6 +751,14 @@ public abstract class CityViewBase : ViewBase {
     
     public virtual void ExecuteCalcConstruction() {
         this.ExecuteCommand(City.CalcConstruction);
+    }
+    
+    public virtual void ExecuteAddUnit(UnitViewModel unit) {
+        this.ExecuteCommand(City.AddUnit, unit);
+    }
+    
+    public virtual void ExecuteRemovUnit(UnitViewModel unit) {
+        this.ExecuteCommand(City.RemovUnit, unit);
     }
 }
 
@@ -1511,6 +1528,10 @@ public class UnitStackViewViewBase : UnitStackViewBase {
     [UnityEngine.HideInInspector()]
     public bool _BindSettle = true;
     
+    [UFToggleGroup("DestroyStack")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindDestroyStack = true;
+    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
     }
@@ -1547,6 +1568,10 @@ public class UnitStackViewViewBase : UnitStackViewBase {
     public virtual void SettleExecuted() {
     }
     
+    /// Invokes DestroyStackExecuted when the DestroyStack command is executed.
+    public virtual void DestroyStackExecuted() {
+    }
+    
     public virtual void ResetWorldPos() {
         if (_WorldPosDisposable != null) _WorldPosDisposable.Dispose();
         _WorldPosDisposable = GetWorldPosObservable().Subscribe(UnitStack._WorldPosProperty).DisposeWith(this);
@@ -1577,6 +1602,9 @@ public class UnitStackViewViewBase : UnitStackViewBase {
         }
         if (this._BindSettle) {
             this.BindCommandExecuted(UnitStack.Settle, SettleExecuted);
+        }
+        if (this._BindDestroyStack) {
+            this.BindCommandExecuted(UnitStack.DestroyStack, DestroyStackExecuted);
         }
     }
 }
