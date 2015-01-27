@@ -27,7 +27,7 @@ public class TerrainManagerController : TerrainManagerControllerBase
         GenerateTerrainData        (terrainManager);
         TerrainDataToHexagonGrid   (terrainManager);
         SetupHexagonGridNeighbors  (terrainManager);
-        CalculateWaterPools             (terrainManager);
+        CalculateWaterPools        (terrainManager);
         GenerateRivers             (terrainManager);
         CalculateHumidity          (terrainManager);
         CalculateTemperature       (terrainManager);

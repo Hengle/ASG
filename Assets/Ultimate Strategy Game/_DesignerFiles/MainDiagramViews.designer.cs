@@ -1049,6 +1049,10 @@ public abstract class FogOfWarViewBase : ViewBase {
     public virtual void ExecuteUpdateUnitView(UnitStackViewModel unitStack) {
         this.ExecuteCommand(FogOfWar.UpdateUnitView, unitStack);
     }
+    
+    public virtual void ExecuteCalculateFOW(FactionViewModel faction) {
+        this.ExecuteCommand(FogOfWar.CalculateFOW, faction);
+    }
 }
 
 public class ChunkViewViewBase : ChunkViewBase {
@@ -1387,7 +1391,7 @@ public class CityViewViewBase : CityViewBase {
 public partial class CityView : CityViewViewBase {
 }
 
-public class UnitStackUnitsUIViewBase : PlayerViewBase {
+public class UnitCardsUIViewBase : PlayerViewBase {
     
     [UFToggleGroup("SelectedUnitStack")]
     [UnityEngine.HideInInspector()]
@@ -1424,7 +1428,7 @@ public class UnitStackUnitsUIViewBase : PlayerViewBase {
     }
 }
 
-public partial class UnitStackUnitsUI : UnitStackUnitsUIViewBase {
+public partial class UnitCardsUI : UnitCardsUIViewBase {
 }
 
 public class UnitSlotViewBase : UnitViewBase {

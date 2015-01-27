@@ -2561,6 +2561,8 @@ public partial class FactionViewModel : FactionViewModelBase {
     
     private PlayerViewModel _ParentPlayer;
     
+    private FogOfWarViewModel _ParentFogOfWar;
+    
     public FactionViewModel(FactionControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
     }
@@ -2656,6 +2658,15 @@ public partial class FactionViewModel : FactionViewModelBase {
         }
         set {
             _ParentPlayer = value;
+        }
+    }
+    
+    public virtual FogOfWarViewModel ParentFogOfWar {
+        get {
+            return this._ParentFogOfWar;
+        }
+        set {
+            _ParentFogOfWar = value;
         }
     }
     
@@ -3826,6 +3837,8 @@ public class FogOfWarViewModelBase : ViewModel {
     
     protected CommandWithSenderAndArgument<FogOfWarViewModel, UnitStackViewModel> _UpdateUnitView;
     
+    protected CommandWithSenderAndArgument<FogOfWarViewModel, FactionViewModel> _CalculateFOW;
+    
     public FogOfWarViewModelBase(FogOfWarControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
     }
@@ -3900,10 +3913,20 @@ public partial class FogOfWarViewModel : FogOfWarViewModelBase {
         }
     }
     
+    public virtual CommandWithSenderAndArgument<FogOfWarViewModel, FactionViewModel> CalculateFOW {
+        get {
+            return _CalculateFOW;
+        }
+        set {
+            _CalculateFOW = value;
+        }
+    }
+    
     protected override void WireCommands(Controller controller) {
         var fogOfWar = controller as FogOfWarControllerBase;
         this.UpdateFOW = new CommandWithSender<FogOfWarViewModel>(this, fogOfWar.UpdateFOW);
         this.UpdateUnitView = new CommandWithSenderAndArgument<FogOfWarViewModel, UnitStackViewModel>(this, fogOfWar.UpdateUnitView);
+        this.CalculateFOW = new CommandWithSenderAndArgument<FogOfWarViewModel, FactionViewModel>(this, fogOfWar.CalculateFOW);
     }
     
     public override void Write(ISerializerStream stream) {
@@ -3932,6 +3955,7 @@ public partial class FogOfWarViewModel : FogOfWarViewModelBase {
         base.FillCommands(list);;
         list.Add(new ViewModelCommandInfo("UpdateFOW", UpdateFOW) { ParameterType = typeof(void) });
         list.Add(new ViewModelCommandInfo("UpdateUnitView", UpdateUnitView) { ParameterType = typeof(UnitStackViewModel) });
+        list.Add(new ViewModelCommandInfo("CalculateFOW", CalculateFOW) { ParameterType = typeof(FactionViewModel) });
     }
 }
 

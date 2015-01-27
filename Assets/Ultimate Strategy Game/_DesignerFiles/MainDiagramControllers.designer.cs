@@ -263,6 +263,7 @@ public abstract class FactionControllerBase : Controller {
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public PlayerController PlayerController {get;set;}
+    [Inject] public FogOfWarController FogOfWarController {get;set;}
     [Inject] public UnitController UnitController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
     [Inject] public CityController CityController {get;set;}
@@ -487,6 +488,7 @@ public abstract class FogOfWarControllerBase : Controller {
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public TerrainManagerController TerrainManagerController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
+    [Inject] public FactionController FactionController {get;set;}
     public abstract void InitializeFogOfWar(FogOfWarViewModel fogOfWar);
     
     public override ViewModel CreateEmpty() {
@@ -505,5 +507,8 @@ public abstract class FogOfWarControllerBase : Controller {
     }
     
     public virtual void UpdateUnitView(FogOfWarViewModel fogOfWar, UnitStackViewModel arg) {
+    }
+    
+    public virtual void CalculateFOW(FogOfWarViewModel fogOfWar, FactionViewModel arg) {
     }
 }

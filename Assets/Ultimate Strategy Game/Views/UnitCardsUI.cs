@@ -7,7 +7,7 @@ using UniRx;
 using UnityEngine.UI;
 
 
-public partial class UnitStackUnitsUI {
+public partial class UnitCardsUI {
 
     public RectTransform unitSlotsContainer;
     public GameObject unitSlotPrefab;
@@ -91,7 +91,7 @@ public partial class UnitStackUnitsUI {
         GameObject newUnitSlot;
         for (int i = 0; i < unitSlotCount; i++)
         {
-            newUnitSlot = Instantiate(unitSlotPrefab) as GameObject;
+            newUnitSlot = Instantiate(unitSlotPrefab, Vector3.zero, Camera.main.transform.rotation) as GameObject;
 
             newUnitSlot.transform.SetParent(unitSlotsContainer.transform);
 

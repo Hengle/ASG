@@ -88,6 +88,8 @@ public class GameLogicController : GameLogicControllerBase
             GiveStarterUnits(player);
         }
 
+        ExecuteCommand(FogOfWar.CalculateFOW, gameLogic.HumanPlayer.Faction);
+
     }
 
     private void GiveStarterUnits (PlayerViewModel player)

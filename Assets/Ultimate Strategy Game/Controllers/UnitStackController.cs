@@ -17,8 +17,10 @@ public class UnitStackController : UnitStackControllerBase {
         // Calculate hex
         unitStack.WorldPosProperty.Subscribe(pos => CalculateHexLocation(unitStack, pos));
 
+
         // make sure to later dispose of this command somehow
-        unitStack._HexLocationProperty.Subscribe(hex => ExecuteCommand(FogOfWar.UpdateUnitView, unitStack));
+        //ExecuteCommand(FogOfWar.CalculateFOW, unitStack);
+        unitStack.HexLocationProperty.Subscribe(hex => ExecuteCommand(FogOfWar.CalculateFOW, unitStack.ParentFaction));
 
 
 
