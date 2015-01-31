@@ -635,6 +635,10 @@ public abstract class UnitStackViewBase : ViewBase {
     public virtual void ExecuteDeselect() {
         this.ExecuteCommand(UnitStack.Deselect);
     }
+    
+    public virtual void ExecutePlanSelectedUnitsMovement() {
+        this.ExecuteCommand(UnitStack.PlanSelectedUnitsMovement);
+    }
 }
 
 [DiagramInfoAttribute("Ultimate Strategy Game")]
@@ -1761,10 +1765,6 @@ public class UnitStackActionsViewViewBase : UnitStackViewBase {
     [UFRequireInstanceMethod("SettlingLocationChanged")]
     public bool _BindSettlingLocation = true;
     
-    [UFToggleGroup("Path")]
-    [UnityEngine.HideInInspector()]
-    public bool _BindPath = true;
-    
     [UFToggleGroup("Select")]
     [UnityEngine.HideInInspector()]
     public bool _BindSelect = true;
@@ -1772,6 +1772,14 @@ public class UnitStackActionsViewViewBase : UnitStackViewBase {
     [UFToggleGroup("Deselect")]
     [UnityEngine.HideInInspector()]
     public bool _BindDeselect = true;
+    
+    [UFToggleGroup("Path")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindPath = true;
+    
+    [UFToggleGroup("MoveSelectedUnits")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindMoveSelectedUnits = true;
     
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
@@ -1801,6 +1809,14 @@ public class UnitStackActionsViewViewBase : UnitStackViewBase {
     public virtual void SettlingLocationChanged(Hex value) {
     }
     
+    /// Invokes SelectExecuted when the Select command is executed.
+    public virtual void SelectExecuted() {
+    }
+    
+    /// Invokes DeselectExecuted when the Deselect command is executed.
+    public virtual void DeselectExecuted() {
+    }
+    
     /// Subscribes to collection modifications.  Add & Remove methods are invoked for each modification.
     public virtual void PathAdded(Hex item) {
     }
@@ -1809,12 +1825,8 @@ public class UnitStackActionsViewViewBase : UnitStackViewBase {
     public virtual void PathRemoved(Hex item) {
     }
     
-    /// Invokes SelectExecuted when the Select command is executed.
-    public virtual void SelectExecuted() {
-    }
-    
-    /// Invokes DeselectExecuted when the Deselect command is executed.
-    public virtual void DeselectExecuted() {
+    /// Invokes MoveSelectedUnitsExecuted when the MoveSelectedUnits command is executed.
+    public virtual void MoveSelectedUnitsExecuted() {
     }
     
     public override void Bind() {
@@ -1837,14 +1849,17 @@ public class UnitStackActionsViewViewBase : UnitStackViewBase {
         if (this._BindSettlingLocation) {
             this.BindProperty(UnitStack._SettlingLocationProperty, this.SettlingLocationChanged);
         }
-        if (this._BindPath) {
-            this.BindCollection(UnitStack._PathProperty, PathAdded, PathRemoved);
-        }
         if (this._BindSelect) {
             this.BindCommandExecuted(UnitStack.Select, SelectExecuted);
         }
         if (this._BindDeselect) {
             this.BindCommandExecuted(UnitStack.Deselect, DeselectExecuted);
+        }
+        if (this._BindPath) {
+            this.BindCollection(UnitStack._PathProperty, PathAdded, PathRemoved);
+        }
+        if (this._BindMoveSelectedUnits) {
+            this.BindCommandExecuted(UnitStack.MoveSelectedUnits, MoveSelectedUnitsExecuted);
         }
     }
 }

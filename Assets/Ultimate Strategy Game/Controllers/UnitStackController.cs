@@ -96,7 +96,14 @@ public class UnitStackController : UnitStackControllerBase {
         unitStack.PlannedAction = PlanedAction.Move;
 
         ExecuteCommand(unitStack.EvaluateMovementPath, unitStack.ParentPlayer.SelectedHex);
+        unitStack.ParentPlayer._SelectedHexProperty.Subscribe(hex => ExecuteCommand(unitStack.EvaluateMovementPath, hex)).DisposeWhenChanged(unitStack._PlannedActionProperty);
+    }
 
+    public override void PlanSelectedUnitsMovement(UnitStackViewModel unitStack)
+    {
+        unitStack.PlannedAction = PlanedAction.Move;
+
+        ExecuteCommand(unitStack.EvaluateMovementPath, unitStack.ParentPlayer.SelectedHex);
         unitStack.ParentPlayer._SelectedHexProperty.Subscribe(hex => ExecuteCommand(unitStack.EvaluateMovementPath, hex)).DisposeWhenChanged(unitStack._PlannedActionProperty);
     }
 
@@ -115,8 +122,6 @@ public class UnitStackController : UnitStackControllerBase {
         unitStack.ParentPlayer._SelectedHexProperty.Subscribe(hex => ExecuteCommand(unitStack.EvaluateSettlingLocation, hex)).DisposeWhenChanged(unitStack._PlannedActionProperty);
 
     }
-
-
 
     public override void EvaluateMovementPath(UnitStackViewModel unitStack, Hex destination)
     {
@@ -242,6 +247,8 @@ public class UnitStackController : UnitStackControllerBase {
         ExecuteCommand(newUnitStack.Move, destination);
 
         unitStack.ParentPlayer.SelectedUnits.Clear();
+        unitStack.Path.Clear();
+        unitStack.PathDestination = null;
     }
     
 

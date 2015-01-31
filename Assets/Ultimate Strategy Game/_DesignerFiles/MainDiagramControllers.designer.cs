@@ -269,6 +269,9 @@ public abstract class UnitStackControllerBase : Controller {
     
     public virtual void Deselect(UnitStackViewModel unitStack) {
     }
+    
+    public virtual void PlanSelectedUnitsMovement(UnitStackViewModel unitStack) {
+    }
 }
 
 public abstract class FactionControllerBase : Controller {

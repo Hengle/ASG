@@ -1855,6 +1855,8 @@ public class UnitStackViewModelBase : ViewModel {
     
     protected CommandWithSender<UnitStackViewModel> _Deselect;
     
+    protected CommandWithSender<UnitStackViewModel> _PlanSelectedUnitsMovement;
+    
     public UnitStackViewModelBase(UnitStackControllerBase controller, bool initialize = true) : 
             base(controller, initialize) {
     }
@@ -2420,6 +2422,15 @@ public partial class UnitStackViewModel : UnitStackViewModelBase {
         }
     }
     
+    public virtual CommandWithSender<UnitStackViewModel> PlanSelectedUnitsMovement {
+        get {
+            return _PlanSelectedUnitsMovement;
+        }
+        set {
+            _PlanSelectedUnitsMovement = value;
+        }
+    }
+    
     public virtual PlayerViewModel ParentPlayer {
         get {
             return this._ParentPlayer;
@@ -2476,6 +2487,7 @@ public partial class UnitStackViewModel : UnitStackViewModelBase {
         this.DestroyStack = new CommandWithSender<UnitStackViewModel>(this, unitStack.DestroyStack);
         this.Select = new CommandWithSender<UnitStackViewModel>(this, unitStack.Select);
         this.Deselect = new CommandWithSender<UnitStackViewModel>(this, unitStack.Deselect);
+        this.PlanSelectedUnitsMovement = new CommandWithSender<UnitStackViewModel>(this, unitStack.PlanSelectedUnitsMovement);
     }
     
     public override void Write(ISerializerStream stream) {
@@ -2572,6 +2584,7 @@ if (stream.DeepSerialize) {
         list.Add(new ViewModelCommandInfo("DestroyStack", DestroyStack) { ParameterType = typeof(void) });
         list.Add(new ViewModelCommandInfo("Select", Select) { ParameterType = typeof(void) });
         list.Add(new ViewModelCommandInfo("Deselect", Deselect) { ParameterType = typeof(void) });
+        list.Add(new ViewModelCommandInfo("PlanSelectedUnitsMovement", PlanSelectedUnitsMovement) { ParameterType = typeof(void) });
     }
     
     protected override void UnitsCollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs args) {

@@ -111,19 +111,14 @@ public partial class UnitStackActionsView
 
     private void UpdateMovementPath ()
     {
-        // Set the verts of the line to match the planned path
-        if (UnitStack.Path != null)
-        {
-            lineRenderer.SetVertexCount(UnitStack.Path.Count);
-            lineRenderer.SetColors(Color.green, Color.red);
+        lineRenderer.SetVertexCount(UnitStack.Path.Count);
+        lineRenderer.SetColors(Color.green, Color.red);
 
-            for (int h = 0; h < UnitStack.Path.Count; h++)
-            {
-                lineRenderer.SetPosition(h, UnitStack.Path[h].worldPos);
-            }
+        for (int h = 0; h < UnitStack.Path.Count; h++)
+        {
+            lineRenderer.SetPosition(h, UnitStack.Path[h].worldPos);
         }
     }
-
 
 
     public override void PathAdded(Hex item)
@@ -132,6 +127,11 @@ public partial class UnitStackActionsView
     }
 
     public override void PathRemoved(Hex item)
+    {
+        UpdateMovementPath();
+    }
+
+    public override void MoveSelectedUnitsExecuted()
     {
         UpdateMovementPath();
     }
