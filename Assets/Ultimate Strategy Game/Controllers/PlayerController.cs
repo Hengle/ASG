@@ -35,14 +35,76 @@ public class PlayerController : PlayerControllerBase
 
     public override void SelectUnitStack(PlayerViewModel player, UnitStackViewModel unitStack)
     {
+        if (player.SelectedUnitStack != null)
+        {
+            player.SelectedUnitStack.Selected = false;
+        }
+
         player.SelectedUnitStack = unitStack;
         player.SelectedUnitStack.Selected = true;
     }
 
     public override void SelectUnit(PlayerViewModel player, UnitViewModel unit)
     {
+        player.SelectedUnits.Clear();
         player.SelectedUnits.Add(unit);
     }
+
+    public override void CtrlSelectUnit(PlayerViewModel player, UnitViewModel unit)
+    {
+        if (player.SelectedUnits.Contains(unit))
+        {
+            player.SelectedUnits.Remove(unit);
+        }
+        else
+        {
+            player.SelectedUnits.Add(unit);
+        }
+    }
+
+    public override void ShiftSelectUnit(PlayerViewModel player, UnitViewModel unit)
+    {
+
+        if (player.SelectedUnits.Count == 0)
+        {
+            player.AddBinding(unit);
+            return;
+        }
+
+
+        ModelCollection<UnitViewModel> unitList = null;
+        if (unit.ParentUnitStack != null)
+        {
+            unitList = unit.ParentUnitStack.Units;
+        }
+        else
+        {
+            unitList = unit.ParentCity.Units;
+        }
+
+        UnitViewModel fromUnit = player.SelectedUnits[0];
+
+        int start = unitList.IndexOf(fromUnit);
+        int end = unitList.IndexOf(unit);
+
+        if (end < start)
+        {
+            start = end;
+            end = unitList.IndexOf(fromUnit);
+        }
+
+        player.SelectedUnits.Clear();
+        player.SelectedUnits.Add(fromUnit);
+
+        for (int i = start; i < end + 1; i++)
+        {
+            if (fromUnit != unitList[i]) ;
+                player.SelectedUnits.Add(unitList[i]);
+        }
+
+ 
+    }
+
 
     public override void SelectCity(PlayerViewModel player, CityViewModel city)
     {

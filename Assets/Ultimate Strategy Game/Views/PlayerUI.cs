@@ -52,7 +52,7 @@ public partial class PlayerUI
 
     public override void SelectedUnitStackChanged(UnitStackViewModel unitStack)
     {
-        if (unitStack != null)
+        if (unitStack != null && unitStack.LeadingUnit != null)
         {
             unitName.text = unitStack.LeadingUnit.Name;
         }

@@ -102,7 +102,9 @@ public class GameLogicController : GameLogicControllerBase
             Population = 850,
             UnitCount = 40,
             UnitCountMax = 50,
-            ParentFaction = player.Faction
+            ParentFaction = player.Faction,
+            MovePoints = 10,
+            MovePointsMax = 10
         };
 
         // Spawn the settle
@@ -112,23 +114,38 @@ public class GameLogicController : GameLogicControllerBase
             Owner = player,
             UnitCount = 80,
             UnitCountMax = 80,
-            ParentFaction = player.Faction
+            ParentFaction = player.Faction,
+            MovePoints = 10,
+            MovePointsMax = 10
         };
 
-        var unitStack = new UnitStackViewModel(UnitStackController)
+        // Spawn the settle
+        MeleeUnitViewModel meleeUnit2 = new MeleeUnitViewModel(MeleeUnitController)
+        {
+            Name = "Melee Unit",
+            Owner = player,
+            UnitCount = 80,
+            UnitCountMax = 80,
+            ParentFaction = player.Faction,
+            MovePoints = 10,
+            MovePointsMax = 10
+        };
+
+        UnitStackViewModel unitStack = new UnitStackViewModel(UnitStackController)
         {
             Owner = player,
             HexLocation = player.StartingHex,
             ParentFaction = player.Faction
         };
 
-
         player.Faction.UnitStacks.Add(unitStack);
         player.Faction.Units.Add(settler);
         player.Faction.Units.Add(meleeUnit);
+        player.Faction.Units.Add(meleeUnit2);
 
         UnitStackController.AddUnit(unitStack, settler);
         UnitStackController.AddUnit(unitStack, meleeUnit);
+        UnitStackController.AddUnit(unitStack, meleeUnit2);
 
 
         /*

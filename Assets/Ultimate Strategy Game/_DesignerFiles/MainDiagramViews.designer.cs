@@ -455,10 +455,6 @@ public abstract class PlayerViewBase : ViewBase {
         this.ExecuteCommand(Player.SelectUnitStack, unitStack);
     }
     
-    public virtual void ExecuteSelectUnit(UnitViewModel unit) {
-        this.ExecuteCommand(Player.SelectUnit, unit);
-    }
-    
     public virtual void ExecuteSelectCity(CityViewModel city) {
         this.ExecuteCommand(Player.SelectCity, city);
     }
@@ -477,6 +473,18 @@ public abstract class PlayerViewBase : ViewBase {
     
     public virtual void ExecuteDeselectAll() {
         this.ExecuteCommand(Player.DeselectAll);
+    }
+    
+    public virtual void ExecuteSelectUnit(UnitViewModel unit) {
+        this.ExecuteCommand(Player.SelectUnit, unit);
+    }
+    
+    public virtual void ExecuteShiftSelectUnit(UnitViewModel unit) {
+        this.ExecuteCommand(Player.ShiftSelectUnit, unit);
+    }
+    
+    public virtual void ExecuteCtrlSelectUnit(UnitViewModel unit) {
+        this.ExecuteCommand(Player.CtrlSelectUnit, unit);
     }
 }
 
@@ -592,6 +600,10 @@ public abstract class UnitStackViewBase : ViewBase {
         this.ExecuteCommand(UnitStack.Move, arg);
     }
     
+    public virtual void ExecuteMoveSelectedUnits(Hex arg) {
+        this.ExecuteCommand(UnitStack.MoveSelectedUnits, arg);
+    }
+    
     public virtual void ExecuteStopMove() {
         this.ExecuteCommand(UnitStack.StopMove);
     }
@@ -615,6 +627,14 @@ public abstract class UnitStackViewBase : ViewBase {
     public virtual void ExecuteDestroyStack() {
         this.ExecuteCommand(UnitStack.DestroyStack);
     }
+    
+    public virtual void ExecuteSelect() {
+        this.ExecuteCommand(UnitStack.Select);
+    }
+    
+    public virtual void ExecuteDeselect() {
+        this.ExecuteCommand(UnitStack.Deselect);
+    }
 }
 
 [DiagramInfoAttribute("Ultimate Strategy Game")]
@@ -631,6 +651,10 @@ public abstract class FactionViewBase : ViewBase {
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
     public Single _Gold;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _Owner;
     
     public override System.Type ViewModelType {
         get {
@@ -656,6 +680,7 @@ public abstract class FactionViewBase : ViewBase {
         faction.Name = this._Name;
         faction.Food = this._Food;
         faction.Gold = this._Gold;
+        faction.Owner = this._Owner == null ? null : this._Owner.ViewModelObject as PlayerViewModel;
     }
     
     public virtual void ExecuteNextTurnCalculation() {
@@ -838,6 +863,22 @@ public abstract class UnitViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public ViewBase _Owner;
     
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _MovePoints;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _MovePointsMax;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _BattleMovePoints;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _BattleMovePointsMax;
+    
     public override System.Type ViewModelType {
         get {
             return typeof(UnitViewModel);
@@ -863,6 +904,14 @@ public abstract class UnitViewBase : ViewBase {
         unit.UnitCount = this._UnitCount;
         unit.UnitCountMax = this._UnitCountMax;
         unit.Owner = this._Owner == null ? null : this._Owner.ViewModelObject as PlayerViewModel;
+        unit.MovePoints = this._MovePoints;
+        unit.MovePointsMax = this._MovePointsMax;
+        unit.BattleMovePoints = this._BattleMovePoints;
+        unit.BattleMovePointsMax = this._BattleMovePointsMax;
+    }
+    
+    public virtual void ExecuteMove(Hex arg) {
+        this.ExecuteCommand(Unit.Move, arg);
     }
 }
 
@@ -1401,6 +1450,10 @@ public class UnitCardsUIViewBase : PlayerViewBase {
     [UnityEngine.HideInInspector()]
     public bool _BindSelectedUnits = true;
     
+    [UFToggleGroup("SelectedCity")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSelectedCity = true;
+    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<PlayerController>());
     }
@@ -1417,6 +1470,10 @@ public class UnitCardsUIViewBase : PlayerViewBase {
     public virtual void SelectedUnitsRemoved(UnitViewModel item) {
     }
     
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void SelectedCityChanged(CityViewModel value) {
+    }
+    
     public override void Bind() {
         base.Bind();
         if (this._BindSelectedUnitStack) {
@@ -1425,13 +1482,16 @@ public class UnitCardsUIViewBase : PlayerViewBase {
         if (this._BindSelectedUnits) {
             this.BindCollection(Player._SelectedUnitsProperty, SelectedUnitsAdded, SelectedUnitsRemoved);
         }
+        if (this._BindSelectedCity) {
+            this.BindProperty(Player._SelectedCityProperty, this.SelectedCityChanged);
+        }
     }
 }
 
 public partial class UnitCardsUI : UnitCardsUIViewBase {
 }
 
-public class UnitSlotViewBase : UnitViewBase {
+public class UnitCardViewBase : UnitViewBase {
     
     [UFToggleGroup("UnitCount")]
     [UnityEngine.HideInInspector()]
@@ -1466,7 +1526,7 @@ public class UnitSlotViewBase : UnitViewBase {
     }
 }
 
-public partial class UnitSlot : UnitSlotViewBase {
+public partial class UnitCard : UnitCardViewBase {
 }
 
 public class PlayerViewViewBase : PlayerViewBase {
@@ -1705,6 +1765,14 @@ public class UnitStackActionsViewViewBase : UnitStackViewBase {
     [UnityEngine.HideInInspector()]
     public bool _BindPath = true;
     
+    [UFToggleGroup("Select")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSelect = true;
+    
+    [UFToggleGroup("Deselect")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindDeselect = true;
+    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
     }
@@ -1741,6 +1809,14 @@ public class UnitStackActionsViewViewBase : UnitStackViewBase {
     public virtual void PathRemoved(Hex item) {
     }
     
+    /// Invokes SelectExecuted when the Select command is executed.
+    public virtual void SelectExecuted() {
+    }
+    
+    /// Invokes DeselectExecuted when the Deselect command is executed.
+    public virtual void DeselectExecuted() {
+    }
+    
     public override void Bind() {
         base.Bind();
         if (this._BindSelected) {
@@ -1763,6 +1839,12 @@ public class UnitStackActionsViewViewBase : UnitStackViewBase {
         }
         if (this._BindPath) {
             this.BindCollection(UnitStack._PathProperty, PathAdded, PathRemoved);
+        }
+        if (this._BindSelect) {
+            this.BindCommandExecuted(UnitStack.Select, SelectExecuted);
+        }
+        if (this._BindDeselect) {
+            this.BindCommandExecuted(UnitStack.Deselect, DeselectExecuted);
         }
     }
 }

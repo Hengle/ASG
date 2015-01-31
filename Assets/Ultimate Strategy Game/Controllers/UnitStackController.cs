@@ -11,7 +11,6 @@ public class UnitStackController : UnitStackControllerBase {
 
     [Inject] public CityController CityController { get; set; }
 
-
     public override void InitializeUnitStack(UnitStackViewModel unitStack)
     {
         // Calculate hex
@@ -32,6 +31,18 @@ public class UnitStackController : UnitStackControllerBase {
                 unitStack.PlannedAction = PlanedAction.None;
             }
         });
+
+    }
+
+    public override void Select(UnitStackViewModel unitStack)
+    {
+        unitStack.Selected = true;
+    }
+
+    public override void Deselect(UnitStackViewModel unitStack)
+    {
+        unitStack.Selected = false;
+        unitStack.PlannedAction = PlanedAction.None;
     }
 
     public void CalculateHexLocation(UnitStackViewModel unitStack, Vector3 pos)
@@ -137,7 +148,7 @@ public class UnitStackController : UnitStackControllerBase {
 
         if (unitStack.MovePoints <= 0)
         {
-            Debug.Log("Out of movement points");
+            Debug.Log("Out of msovement points");
             return;
         }
 
@@ -165,6 +176,98 @@ public class UnitStackController : UnitStackControllerBase {
         unitStack.PathDestination = destination;
         unitStack.NextHexInPath = unitStack.Path[0];
     }
+
+    public override void MoveSelectedUnits(UnitStackViewModel unitStack, Hex destination)
+    {
+        if (destination == null)
+        {
+            Debug.Log("Cannot move to null");
+            return;
+        }
+
+        if (unitStack.HexLocation == destination)
+        {
+            Debug.Log("Already at destiantion");
+            return;
+        }
+        
+        // TODO
+        //if (unitStack.HexLocation.UnitStack)
+        //{
+
+        //}
+        
+        ModelCollection<UnitViewModel> units = unitStack.ParentPlayer.SelectedUnits;
+
+        for (int i = 0; i < units.Count; i++)
+        {
+            if (units[i].MovePoints <= 0)
+            {
+                return;
+            }
+        }
+
+        if (units.Count == 0) return;
+        
+
+        // Find the path that the stack will take
+        List<Hex> path = Pathfinding.FindPath(unitStack.HexLocation, destination);
+
+        if (path == null)
+        {
+            Debug.Log("Couldn't find path");
+        }
+
+        Hex splitToHex = path[0];
+
+        UnitStackViewModel newUnitStack = new UnitStackViewModel(UnitStackController)
+        {
+            Owner = unitStack.ParentFaction.ParentPlayer,
+            ParentFaction = unitStack.ParentFaction,
+            HexLocation = splitToHex,
+        };
+        newUnitStack.ParentFaction.UnitStacks.Add(newUnitStack);
+        
+
+        for (int i = 0; i < units.Count; i++)
+        {
+            ExecuteCommand(unitStack.RemoveUnit, units[i]);
+            ExecuteCommand(newUnitStack.AddUnit, units[i]);
+        }
+
+        newUnitStack.Owner = unitStack.ParentFaction.ParentPlayer;
+
+
+        ExecuteCommand(unitStack.ParentFaction.ParentPlayer.SelectUnitStack, newUnitStack);
+        ExecuteCommand(newUnitStack.Move, destination);
+
+        unitStack.ParentPlayer.SelectedUnits.Clear();
+    }
+    
+
+    /*
+    public override void MoveUnits(UnitStackViewModel unitStack, Hex destination)
+    {
+        if (destination == null)
+        {
+            Debug.Log("Cannot move to null");
+            return;
+        }
+
+        if (unitStack.MovePoints <= 0)
+        {
+            Debug.Log("Out of msovement points");
+            return;
+        }
+
+        if (unitStack.HexLocation == destination)
+        {
+            Debug.Log("Already at destiantion");
+            return;
+        }
+
+        // check if the movement is valid
+    }*/
 
     public override void Settle(UnitStackViewModel unitStack)
     {

@@ -6,48 +6,100 @@ using UnityEngine;
 using UniRx;
 using UnityEngine.UI;
 
-
+/// <summary>
+/// Generic unit card UI. 
+/// Used for both cities and unit stacks.
+/// </summary>
 public partial class UnitCardsUI {
 
-    public RectTransform unitSlotsContainer;
     public GameObject unitSlotPrefab;
+    public RectTransform unitSlotsContainer;
 
+    
     public int unitSlotCount;
-    public List<UnitSlot> unitSlots;
+    public List<UnitCard> unitSlots;
+
+
 
     public override void Start()
     {
         base.Start();
+
         GenerateUnitSlots();
-        ToggleShowSlots(false);
+
+        ShowUnitCards(false);
 
     }
 
     /// Subscribes to the property and is notified anytime the value changes.
-    public override void SelectedUnitStackChanged(UnitStackViewModel value) 
+    public override void SelectedUnitStackChanged(UnitStackViewModel unitStack) 
     {
-        if (value == null)
+        if (unitStack == null)
         {
-            for (int i = 0; i < unitSlots.Count; i++)
-            {
-                unitSlots[i].gameObject.SetActive(false);
-            }
+            ShowUnitCards(false);
             return;
         }
 
-        UpdateUnitStackSlots();
-        Player.SelectedUnitStack._UnitsProperty.Subscribe(units => UpdateUnitStackSlots()).DisposeWhenChanged(Player.SelectedUnitStackProperty, true);        
+        // Update the unit cards
+        UpdateUnitCards(unitStack.Units);
+        unitStack._UnitsProperty.Subscribe(units => UpdateUnitCards(unitStack.Units)).DisposeWhenChanged(Player.SelectedUnitStackProperty, true);
+        Player._SelectedUnitsProperty.Subscribe(units => UpdateSelectedUnits()).DisposeWhenChanged(Player.SelectedUnitStackProperty, true);    
 
     }
 
-    private void UpdateUnitStackSlots ()
+    public override void SelectedUnitsAdded(UnitViewModel unit)
     {
         for (int i = 0; i < unitSlots.Count; i++)
         {
-            if (i < Player.SelectedUnitStack.Units.Count)
+            if (unitSlots[i].Unit != null && unitSlots[i].Unit == unit)
+            {
+                unitSlots[i].Select(true);
+            }
+        }
+    }
+
+    public override void SelectedUnitsRemoved(UnitViewModel unit)
+    {
+
+    }
+
+    public void UpdateSelectedUnits ()
+    {
+        for (int i = 0; i < unitSlots.Count; i++)
+        {
+            if (Player.SelectedUnits.Contains(unitSlots[i].Unit))
+            {
+                unitSlots[i].Select(true);
+            }
+            else
+            {
+                unitSlots[i].Select(false);
+            }
+        }
+    }
+
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void SelectedCityChanged(CityViewModel city)
+    {
+        if (city == null)
+        {
+            ShowUnitCards(false);
+            return;
+        }
+
+        // Update the unit cards
+        UpdateUnitCards(city.Units);
+        city._UnitsProperty.Subscribe(units => UpdateUnitCards(city.Units)).DisposeWhenChanged(Player.SelectedCityProperty, true);     
+    }
+
+    private void UpdateUnitCards (ModelCollection<UnitViewModel> units)
+    {
+        for (int i = 0; i < unitSlots.Count; i++)
+        {
+            if (i < units.Count)
             {
                 unitSlots[i].gameObject.SetActive(true);
-                unitSlots[i].Unit = Player.SelectedUnitStack.Units[i];
+                unitSlots[i].Unit = units[i];
                 unitSlots[i].SetupBindings();
             }
             else
@@ -88,26 +140,29 @@ public partial class UnitCardsUI {
 
     private void GenerateUnitSlots ()
     {
-        GameObject newUnitSlot;
+        GameObject unitCard;
         for (int i = 0; i < unitSlotCount; i++)
         {
-            newUnitSlot = Instantiate(unitSlotPrefab, Vector3.zero, Camera.main.transform.rotation) as GameObject;
+            unitCard = Instantiate(unitSlotPrefab, Vector3.zero, Camera.main.transform.rotation) as GameObject;
 
-            newUnitSlot.transform.SetParent(unitSlotsContainer.transform);
+            unitCard.transform.SetParent(unitSlotsContainer.transform);
 
-            newUnitSlot.GetComponent<RectTransform>().localScale = Vector3.one;
-            newUnitSlot.GetComponent<RectTransform>().transform.localPosition = Vector3.zero;
+            unitCard.GetComponent<RectTransform>().localScale = Vector3.one;
+            unitCard.GetComponent<RectTransform>().transform.localPosition = Vector3.zero;
             unitSlotsContainer.GetComponent<GridLayoutGroup>().CalculateLayoutInputHorizontal();
 
-            unitSlots.Add(newUnitSlot.GetComponent<UnitSlot>());
-            
+            unitSlots.Add(unitCard.GetComponent<UnitCard>());
+            unitCard.GetComponent<UnitCard>().unitCardsUI = this;
+        
+
+
 
             //unitSlots[i].Unit = null;
             //unitSlots[i].Unbind();
         }
     }
 
-    private void ToggleShowSlots (bool value)
+    private void ShowUnitCards (bool value)
     {
         for (int i = 0; i < unitSlots.Count; i++)
         {

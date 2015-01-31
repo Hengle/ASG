@@ -28,8 +28,10 @@ public partial class FactionView
     {
         var unitStack = InstantiateView(unitStackPrefab, item, item.HexLocation.worldPos + Vector3.up * 0.6f, Quaternion.identity);
 
-        //if (Faction.UnitStacks.Count == 1)
+        if (Faction.UnitStacks.Count == 1)
             CameraManager.main.PanTo(unitStack.transform);
+        
+        // TODO: owner is not being assigned
 
         // Use the properties used in the inspector
         unitStack.InitializeData(item);

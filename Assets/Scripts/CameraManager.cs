@@ -46,7 +46,7 @@ public class CameraManager : MonoBehaviour
     void Update ()
     {
 
-        /*
+        
         if (Input.GetKey(KeyCode.Mouse2))
         {
             x += Input.GetAxis("Mouse X") * rotationSpeed * Time.fixedDeltaTime;
@@ -55,7 +55,7 @@ public class CameraManager : MonoBehaviour
             y = Mathf.Clamp(y, minAngle, maxAngle);
 
             transform.rotation = Quaternion.Euler(y, x, 0);
-        }*/
+        }
 
 
         zoomDistance -= Input.GetAxis("Mouse ScrollWheel") * zoomSpeed * Time.fixedDeltaTime;
@@ -69,7 +69,6 @@ public class CameraManager : MonoBehaviour
 
     public void PanTo(Transform target)
     {
-        Debug.Log("Set");
         focusPos = target.position + Quaternion.Euler(y, x, 0) * new Vector3(0.0f, 0.0f, -zoomDistance);
     }
 }

@@ -11,6 +11,7 @@ public partial class UnitStackViewModel
 
     public static TerrainManagerViewModel terrainManager;
 
+
  /*
     public override Hex ComputeHexLocation()
     {

@@ -58,7 +58,6 @@ public partial class PlayerView
             if (hoverObject.CompareTag("CampainUnit"))
             {
                 ExecuteSetHoverUnitStack(hoverObject.GetComponent<UnitStackView>().UnitStack);
-                Debug.Log("Selecting unit stack");
             }
             else
             {
@@ -73,7 +72,6 @@ public partial class PlayerView
                 if (hoverObject.tag == "CampainUnit")
                 {
                     ExecuteSelectUnitStack(hoverObject.GetComponent<UnitStackView>().UnitStack);
-                    Debug.Log("Selecting unit stack");
                     return;
                 }
 
@@ -109,6 +107,7 @@ public partial class PlayerView
                 ExecuteCommand(Player.SelectedUnitStack.PlanMovement);
                 return;
             }
+
             /*
             // Evaluate city 
             if (Input.GetButton("Mouse1") && hit.collider.gameObject.CompareTag("City") && Player.SelectedUnitStack.PlannedAction != PlanedAction.None)
@@ -123,23 +122,34 @@ public partial class PlayerView
              * */
 
 
-
-            if (Input.GetKeyUp(KeyCode.Mouse1) && Player.SelectedUnitStack != null && Player.HoverUnitStack != null)
+            // Right click
+            if (Input.GetKeyUp(KeyCode.Mouse1) && Player.SelectedUnitStack != null)
             {
-                //ExecuteCommand(Player.SelectedUnitStack.UnitDestiantion);
+                // On Another stack
+                if (Player.HoverUnitStack != null)
+                {
+                    //ExecuteCommand(Player.SelectedUnitStack.UnitDestiantion);
+                }
+                // On a city
+                if (Player.HoverCity != null)
+                {
+                    //ExecuteCommand(Player.SelectedUnitStack.CityDestination);
+                }
+
+                // Move the whole unit stack
+                if (Player.SelectedUnits.Count == 0 && Player.SelectedHex != null)
+                {
+                    ExecuteCommand(Player.SelectedUnitStack.Move, Player.SelectedHex);
+                    return;
+                }
+
+                // Move selected units
+                if (Player.SelectedUnits.Count > 0 && Player.SelectedHex != null)
+                {
+                    ExecuteCommand(Player.SelectedUnitStack.MoveSelectedUnits, Player.SelectedHex);
+                    return;
+                }
             }
-
-            if (Input.GetKeyUp(KeyCode.Mouse1) && Player.SelectedUnitStack != null && Player.HoverCity != null)
-            {
-                //ExecuteCommand(Player.SelectedUnitStack.CityDestination);
-            }
-
-            if (Input.GetKeyUp(KeyCode.Mouse1) && Player.SelectedUnitStack != null && Player.SelectedHex != null)
-            {
-                ExecuteCommand(Player.SelectedUnitStack.Move, Player.SelectedHex);
-            }
-
-
 
         }
 

@@ -139,9 +139,9 @@ public abstract class PlayerControllerBase : Controller {
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
+    [Inject] public FactionController FactionController {get;set;}
     [Inject] public UnitController UnitController {get;set;}
     [Inject] public CityController CityController {get;set;}
-    [Inject] public FactionController FactionController {get;set;}
     public abstract void InitializePlayer(PlayerViewModel player);
     
     public override ViewModel CreateEmpty() {
@@ -165,9 +165,6 @@ public abstract class PlayerControllerBase : Controller {
     public virtual void SelectUnitStack(PlayerViewModel player, UnitStackViewModel arg) {
     }
     
-    public virtual void SelectUnit(PlayerViewModel player, UnitViewModel arg) {
-    }
-    
     public virtual void SelectCity(PlayerViewModel player, CityViewModel arg) {
     }
     
@@ -181,6 +178,15 @@ public abstract class PlayerControllerBase : Controller {
     }
     
     public virtual void DeselectAll(PlayerViewModel player) {
+    }
+    
+    public virtual void SelectUnit(PlayerViewModel player, UnitViewModel arg) {
+    }
+    
+    public virtual void ShiftSelectUnit(PlayerViewModel player, UnitViewModel arg) {
+    }
+    
+    public virtual void CtrlSelectUnit(PlayerViewModel player, UnitViewModel arg) {
     }
 }
 
@@ -237,6 +243,9 @@ public abstract class UnitStackControllerBase : Controller {
     public virtual void Move(UnitStackViewModel unitStack, Hex arg) {
     }
     
+    public virtual void MoveSelectedUnits(UnitStackViewModel unitStack, Hex arg) {
+    }
+    
     public virtual void StopMove(UnitStackViewModel unitStack) {
     }
     
@@ -253,6 +262,12 @@ public abstract class UnitStackControllerBase : Controller {
     }
     
     public virtual void DestroyStack(UnitStackViewModel unitStack) {
+    }
+    
+    public virtual void Select(UnitStackViewModel unitStack) {
+    }
+    
+    public virtual void Deselect(UnitStackViewModel unitStack) {
     }
 }
 
@@ -397,6 +412,9 @@ public abstract class UnitControllerBase : Controller {
     
     public override void Initialize(ViewModel viewModel) {
         this.InitializeUnit(((UnitViewModel)(viewModel)));
+    }
+    
+    public virtual void Move(UnitViewModel unit, Hex arg) {
     }
 }
 

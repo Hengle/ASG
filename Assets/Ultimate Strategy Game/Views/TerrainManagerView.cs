@@ -57,20 +57,11 @@ public partial class TerrainManagerView
     public override void Start()
     {
         base.Start();
-
-        Debug.Log(SystemInfo.processorCount);
-        Debug.Log(ThreadBase.AvailableProcessors);
-
-
+        
         // create material for GL rendering //
         material = new Material(Shader.Find("GUI/Text Shader"));
         material.hideFlags = HideFlags.HideAndDontSave;
         material.shader.hideFlags = HideFlags.HideAndDontSave;
-    }
-
-    public void Test ()
-    {
-        Debug.Log("Testing");
     }
 
 
@@ -154,10 +145,10 @@ public partial class TerrainManagerView
             for (int y = 0; y < TerrainManager.Chunks.GetLength(1); y++)
             {
                 if (x + 1 < TerrainManager.Chunks.GetLength(0))
-                    ChunkView.StitchChunks(chunks[x, y].GetComponent<MeshFilter>().mesh, chunks[x + 1, y].GetComponent<MeshFilter>().mesh, 1);
+                    ChunkView.StitchChunks(chunks[x, y].GetComponent<MeshFilter>().mesh, chunks[x + 1, y].GetComponent<MeshFilter>().mesh, TerrainManager.ChunkResolution, 1);
 
                 if (y + 1 < TerrainManager.Chunks.GetLength(1))
-                    ChunkView.StitchChunks(chunks[x, y].GetComponent<MeshFilter>().mesh, chunks[x, y + 1].GetComponent<MeshFilter>().mesh, 0);
+                    ChunkView.StitchChunks(chunks[x, y].GetComponent<MeshFilter>().mesh, chunks[x, y + 1].GetComponent<MeshFilter>().mesh, TerrainManager.ChunkResolution, 0);
             }
         }
     }

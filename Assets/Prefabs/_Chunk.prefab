@@ -12,6 +12,7 @@ GameObject:
   - 33: {fileID: 3300000}
   - 114: {fileID: 11400000}
   - 64: {fileID: 6400000}
+  - 205: {fileID: 20500000}
   m_Layer: 0
   m_Name: _Chunk
   m_TagString: Untagged
@@ -83,6 +84,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   texture: {fileID: 0}
+--- !u!205 &20500000
+LODGroup:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
+  m_Size: 1
+  m_ScreenRelativeTransitionHeight: 0
+  m_LODs:
+  - screenRelativeHeight: .600000024
+    renderers: []
+  - screenRelativeHeight: .300000012
+    renderers: []
+  - screenRelativeHeight: .100000001
+    renderers: []
+  m_Enabled: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

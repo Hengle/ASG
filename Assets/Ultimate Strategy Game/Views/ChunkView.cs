@@ -32,19 +32,44 @@ public partial class ChunkView
     {
 
         GenerateTextures();
-        UpdateMesh();
+        GetComponent<MeshFilter>().mesh = UpdateMesh(chunkResolution);
         UpdateCollisions();
 
         /*
-        LOD[] lods = new LOD[2];
- 
+        LOD[] lods = new LOD[3];
+        
         Renderer[] lodRenderers = new Renderer[1];
-        lodRenderers[0] = GetComponent<MeshFilter>().renderer;
- 
-        // Assign list to LOD 0.  Do the same for others
+        GetComponent<MeshFilter>().mesh = UpdateMesh(chunkResolution);
+        MeshFilter meshFilter = GetComponent<MeshFilter>();
+        meshFilter.mesh = UpdateMesh(chunkResolution);
+        lodRenderers[0] = renderer;       
         lods[0].renderers = lodRenderers;
-        lods[0].screenRelativeTransitionHeight = 50;
-        lods[1].screenRelativeTransitionHeight = 10;
+        lods[0].screenRelativeTransitionHeight = 0.9f;
+
+        Renderer[] lodRenderers2 = new Renderer[1];
+        //new MeshRenderer().
+        GameObject mesh2 = (GameObject)Instantiate(new GameObject(), transform.position, Quaternion.identity);
+        mesh2.AddComponent<MeshFilter>();
+        mesh2.AddComponent<MeshRenderer>();
+        mesh2.GetComponent<MeshRenderer>().material = GetComponent<MeshRenderer>().material;
+        mesh2.transform.parent = this.transform;
+        mesh2.GetComponent<MeshFilter>().mesh = UpdateMesh(chunkResolution / 2);
+        lodRenderers2[0] = mesh2.GetComponent<MeshFilter>().renderer;
+        lods[1].renderers = lodRenderers2;
+        lods[1].screenRelativeTransitionHeight = 0.7f;
+
+        Renderer[] lodRenderers3 = new Renderer[1];
+        //new MeshRenderer().
+        GameObject mesh3 = (GameObject)Instantiate(new GameObject(), transform.position, Quaternion.identity);
+        mesh3.AddComponent<MeshFilter>();
+        mesh3.AddComponent<MeshRenderer>();
+        mesh3.GetComponent<MeshRenderer>().material = GetComponent<MeshRenderer>().material;
+        mesh3.transform.parent = this.transform;
+        mesh3.GetComponent<MeshFilter>().mesh = UpdateMesh(8);
+        lodRenderers3[0] = mesh3.GetComponent<MeshFilter>().renderer;
+        lods[2].renderers = lodRenderers3;
+        lods[2].screenRelativeTransitionHeight = 0.1f;
+        
 
         // Make it live!
         GetComponent<LODGroup>().SetLODS(lods);
@@ -90,24 +115,24 @@ public partial class ChunkView
     }
 
 
-    private void UpdateMesh()
+    private Mesh UpdateMesh(int res)
     {
-        Mesh mesh = GetComponent<MeshFilter>().mesh;
+        Mesh mesh = new Mesh();
         mesh.Clear();
-
+        
         // Pixels per vetex point
-        float resStep = (float)chunkSize / (float)chunkResolution;
-        float heightmapStep = (float)substanceTexture2D.width / (float)chunkResolution;
+        float resStep = (float)chunkSize / (float)res;
+        float heightmapStep = (float)substanceTexture2D.width / (float)res;
         float uvStep = 1f / chunkSize;
 
-        vertices = new Vector3[(chunkResolution + 1) * (chunkResolution + 1)];
+        vertices = new Vector3[(res + 1) * (res + 1)];
         normals = new Vector3[vertices.Length];
         uv = new Vector2[vertices.Length];
 
 
-        for (int v = 0, z = 0; z <= chunkResolution; z++)
+        for (int v = 0, z = 0; z <= res; z++)
         {
-            for (int x = 0; x <= chunkResolution; x++, v++)
+            for (int x = 0; x <= res; x++, v++)
             {
                 vertices[v] = new Vector3(x * resStep / pixelsPerUnit,
                                           substanceTexture2D.GetPixel((int)(x * heightmapStep), (int)(z * heightmapStep)).grayscale * Chunk.TerrainManager.PixelToHeight,
@@ -123,24 +148,78 @@ public partial class ChunkView
         mesh.normals = normals;
         mesh.uv = uv;
 
-        int[] triangles = new int[chunkResolution * chunkResolution * 6];
-        for (int t = 0, v = 0, y = 0; y < chunkResolution; y++, v++)
+        int[] triangles = new int[res * res * 6];
+        for (int t = 0, v = 0, y = 0; y < res; y++, v++)
         {
-            for (int x = 0; x < chunkResolution; x++, v++, t += 6)
+            for (int x = 0; x < res; x++, v++, t += 6)
             {
                 triangles[t] = v;
-                triangles[t + 1] = v + chunkResolution + 1;
+                triangles[t + 1] = v + res + 1;
                 triangles[t + 2] = v + 1;
                 triangles[t + 3] = v + 1;
-                triangles[t + 4] = v + chunkResolution + 1;
-                triangles[t + 5] = v + chunkResolution + 2;
+                triangles[t + 4] = v + res + 1;
+                triangles[t + 5] = v + res + 2;
             }
         }
         mesh.triangles = triangles;
 
-        CalculateNormals();
+        CalculateNormals(res);
         TangentSolver.Solve(mesh);
         mesh.Optimize();
+        return mesh;
+    }
+
+    private Mesh GenerateMesh(int resolution)
+    {
+        Mesh mesh = new Mesh();
+
+        // Pixels per vetex point
+        float resStep = (float)chunkSize / (float)resolution;
+        float heightmapStep = (float)substanceTexture2D.width / (float)resolution;
+        float uvStep = 1f / chunkSize;
+
+        vertices = new Vector3[(resolution + 1) * (resolution + 1)];
+        normals = new Vector3[vertices.Length];
+        uv = new Vector2[vertices.Length];
+
+
+        for (int v = 0, z = 0; z <= resolution; z++)
+        {
+            for (int x = 0; x <= resolution; x++, v++)
+            {
+                vertices[v] = new Vector3(x * resStep / pixelsPerUnit,
+                                          substanceTexture2D.GetPixel((int)(x * heightmapStep), (int)(z * heightmapStep)).grayscale * Chunk.TerrainManager.PixelToHeight,
+                                          z * resStep / pixelsPerUnit
+                                          );
+
+                normals[v] = Vector3.up;
+                uv[v] = new Vector2(x * resStep * uvStep, z * resStep * uvStep);
+            }
+        }
+
+        mesh.vertices = vertices;
+        mesh.normals = normals;
+        mesh.uv = uv;
+
+        int[] triangles = new int[resolution * resolution * 6];
+        for (int t = 0, v = 0, y = 0; y < resolution; y++, v++)
+        {
+            for (int x = 0; x < resolution; x++, v++, t += 6)
+            {
+                triangles[t] = v;
+                triangles[t + 1] = v + resolution + 1;
+                triangles[t + 2] = v + 1;
+                triangles[t + 3] = v + 1;
+                triangles[t + 4] = v + resolution + 1;
+                triangles[t + 5] = v + resolution + 2;
+            }
+        }
+        mesh.triangles = triangles;
+
+        CalculateNormals(resolution);
+        TangentSolver.Solve(mesh);
+        mesh.Optimize();
+        return mesh;
     }
 
 
@@ -190,67 +269,67 @@ public partial class ChunkView
     }
 
 
-    private static float GetXDerivative(int x, int z)
+    private static float GetXDerivative(int x, int z, int resolution)
     {
-        int rowOffset = z * (chunkResolution + 1);
+        int rowOffset = z * (resolution + 1);
         float left, right, scale;
         if (x > 0)
         {
             left = vertices[rowOffset + x ].y;
-            if (x < chunkResolution)
+            if (x < resolution)
             {
                 right = vertices[rowOffset + x + 1].y;
-                scale = 0.5f * chunkResolution;
+                scale = 0.5f * resolution;
             }
             else
             {
                 right = vertices[rowOffset + x].y;
-                scale = chunkResolution;
+                scale = resolution;
             }
         }
         else
         {
             left = vertices[rowOffset + x].y;
             right = vertices[rowOffset + x + 1].y;
-            scale = chunkResolution;
+            scale = resolution;
         }
         return (right - left) * scale;
     }
 
-    private static float GetZDerivative(int x, int z)
+    private static float GetZDerivative(int x, int z, int resolution)
     {
-        int rowLength = chunkResolution + 1;
+        int rowLength = resolution + 1;
         float back, forward, scale;
         if (z > 0)
         {
             back = vertices[(z ) * rowLength + x].y;
-            if (z < chunkResolution)
+            if (z < resolution)
             {
                 forward = vertices[(z + 1) * rowLength + x].y;
-                scale = 0.5f * chunkResolution;
+                scale = 0.5f * resolution;
             }
             else
             {
                 forward = vertices[z * rowLength + x].y;
-                scale = chunkResolution;
+                scale = resolution;
             }
         }
         else
         {
             back = vertices[z * rowLength + x].y;
             forward = vertices[(z + 1) * rowLength + x].y;
-            scale = chunkResolution;
+            scale = resolution;
         }
         return (forward - back) * scale;
     }
 
-    private static void CalculateNormals()
+    private static void CalculateNormals(int resolution)
     {
-        for (int v = 0, z = 0; z <= chunkResolution; z++)
+        for (int v = 0, z = 0; z <= resolution; z++)
         {
-            for (int x = 0; x <= chunkResolution; x++, v++)
+            for (int x = 0; x <= resolution; x++, v++)
             {
-                normals[v] = new Vector3(-GetXDerivative(x, z), 1f, -GetZDerivative(x, z)).normalized;
+                normals[v] = new Vector3(-GetXDerivative(x, z, resolution), 1f, -GetZDerivative(x, z, resolution)).normalized;
             }
         }
     }
@@ -275,32 +354,32 @@ public partial class ChunkView
      *   2  
      */
 
-    public static void StitchChunks(Mesh chunk1, Mesh chunk2, int side)
+    public static void StitchChunks(Mesh chunk1, Mesh chunk2, int resolution, int side)
     {
-        float[] heights1 = new float[chunkResolution + 1];
+        float[] heights1 = new float[resolution + 1];
         
         vertices = chunk1.vertices;
         Vector3[] vertices2 = chunk2.vertices;
-        
 
-        for (int z = 0, v = 0; z <= chunkResolution; z++)
+
+        for (int z = 0, v = 0; z <= resolution; z++)
         {
-            for (int x = 0; x <= chunkResolution; x++, v++)
+            for (int x = 0; x <= resolution; x++, v++)
             {
 
-                if (z == chunkResolution && side == 0)
+                if (z == resolution && side == 0)
                 {
                     heights1[x] = vertices[v].y;
                 }
 
-                if (x == chunkResolution && side == 1)
+                if (x == resolution && side == 1)
                 {
-                    vertices2[z + z * chunkResolution].y = vertices[v].y;
+                    vertices2[z + z * resolution].y = vertices[v].y;
                 }
             }
         }
 
-        for (int x = 0; x <= chunkResolution; x++)
+        for (int x = 0; x <= resolution; x++)
         {
             vertices2[x].y = heights1[x];
         }

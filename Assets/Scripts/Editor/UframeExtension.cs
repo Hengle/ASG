@@ -26,6 +26,7 @@ public class MyCustomElementItemTypesPlugin : DiagramPlugin
         typeContainer.RegisterInstance(new ElementItemType() { Type = typeof(Hexagon), Group = "Custom Types", Label = "Hexagon", IsPrimitive = false }, "Hexagon");
         typeContainer.RegisterInstance(new ElementItemType() { Type = typeof(UnityEngine.Color), Group = "Custom Types", Label = "Color", IsPrimitive = false }, "Color");
         typeContainer.RegisterInstance(new ElementItemType() { Type = typeof(UnityEngine.AnimationCurve), Group = "Custom Types", Label = "Animation Curve", IsPrimitive = false }, "Animation Curve");
+        typeContainer.RegisterInstance(new ElementItemType() { Type = typeof(UnitViewModel[]), Group = "Custom Types", Label = "UnitViewModel[]", IsPrimitive = false }, "UnitViewModel[]");
 
 
     }
