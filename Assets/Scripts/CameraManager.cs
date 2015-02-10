@@ -10,6 +10,7 @@ public class CameraManager : MonoBehaviour
     public float moveDamping = 10;
     public float cameraAngle = 52;
 
+    public bool canRotate = false;
     public float rotationSpeed = 60;
     public float rotationDamping = 10;
 
@@ -37,38 +38,40 @@ public class CameraManager : MonoBehaviour
     void Start ()
     {
         main = this;
+        
         _transform = transform;
-        x = _transform.rotation.eulerAngles.y;
-        y = _transform.rotation.eulerAngles.x;
-        //_transform.localEulerAngles = new Vector3(cameraAngle, 0, 0);
+        y = cameraAngle;
+
+        _transform.rotation = Quaternion.Euler(y, x, 0);
     }
 
     void Update ()
     {
 
         
-        if (Input.GetKey(KeyCode.Mouse2))
+        if (canRotate && Input.GetKey(KeyCode.Mouse2))
         {
             x += Input.GetAxis("Mouse X") * rotationSpeed * Time.fixedDeltaTime;
             y -= Input.GetAxis("Mouse Y") * rotationSpeed * Time.fixedDeltaTime;
 
             y = Mathf.Clamp(y, minAngle, maxAngle);
 
-            transform.rotation = Quaternion.Euler(y, x, 0);
+            _transform.rotation = Quaternion.Euler(y, x, 0);
         }
 
 
         zoomDistance -= Input.GetAxis("Mouse ScrollWheel") * zoomSpeed * Time.fixedDeltaTime;
         zoomDistance = Mathf.Clamp(zoomDistance, minZoom, maxZoom);
 
-
-        focusPos += Quaternion.Euler(0, x, 0) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")) * moveSpeed * Time.deltaTime;
-        transform.position = focusPos + Quaternion.Euler(y, x, 0) * new Vector3(0.0f, 0.0f, -zoomDistance);
-
+        focusPos += Quaternion.Euler(0, x, 0) * new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")) * moveSpeed * (zoomDistance / maxZoom) * Time.deltaTime;
+        _transform.position = focusPos + Quaternion.Euler(y, x, 0) * new Vector3(0.0f, 0.0f, -zoomDistance);
+  
     }
 
     public void PanTo(Transform target)
     {
-        focusPos = target.position + Quaternion.Euler(y, x, 0) * new Vector3(0.0f, 0.0f, -zoomDistance);
+        //float y = transform.position.y;
+        focusPos = target.position;
+        //focusPos.y = y;
     }
 }

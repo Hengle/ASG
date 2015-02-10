@@ -22,7 +22,7 @@ public class SettlerUnitController : SettlerUnitControllerBase {
             HexLocation = settlerUnit.ParentUnitStack.HexLocation
         };
 
-        settlerUnit.ParentFaction.Cities.Add(city);
+        settlerUnit.ParentUnitStack.ParentFaction.Cities.Add(city);
 
         settlerUnit = null;
 

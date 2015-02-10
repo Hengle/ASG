@@ -8,7 +8,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public partial class PlayerUI 
-{
+{ 
 
     public Image toolTip;
     public Text toolTipDescription;
@@ -58,7 +58,20 @@ public partial class PlayerUI
         }
         else
         {
-            unitName.text = "No Unit Selected";
+            unitName.text = "";
+        }
+    }
+
+    /// Subscribes to the property and is notified anytime the value changes.
+    public override void SelectedCityChanged(CityViewModel city)
+    {
+        if (city != null)
+        {
+            unitName.text = city.Name;
+        }
+        else
+        {
+            unitName.text = "";
         }
     }
 

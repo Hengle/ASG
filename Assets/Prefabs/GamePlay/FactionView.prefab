@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &100000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 400000}
+  - 114: {fileID: 11400000}
+  m_Layer: 0
+  m_Name: FactionView
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &400000
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 28.7068977, y: 6.00139427, z: 17.3422794}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19546ba8f30151449bb32074c5313543, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _LogEvents: 0
+  _forceResolveViewModel: 0
+  _InjectView: 0
+  _overrideViewModel: 0
+  _resolveName: 
+  _Save: 0
+  _Name: 
+  _Food: 0
+  _Gold: 0
+  _Owner: {fileID: 0}
+  _BindCities: 1
+  _CitiesSceneFirst: 0
+  _CitiesContainer: {fileID: 0}
+  _BindUnitStacks: 1
+  _UnitStacksSceneFirst: 0
+  _UnitStacksContainer: {fileID: 0}
+  unitStackPrefab: {fileID: 100000, guid: 65f0818cbd7c06441ab9332ec27f77fe, type: 2}
+  settlerUnitPrefab: {fileID: 100000, guid: 65f0818cbd7c06441ab9332ec27f77fe, type: 2}
+  cityPrefab: {fileID: 100000, guid: 5f51c90edd63110499a82c82b56b149c, type: 2}
+  cityUIPrefab: {fileID: 100016, guid: d7bd8d2405f2a3a4ab37ceb9ca183cee, type: 2}
+  cityUIContainer: {fileID: 0}
+  obj: {fileID: 0}
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 100000}
+  m_IsPrefabParent: 1

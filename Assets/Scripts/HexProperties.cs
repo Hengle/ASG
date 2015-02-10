@@ -13,7 +13,11 @@ public static class HexProperties
     public static Vector3[] vertPos;
 
 
-    public static void SetProperties (int hexSide)
+    public static float unityWidth;
+    public static float unityHeight;
+
+
+    public static void SetProperties (int hexSide, int pixelsPerUnit)
     {
         side = hexSide;
         tileH = Mathf.Sin((30f * Mathf.PI) / 180f) * side;
@@ -27,6 +31,9 @@ public static class HexProperties
         {
             vertPos[i] = GetVert(i);
         }
+
+        unityWidth = width / pixelsPerUnit;
+        unityHeight = height / pixelsPerUnit;
 
     }
 

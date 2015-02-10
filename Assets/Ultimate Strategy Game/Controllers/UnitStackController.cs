@@ -13,14 +13,15 @@ public class UnitStackController : UnitStackControllerBase {
 
     public override void InitializeUnitStack(UnitStackViewModel unitStack)
     {
+
+
         // Calculate hex
         unitStack.WorldPosProperty.Subscribe(pos => CalculateHexLocation(unitStack, pos));
 
 
         // make sure to later dispose of this command somehow
-        //ExecuteCommand(FogOfWar.CalculateFOW, unitStack);
+        ExecuteCommand(FogOfWar.CalculateFOW, unitStack.ParentFaction);
         unitStack.HexLocationProperty.Subscribe(hex => ExecuteCommand(FogOfWar.CalculateFOW, unitStack.ParentFaction));
-
 
 
         // If the unit is not selected the player cannot plan actions with it!
@@ -61,13 +62,25 @@ public class UnitStackController : UnitStackControllerBase {
         base.NextTurnCalculation(unitStack);
 
         unitStack.MovePoints = unitStack.MovePointsTotal;
+        for (int i = 0; i < unitStack.Units.Count; i++)
+        {
+            unitStack.Units[i].MovePoints = unitStack.Units[i].MovePointsTotal;
+        }
 
     }
 
     public override void AddUnit(UnitStackViewModel unitStack, UnitViewModel unit)
     {
         unitStack.Units.Add(unit);
-        unitStack.LeadingUnit = unitStack.Units[0];
+
+        CalculateUnitStackStats(unitStack);
+    }
+
+    public override void AddUnits(UnitStackViewModel unitStack, UnitViewModel[] units)
+    {
+        unitStack.Units.AddRange(units);
+    
+        CalculateUnitStackStats(unitStack);
     }
 
     public override void RemoveUnit(UnitStackViewModel unitStack, UnitViewModel unit)
@@ -80,15 +93,61 @@ public class UnitStackController : UnitStackControllerBase {
             return;
         }
 
+
+        CalculateUnitStackStats(unitStack);
+    }
+
+    public override void RemoveUnits(UnitStackViewModel unitStack, UnitViewModel[] units)
+    {
+        for (int i = 0; i < units.Length; i++)
+        {
+            unitStack.Units.Remove(units[i]);
+        }
+
+        CalculateUnitStackStats(unitStack);
+    }
+
+    private void CalculateUnitStackStats(UnitStackViewModel unitStack)
+    {
+        unitStack.Visible = true;
         unitStack.LeadingUnit = unitStack.Units[0];
+
+        unitStack.MovePoints = unitStack.Units[0].MovePoints;
+        unitStack.MovePointsTotal = unitStack.Units[0].MovePointsTotal;
+        unitStack.ViewRange = unitStack.Units[0].ViewRange;
+
+
+        foreach (UnitViewModel unit in unitStack.Units)
+        {
+            // Set movement points
+            if (unit.MovePoints < unitStack.MovePoints)
+            {
+                unitStack.MovePoints = unit.MovePoints;
+            }
+            // Set total movement points
+            if (unit.MovePointsTotal < unitStack.MovePointsTotal)
+            {
+                unitStack.MovePointsTotal = unit.MovePointsTotal;
+            }
+            // Set view range
+            if (unit.ViewRange > unitStack.ViewRange)
+            {
+                unitStack.ViewRange = unit.ViewRange;
+            }
+        }
     }
 
     public override void DestroyStack(UnitStackViewModel unitStack)
     {
+        // Make sure to clean up after stack
+        ExecuteCommand(unitStack.CancelAction);
+        
         for (int i = 0; i < unitStack.Units.Count; i++)
         {
             ExecuteCommand(unitStack.RemoveUnit, unitStack.Units[i]);
         }
+
+        unitStack.ParentFaction.UnitStacks.Remove(unitStack);
     }
 
     public override void PlanMovement(UnitStackViewModel unitStack)
@@ -140,41 +199,27 @@ public class UnitStackController : UnitStackControllerBase {
     }
 
 
+    public override void CancelAction(UnitStackViewModel unitStack)
+    {
+        unitStack.PlannedAction = PlanedAction.None;
+        unitStack.PathDestination = null;
+        unitStack.UnitStackTarget = null;
+        unitStack.CityTarget = null;
+        unitStack.Path.Clear();
+    }
+
     public override void Move(UnitStackViewModel unitStack, Hex destination)
     {
-
+        
         unitStack.PlannedAction = PlanedAction.None;
 
-        if (destination == null)
-        {
-            Debug.Log("Cannot move to null");
-            return;
-        }
-
-        if (unitStack.MovePoints <= 0)
-        {
-            Debug.Log("Out of msovement points");
-            return;
-        }
-
-        if (unitStack.HexLocation == destination)
-        {
-            Debug.Log("Already at destiantion");
-            return;
-        }
+        if (destination == null) return;
+        if (unitStack.HexLocation == destination) return;
+        if (unitStack.CanMove() == false) return;
 
 
-        // Clear the previous path
-        unitStack.Path.Clear();
-
-        // Find a new path
         List<Hex> path = Pathfinding.FindPath(unitStack.HexLocation, destination);
-
-        if (path == null)
-        {
-            Debug.Log("Couldn't find path");
-        }
-
+        unitStack.Path.Clear();
         unitStack.Path.AddRange(path);
         
 
@@ -182,99 +227,177 @@ public class UnitStackController : UnitStackControllerBase {
         unitStack.NextHexInPath = unitStack.Path[0];
     }
 
+
     public override void MoveSelectedUnits(UnitStackViewModel unitStack, Hex destination)
     {
-        if (destination == null)
+        PlayerViewModel player = unitStack.ParentPlayer;
+        ModelCollection<UnitViewModel> units = player.SelectedUnits;
+
+        unitStack.PlannedAction = PlanedAction.None;
+
+        if (destination == null) return;
+        if (unitStack.HexLocation == destination) return;
+        if (unitStack.CanMove(units) == false) return;
+
+        // if only a single unit in stack or all of them selected
+        if (unitStack.Units.Count == 1 || unitStack.Units.Count == units.Count)
         {
-            Debug.Log("Cannot move to null");
+            ExecuteCommand(unitStack.Move, destination);
             return;
         }
 
-        if (unitStack.HexLocation == destination)
-        {
-            Debug.Log("Already at destiantion");
-            return;
-        }
-        
-        // TODO
-        //if (unitStack.HexLocation.UnitStack)
-        //{
+  
+        // Create stack
+        UnitStackViewModel newUnitStack = player.Faction.CreateUnitStack(unitStack.HexLocation);
+        ExecuteCommand(newUnitStack.AddUnits, units.ToList().ToArray());
+        ExecuteCommand(unitStack.RemoveUnits, units.ToList().ToArray());
+       
 
-        //}
-        
-        ModelCollection<UnitViewModel> units = unitStack.ParentPlayer.SelectedUnits;
-
-        for (int i = 0; i < units.Count; i++)
-        {
-            if (units[i].MovePoints <= 0)
-            {
-                return;
-            }
-        }
-
-        if (units.Count == 0) return;
-        
-
-        // Find the path that the stack will take
-        List<Hex> path = Pathfinding.FindPath(unitStack.HexLocation, destination);
-
-        if (path == null)
-        {
-            Debug.Log("Couldn't find path");
-        }
-
-        Hex splitToHex = path[0];
-
-        UnitStackViewModel newUnitStack = new UnitStackViewModel(UnitStackController)
-        {
-            Owner = unitStack.ParentFaction.ParentPlayer,
-            ParentFaction = unitStack.ParentFaction,
-            HexLocation = splitToHex,
-        };
-        newUnitStack.ParentFaction.UnitStacks.Add(newUnitStack);
-        
-
-        for (int i = 0; i < units.Count; i++)
-        {
-            ExecuteCommand(unitStack.RemoveUnit, units[i]);
-            ExecuteCommand(newUnitStack.AddUnit, units[i]);
-        }
-
-        newUnitStack.Owner = unitStack.ParentFaction.ParentPlayer;
-
-
-        ExecuteCommand(unitStack.ParentFaction.ParentPlayer.SelectUnitStack, newUnitStack);
+        ExecuteCommand(unitStack.CancelAction);
+        ExecuteCommand(player.SelectUnitStack, newUnitStack);
         ExecuteCommand(newUnitStack.Move, destination);
-
-        unitStack.ParentPlayer.SelectedUnits.Clear();
-        unitStack.Path.Clear();
-        unitStack.PathDestination = null;
     }
-    
 
-    /*
-    public override void MoveUnits(UnitStackViewModel unitStack, Hex destination)
+
+    public override void MergeWithStack(UnitStackViewModel unitStack, UnitStackViewModel targetStack)
     {
-        if (destination == null)
+        // If we are the target
+        if (unitStack == targetStack) return;
+
+        unitStack.UnitStackTarget = targetStack;
+
+        ExecuteCommand(unitStack.Move, targetStack.HexLocation);
+
+
+        // Follow target
+        targetStack.HexLocationProperty.Subscribe( hex => ExecuteCommand(unitStack.EvaluateMovementPath, targetStack.HexLocation) ).DisposeWhenChanged(unitStack.UnitStackTargetProperty);
+    
+        // Merge once a hex away
+        unitStack.HexLocationProperty.Subscribe(hex =>
         {
-            Debug.Log("Cannot move to null");
+            if (hex == targetStack.HexLocation)
+            {
+                ExecuteCommand(targetStack.AddUnits, unitStack.Units.ToList().ToArray());
+                ExecuteCommand(targetStack.Owner.SelectUnitStack, targetStack);
+                ExecuteCommand(unitStack.DestroyStack);
+            }
+        }).DisposeWhenChanged(unitStack.UnitStackTargetProperty, false);
+
+    }
+
+    public override void MergeSelectedUnitsWithStack(UnitStackViewModel unitStack, UnitStackViewModel targetStack)
+    {
+
+        PlayerViewModel player = unitStack.ParentPlayer;
+        ModelCollection<UnitViewModel> units = player.SelectedUnits;
+
+        unitStack.PlannedAction = PlanedAction.None;
+
+        if (targetStack == null) return;
+        if (targetStack == unitStack) return;
+        if (unitStack.CanMove(units) == false) return;
+
+        // if only a single unit in stack or all of them selected
+        if (unitStack.Units.Count == 1 || unitStack.Units.Count == units.Count)
+        {
+            ExecuteCommand(unitStack.MergeWithStack, targetStack);
             return;
         }
 
-        if (unitStack.MovePoints <= 0)
+
+        // Create stack
+        UnitStackViewModel newUnitStack = player.Faction.CreateUnitStack(unitStack.HexLocation);
+        ExecuteCommand(newUnitStack.AddUnits, units.ToList().ToArray());
+        ExecuteCommand(unitStack.RemoveUnits, units.ToList().ToArray());
+
+
+        ExecuteCommand(unitStack.CancelAction);
+        ExecuteCommand(player.SelectUnitStack, newUnitStack);
+        ExecuteCommand(newUnitStack.MergeWithStack, targetStack);
+
+    }
+
+    public override void MergeWithCity(UnitStackViewModel unitStack, CityViewModel city)
+    {
+        unitStack.CityTarget = city;
+
+        ExecuteCommand(unitStack.Move, city.HexLocation);
+
+        // Merge once a hex away
+        unitStack.HexLocationProperty.Subscribe(hex =>
         {
-            Debug.Log("Out of msovement points");
+            if (hex == city.HexLocation)
+            {
+                ExecuteCommand(city.AddUnits, unitStack.Units.ToList().ToArray());
+                ExecuteCommand(unitStack.Owner.SelectCity, city);
+                ExecuteCommand(unitStack.DestroyStack);
+            }
+        }).DisposeWhenChanged(unitStack.CityTargetProperty, false);
+    }
+
+    public override void MergeSelectedWithCity(UnitStackViewModel unitStack, CityViewModel city)
+    {
+        PlayerViewModel player = unitStack.ParentPlayer;
+        ModelCollection<UnitViewModel> units = player.SelectedUnits;
+
+        unitStack.PlannedAction = PlanedAction.None;
+
+        if (unitStack.CanMove(units) == false) return;
+
+        // if only a single unit in stack or all of them selected
+        if (unitStack.Units.Count == 1 || unitStack.Units.Count == units.Count)
+        {
+            ExecuteCommand(unitStack.MergeWithCity, city);
             return;
         }
 
-        if (unitStack.HexLocation == destination)
-        {
-            Debug.Log("Already at destiantion");
-            return;
-        }
 
-        // check if the movement is valid
-    }*/
+        // Create stack
+        UnitStackViewModel newUnitStack = player.Faction.CreateUnitStack(unitStack.HexLocation);
+        ExecuteCommand(newUnitStack.AddUnits, units.ToList().ToArray());
+        ExecuteCommand(unitStack.RemoveUnits, units.ToList().ToArray());
+
+
+        ExecuteCommand(unitStack.CancelAction);
+        ExecuteCommand(player.SelectUnitStack, newUnitStack);
+        ExecuteCommand(newUnitStack.MergeWithCity, city);
+    }
+
+
+
+    public override void AttackStack(UnitStackViewModel unitStack, UnitStackViewModel target)
+    {
+        unitStack.UnitStackTarget = target;
+
+        ExecuteCommand(unitStack.Move, target.HexLocation);
+
+        // If the target moves follow it if we still see it
+        unitStack.UnitStackTarget.HexLocationProperty.Subscribe(hex =>
+        {
+            if (target.Visible)
+            {
+                ExecuteCommand(unitStack.EvaluateMovementPath, target.HexLocation);
+            }
+            else
+            {
+                Debug.Log("Unit target lost");
+                //unitStack.ParentFaction.Message("Unit Lost");
+            }
+        }).DisposeWhenChanged(unitStack.UnitStackTargetProperty);
+
+        unitStack.HexLocationProperty.Subscribe(hex =>
+        {
+            if (unitStack.NextHexInPath == target.HexLocation)
+            {
+
+            }
+        });
+
+    }
+
+
+
+
 
     public override void Settle(UnitStackViewModel unitStack)
     {
@@ -318,13 +441,17 @@ public class UnitStackController : UnitStackControllerBase {
         // Create city data
         CityViewModel city = new CityViewModel(CityController)
         {
+            Owner = unitStack.Owner,
             Name = "City " + (int)UnityEngine.Random.Range(0, 100),
+            ViewRange = 6,
             Happieness = 75,
             GoldIncome = 10,
             Population = settler.Population,
             PopulationGrowth = 0.02f,
             HexLocation = settleHex
         };
+        unitStack.ParentFaction.Cities.Add(city);
+
         // Remove the settler once the city has been founded
         ExecuteCommand(unitStack.RemoveUnit, settler);           
 
@@ -332,16 +459,16 @@ public class UnitStackController : UnitStackControllerBase {
         // Move all units from stack into the city
         for (int i = 0; i < unitStack.Units.Count; i++)
         {
-            ExecuteCommand(city.AddUnit, unitStack.Units[i]);           
+            ExecuteCommand(city.AddUnit, unitStack.Units[i]);
         }
 
-
-        unitStack.ParentFaction.Cities.Add(city);
-
+        // Remove the Unit Stack
         unitStack.StackState = StackState.Idling;
         unitStack.SettlingLocation = null;
         unitStack.PlannedSettlingLocation = null;
         ExecuteCommand(unitStack.DestroyStack, unitStack);
+
+        ExecuteCommand(city.Owner.SelectCity, city);
     }
 
 

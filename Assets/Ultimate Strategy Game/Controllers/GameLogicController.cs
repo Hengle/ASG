@@ -51,8 +51,10 @@ public class GameLogicController : GameLogicControllerBase
 
         // Add human player
         if (gameLogic.HumanPlayer == null)
+        {
             gameLogic.HumanPlayer = new PlayerViewModel(PlayerController);
-        
+        }
+
         gameLogic.CurrentPlayer = gameLogic.HumanPlayer;
         gameLogic.Players.Add(gameLogic.HumanPlayer);
         gameLogic.Factions.Add(gameLogic.HumanFaction);
@@ -60,6 +62,9 @@ public class GameLogicController : GameLogicControllerBase
         startingHex = TerrainManagerController.GetStartingLocation(TerrainManager);
 
         gameLogic.HumanPlayer.StartingHex = startingHex;
+        gameLogic.HumanPlayer.Faction = gameLogic.HumanFaction;
+        gameLogic.HumanFaction.Owner = gameLogic.HumanPlayer;
+
         GiveStarterUnits(gameLogic.HumanPlayer);
 
 
@@ -75,7 +80,8 @@ public class GameLogicController : GameLogicControllerBase
             };
 
             faction = new FactionViewModel(FactionController) { 
-                Name = player.Name + "'s faction"  
+                Name = player.Name + "'s faction",
+                Owner = player
             };
             player.Faction = faction;
 
@@ -102,9 +108,9 @@ public class GameLogicController : GameLogicControllerBase
             Population = 850,
             UnitCount = 40,
             UnitCountMax = 50,
-            ParentFaction = player.Faction,
-            MovePoints = 10,
-            MovePointsMax = 10
+            MovePoints = 8,
+            MovePointsTotal = 8,
+            ViewRange = 2
         };
 
         // Spawn the settle
@@ -114,9 +120,9 @@ public class GameLogicController : GameLogicControllerBase
             Owner = player,
             UnitCount = 80,
             UnitCountMax = 80,
-            ParentFaction = player.Faction,
             MovePoints = 10,
-            MovePointsMax = 10
+            MovePointsTotal = 10,
+            ViewRange = 4
         };
 
         // Spawn the settle
@@ -126,52 +132,23 @@ public class GameLogicController : GameLogicControllerBase
             Owner = player,
             UnitCount = 80,
             UnitCountMax = 80,
-            ParentFaction = player.Faction,
             MovePoints = 10,
-            MovePointsMax = 10
+            MovePointsTotal = 10,
+            ViewRange = 4
         };
 
         UnitStackViewModel unitStack = new UnitStackViewModel(UnitStackController)
         {
             Owner = player,
-            HexLocation = player.StartingHex,
-            ParentFaction = player.Faction
+            HexLocation = player.StartingHex
         };
 
         player.Faction.UnitStacks.Add(unitStack);
-        player.Faction.Units.Add(settler);
-        player.Faction.Units.Add(meleeUnit);
-        player.Faction.Units.Add(meleeUnit2);
 
         UnitStackController.AddUnit(unitStack, settler);
         UnitStackController.AddUnit(unitStack, meleeUnit);
         UnitStackController.AddUnit(unitStack, meleeUnit2);
 
-
-        /*
-        // Give each player 1 worker and 1 combat unitStack
-        var worker = new WorkerUnitViewModel(WorkerUnitController)
-        {
-            Owner = player,
-            CurrentTile = startTile,
-            Position = player.StartingPosition
-        };
-
-        player..Add(worker);
-        ExecuteCommand(startTile.SpawnUnit, worker);
-
-        // Hack: grab a new starting position from the map and spawn a combat unitStack
-        var randomPos = CoreMapController.GetRandomPlayerStartPosition();
-        var tile = CoreMapController.GetTile(CoreMap, randomPos);
-        var combatUnit = new CombatUnitViewModel(CombatUnitController)
-        {
-            Owner = player,
-            CurrentTile = tile,
-            Position = randomPos
-        };
-        player.AllUnits.Add(combatUnit);
-        ExecuteCommand(tile.SpawnUnit, combatUnit);
-        */
     }
 
 
@@ -193,9 +170,6 @@ public class GameLogicController : GameLogicControllerBase
         {
             FactionController.NextTurnCalculation(gameLogic.Factions[i]);
         }
-
-
-        Debug.Log("Turn " + gameLogic.TurnCount);
 
     }
 }

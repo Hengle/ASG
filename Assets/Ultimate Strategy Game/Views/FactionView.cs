@@ -16,29 +16,34 @@ public partial class FactionView
     public GameObject cityUIPrefab;
     public Transform cityUIContainer;
 
+    public GameObject obj;
 
-    public override void Start()
-    {
-        base.Start();
-        
-    }
+    private bool startGame = false;
 
     /// This binding will add or remove views based on an element/viewmodel collection.
     public override ViewBase CreateUnitStacksView(UnitStackViewModel item) 
     {
         var unitStack = InstantiateView(unitStackPrefab, item, item.HexLocation.worldPos + Vector3.up * 0.6f, Quaternion.identity);
+        //var owner = item.Owner;
 
-        if (Faction.UnitStacks.Count == 1)
+        if (startGame)
+        {
+            startGame = false;
             CameraManager.main.PanTo(unitStack.transform);
+        }
         
         // TODO: owner is not being assigned
 
         // Use the properties used in the inspector
-        unitStack.InitializeData(item);
+        //unitStack.InitializeData(item);
+        //unitStack.GetComponent<UnitStackFlagView>().UnitStack.Owner = owner;
+        
         unitStack.GetComponent<UnitStackFlagView>().UnitStack = item;
         unitStack.GetComponent<UnitStackFlagView>().SetupBindings();
         unitStack.GetComponent<UnitStackActionsView>().UnitStack = item;
         unitStack.GetComponent<UnitStackActionsView>().SetupBindings();
+
+
 
         return unitStack;
     }
@@ -58,7 +63,7 @@ public partial class FactionView
     public override ViewBase CreateCitiesView(CityViewModel item) 
     {
         var city = InstantiateView(cityPrefab, item, item.HexLocation.worldPos, Quaternion.identity);
-        //city.InitializeData(item);
+        
         city.GetComponent<CityFlagView>().City = item;
         city.GetComponent<CityFlagView>().SetupBindings();
 

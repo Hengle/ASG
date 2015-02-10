@@ -65,6 +65,11 @@ public partial class Hex : IHeapItem<Hex>
         return -compare;
     }
 
+    public Vector3 GetRandomPointInArea()
+    {
+        return Vector3.zero;
+        //UnityEngine.Random.insideUnitCircle();
+    }
 
     public bool HasLandTiles ()
     {
@@ -287,6 +292,22 @@ public partial class Hex : IHeapItem<Hex>
                 Hex.SearchNeighbors(t_hex, searchParams, result);
             }
         });
+    }
+
+    public static void GetViewRange(Hex hex, int range, int height, List<Hex> result)
+    {
+        if (range <= 0)
+            return;
+
+        for (int i = 0; i < hex.neighbors.Count; i++)
+        {
+
+            if (result.Contains(hex.neighbors[i]) == false)
+                result.Add(hex.neighbors[i]);
+                
+            Hex.GetViewRange(hex.neighbors[i], range - 1, height, result);
+            
+        }
     }
 
     public static void SearchNeighbors(Hex hex, int range, Func<Hex, bool> searchParams, List<Hex> result)

@@ -1,7 +1,10 @@
+// Upgrade NOTE: commented out 'float4 unity_DynamicLightmapST', a built-in variable
+// Upgrade NOTE: commented out 'float4 unity_LightmapST', a built-in variable
+
 // Shader created with Shader Forge v1.02 
 // Shader Forge (c) Neat Corporation / Joachim Holmer - http://www.acegikmo.com/shaderforge/
 // Note: Manually altering this data may prevent you from opening it in Shader Forge
-/*SF_DATA;ver:1.02;sub:START;pass:START;ps:flbk:,lico:1,lgpr:1,nrmq:1,limd:0,uamb:True,mssp:True,lmpd:False,lprd:False,rprd:False,enco:False,frtr:True,vitr:True,dbil:False,rmgx:True,rpth:0,hqsc:True,hqlp:False,tesm:0,blpr:4,bsrc:4,bdst:1,culm:0,dpts:2,wrdp:True,ufog:False,aust:True,igpj:False,qofs:0,qpre:2,rntp:3,fgom:False,fgoc:False,fgod:False,fgor:False,fgmd:0,fgcr:0.1280277,fgcg:0.1953466,fgcb:0.2352941,fgca:1,fgde:0.01,fgrn:0,fgrf:300,ofsf:0,ofsu:0,f2p0:False;n:type:ShaderForge.SFN_Final,id:3082,x:32928,y:32648,varname:node_3082,prsc:2|custl-7364-OUT,clip-9254-OUT;n:type:ShaderForge.SFN_Tex2d,id:5332,x:32308,y:32799,ptovrint:False,ptlb:FOW,ptin:_FOW,varname:node_5332,prsc:2,tex:266f68dc02a800e4882eafa3f274943c,ntxv:2,isnm:False;n:type:ShaderForge.SFN_Multiply,id:7364,x:32570,y:32650,varname:node_7364,prsc:2|A-422-RGB,B-5332-RGB;n:type:ShaderForge.SFN_Color,id:422,x:32308,y:32627,ptovrint:False,ptlb:Color,ptin:_Color,varname:node_422,prsc:2,glob:False,c1:1,c2:1,c3:1,c4:1;n:type:ShaderForge.SFN_Slider,id:6863,x:32229,y:32992,ptovrint:False,ptlb:Transparency,ptin:_Transparency,varname:node_6863,prsc:2,min:0,cur:1,max:1;n:type:ShaderForge.SFN_Multiply,id:9254,x:32583,y:32874,varname:node_9254,prsc:2|A-5332-A,B-6863-OUT;proporder:5332-422-6863;pass:END;sub:END;*/
+/*SF_DATA;ver:1.02;sub:START;pass:START;ps:flbk:,lico:1,lgpr:1,nrmq:1,limd:0,uamb:True,mssp:True,lmpd:False,lprd:False,rprd:False,enco:False,frtr:True,vitr:True,dbil:False,rmgx:True,rpth:0,hqsc:True,hqlp:False,tesm:0,blpr:4,bsrc:4,bdst:1,culm:0,dpts:2,wrdp:True,ufog:False,aust:True,igpj:False,qofs:0,qpre:2,rntp:3,fgom:False,fgoc:False,fgod:False,fgor:False,fgmd:0,fgcr:0.1280277,fgcg:0.1953466,fgcb:0.2352941,fgca:1,fgde:0.01,fgrn:0,fgrf:300,ofsf:0,ofsu:0,f2p0:False;n:type:ShaderForge.SFN_Final,id:3082,x:32928,y:32648,varname:node_3082,prsc:2|clip-9254-OUT;n:type:ShaderForge.SFN_Tex2d,id:5332,x:31801,y:32924,ptovrint:False,ptlb:FOW,ptin:_FOW,varname:node_5332,prsc:2,tex:6a985dfcd1d3ca94e9753748ed65c697,ntxv:2,isnm:False;n:type:ShaderForge.SFN_Color,id:422,x:32316,y:32465,ptovrint:False,ptlb:Color,ptin:_Color,varname:node_422,prsc:2,glob:False,c1:1,c2:1,c3:1,c4:1;n:type:ShaderForge.SFN_Slider,id:6863,x:32075,y:33144,ptovrint:False,ptlb:Transparency,ptin:_Transparency,varname:node_6863,prsc:2,min:0,cur:1,max:1;n:type:ShaderForge.SFN_Multiply,id:9254,x:32681,y:33089,varname:node_9254,prsc:2|A-5332-A,B-6863-OUT;n:type:ShaderForge.SFN_TexCoord,id:6567,x:31790,y:32582,varname:node_6567,prsc:2,uv:0;n:type:ShaderForge.SFN_Vector2,id:5485,x:31781,y:32736,varname:node_5485,prsc:2,v1:0.1,v2:0.1;n:type:ShaderForge.SFN_Add,id:2024,x:31967,y:32644,varname:node_2024,prsc:2|A-6567-UVOUT,B-5485-OUT;proporder:5332-422-6863;pass:END;sub:END;*/
 
 Shader "Shader Forge/FOW" {
     Properties {
@@ -23,7 +26,6 @@ Shader "Shader Forge/FOW" {
             Blend DstColor Zero
             
             
-            Fog {Mode Off}
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -32,8 +34,11 @@ Shader "Shader Forge/FOW" {
             #pragma multi_compile_fwdbase_fullshadows
             #pragma exclude_renderers xbox360 ps3 flash d3d11_9x 
             #pragma target 3.0
+            // float4 unity_LightmapST;
+            #ifdef DYNAMICLIGHTMAP_ON
+                // float4 unity_DynamicLightmapST;
+            #endif
             uniform sampler2D _FOW; uniform float4 _FOW_ST;
-            uniform float4 _Color;
             uniform float _Transparency;
             struct VertexInput {
                 float4 vertex : POSITION;
@@ -42,6 +47,11 @@ Shader "Shader Forge/FOW" {
             struct VertexOutput {
                 float4 pos : SV_POSITION;
                 float2 uv0 : TEXCOORD0;
+                #ifndef LIGHTMAP_OFF
+                    float4 uvLM : TEXCOORD1;
+                #else
+                    float3 shLight : TEXCOORD1;
+                #endif
             };
             VertexOutput vert (VertexInput v) {
                 VertexOutput o;
@@ -54,7 +64,7 @@ Shader "Shader Forge/FOW" {
                 float4 _FOW_var = tex2D(_FOW,TRANSFORM_TEX(i.uv0, _FOW));
                 clip((_FOW_var.a*_Transparency) - 0.5);
 ////// Lighting:
-                float3 finalColor = (_Color.rgb*_FOW_var.rgb);
+                float3 finalColor = 0;
                 return fixed4(finalColor,1);
             }
             ENDCG
@@ -65,7 +75,6 @@ Shader "Shader Forge/FOW" {
                 "LightMode"="ShadowCollector"
             }
             
-            Fog {Mode Off}
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -77,6 +86,10 @@ Shader "Shader Forge/FOW" {
             #pragma multi_compile_shadowcollector
             #pragma exclude_renderers xbox360 ps3 flash d3d11_9x 
             #pragma target 3.0
+            // float4 unity_LightmapST;
+            #ifdef DYNAMICLIGHTMAP_ON
+                // float4 unity_DynamicLightmapST;
+            #endif
             uniform sampler2D _FOW; uniform float4 _FOW_ST;
             uniform float _Transparency;
             struct VertexInput {
@@ -86,6 +99,11 @@ Shader "Shader Forge/FOW" {
             struct VertexOutput {
                 V2F_SHADOW_COLLECTOR;
                 float2 uv0 : TEXCOORD5;
+                #ifndef LIGHTMAP_OFF
+                    float4 uvLM : TEXCOORD6;
+                #else
+                    float3 shLight : TEXCOORD6;
+                #endif
             };
             VertexOutput vert (VertexInput v) {
                 VertexOutput o;
@@ -110,7 +128,6 @@ Shader "Shader Forge/FOW" {
             Cull Off
             Offset 1, 1
             
-            Fog {Mode Off}
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -121,6 +138,10 @@ Shader "Shader Forge/FOW" {
             #pragma multi_compile_shadowcaster
             #pragma exclude_renderers xbox360 ps3 flash d3d11_9x 
             #pragma target 3.0
+            // float4 unity_LightmapST;
+            #ifdef DYNAMICLIGHTMAP_ON
+                // float4 unity_DynamicLightmapST;
+            #endif
             uniform sampler2D _FOW; uniform float4 _FOW_ST;
             uniform float _Transparency;
             struct VertexInput {
@@ -130,6 +151,11 @@ Shader "Shader Forge/FOW" {
             struct VertexOutput {
                 V2F_SHADOW_CASTER;
                 float2 uv0 : TEXCOORD1;
+                #ifndef LIGHTMAP_OFF
+                    float4 uvLM : TEXCOORD2;
+                #else
+                    float3 shLight : TEXCOORD2;
+                #endif
             };
             VertexOutput vert (VertexInput v) {
                 VertexOutput o;

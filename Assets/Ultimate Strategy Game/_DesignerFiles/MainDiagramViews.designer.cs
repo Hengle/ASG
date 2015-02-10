@@ -521,15 +521,19 @@ public abstract class UnitStackViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public ViewBase _UnitStackDestination;
+    public ViewBase _UnitStackTarget;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public ViewBase _CityDestination;
+    public ViewBase _CityTarget;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
     public Int32 _ViewRange;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Boolean _Visible;
     
     public override System.Type ViewModelType {
         get {
@@ -559,9 +563,10 @@ public abstract class UnitStackViewBase : ViewBase {
         unitStack.MovePointsTotal = this._MovePointsTotal;
         unitStack.StackState = this._StackState;
         unitStack.PlannedAction = this._PlannedAction;
-        unitStack.UnitStackDestination = this._UnitStackDestination == null ? null : this._UnitStackDestination.ViewModelObject as UnitStackViewModel;
-        unitStack.CityDestination = this._CityDestination == null ? null : this._CityDestination.ViewModelObject as CityViewModel;
+        unitStack.UnitStackTarget = this._UnitStackTarget == null ? null : this._UnitStackTarget.ViewModelObject as UnitStackViewModel;
+        unitStack.CityTarget = this._CityTarget == null ? null : this._CityTarget.ViewModelObject as CityViewModel;
         unitStack.ViewRange = this._ViewRange;
+        unitStack.Visible = this._Visible;
     }
     
     public virtual void ExecuteNextTurnCalculation() {
@@ -638,6 +643,38 @@ public abstract class UnitStackViewBase : ViewBase {
     
     public virtual void ExecutePlanSelectedUnitsMovement() {
         this.ExecuteCommand(UnitStack.PlanSelectedUnitsMovement);
+    }
+    
+    public virtual void ExecuteAttackStack(UnitStackViewModel unitStack) {
+        this.ExecuteCommand(UnitStack.AttackStack, unitStack);
+    }
+    
+    public virtual void ExecuteMergeWithStack(UnitStackViewModel unitStack) {
+        this.ExecuteCommand(UnitStack.MergeWithStack, unitStack);
+    }
+    
+    public virtual void ExecuteAttackCity(CityViewModel city) {
+        this.ExecuteCommand(UnitStack.AttackCity, city);
+    }
+    
+    public virtual void ExecuteMergeWithCity(CityViewModel city) {
+        this.ExecuteCommand(UnitStack.MergeWithCity, city);
+    }
+    
+    public virtual void ExecuteMergeSelectedUnitsWithStack(UnitStackViewModel unitStack) {
+        this.ExecuteCommand(UnitStack.MergeSelectedUnitsWithStack, unitStack);
+    }
+    
+    public virtual void ExecuteAddUnits(UnitViewModel[] arg) {
+        this.ExecuteCommand(UnitStack.AddUnits, arg);
+    }
+    
+    public virtual void ExecuteRemoveUnits(UnitViewModel[] arg) {
+        this.ExecuteCommand(UnitStack.RemoveUnits, arg);
+    }
+    
+    public virtual void ExecuteMergeSelectedWithCity(CityViewModel city) {
+        this.ExecuteCommand(UnitStack.MergeSelectedWithCity, city);
     }
 }
 
@@ -727,6 +764,14 @@ public abstract class CityViewBase : ViewBase {
     [UnityEngine.HideInInspector()]
     public Int32 _Happieness;
     
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public ViewBase _Owner;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _ViewRange;
+    
     public override System.Type ViewModelType {
         get {
             return typeof(CityViewModel);
@@ -756,6 +801,8 @@ public abstract class CityViewBase : ViewBase {
         city.Knowledge = this._Knowledge;
         city.GoldIncome = this._GoldIncome;
         city.Happieness = this._Happieness;
+        city.Owner = this._Owner == null ? null : this._Owner.ViewModelObject as PlayerViewModel;
+        city.ViewRange = this._ViewRange;
     }
     
     public virtual void ExecuteNextTurnCalculation() {
@@ -786,8 +833,28 @@ public abstract class CityViewBase : ViewBase {
         this.ExecuteCommand(City.AddUnit, unit);
     }
     
-    public virtual void ExecuteRemovUnit(UnitViewModel unit) {
-        this.ExecuteCommand(City.RemovUnit, unit);
+    public virtual void ExecuteRemoveUnit(UnitViewModel unit) {
+        this.ExecuteCommand(City.RemoveUnit, unit);
+    }
+    
+    public virtual void ExecuteAddUnits(UnitViewModel[] arg) {
+        this.ExecuteCommand(City.AddUnits, arg);
+    }
+    
+    public virtual void ExecuteRemoveUnits(UnitViewModel[] arg) {
+        this.ExecuteCommand(City.RemoveUnits, arg);
+    }
+    
+    public virtual void ExecuteMoveSelectedUnits(Hex arg) {
+        this.ExecuteCommand(City.MoveSelectedUnits, arg);
+    }
+    
+    public virtual void ExecuteMergeSelectedWithStack(UnitStackViewModel unitStack) {
+        this.ExecuteCommand(City.MergeSelectedWithStack, unitStack);
+    }
+    
+    public virtual void ExecuteAttackWithSelectedUnits(UnitStackMovementState arg) {
+        this.ExecuteCommand(City.AttackWithSelectedUnits, arg);
     }
 }
 
@@ -873,7 +940,7 @@ public abstract class UnitViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _MovePointsMax;
+    public Int32 _MovePointsTotal;
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
@@ -881,7 +948,11 @@ public abstract class UnitViewBase : ViewBase {
     
     [UFGroup("View Model Properties")]
     [UnityEngine.HideInInspector()]
-    public Int32 _BattleMovePointsMax;
+    public Int32 _BattleMovePointsTotal;
+    
+    [UFGroup("View Model Properties")]
+    [UnityEngine.HideInInspector()]
+    public Int32 _ViewRange;
     
     public override System.Type ViewModelType {
         get {
@@ -909,9 +980,10 @@ public abstract class UnitViewBase : ViewBase {
         unit.UnitCountMax = this._UnitCountMax;
         unit.Owner = this._Owner == null ? null : this._Owner.ViewModelObject as PlayerViewModel;
         unit.MovePoints = this._MovePoints;
-        unit.MovePointsMax = this._MovePointsMax;
+        unit.MovePointsTotal = this._MovePointsTotal;
         unit.BattleMovePoints = this._BattleMovePoints;
-        unit.BattleMovePointsMax = this._BattleMovePointsMax;
+        unit.BattleMovePointsTotal = this._BattleMovePointsTotal;
+        unit.ViewRange = this._ViewRange;
     }
     
     public virtual void ExecuteMove(Hex arg) {
@@ -1239,6 +1311,10 @@ public class PlayerUIViewBase : PlayerViewBase {
     [UnityEngine.HideInInspector()]
     public bool _BindHoverCity = true;
     
+    [UFToggleGroup("SelectedCity")]
+    [UnityEngine.HideInInspector()]
+    public bool _BindSelectedCity = true;
+    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<PlayerController>());
     }
@@ -1267,6 +1343,10 @@ public class PlayerUIViewBase : PlayerViewBase {
     public virtual void HoverCityChanged(CityViewModel value) {
     }
     
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void SelectedCityChanged(CityViewModel value) {
+    }
+    
     public override void Bind() {
         base.Bind();
         if (this._BindSelectedUnitStack) {
@@ -1283,6 +1363,9 @@ public class PlayerUIViewBase : PlayerViewBase {
         }
         if (this._BindHoverCity) {
             this.BindProperty(Player._HoverCityProperty, this.HoverCityChanged);
+        }
+        if (this._BindSelectedCity) {
+            this.BindProperty(Player._SelectedCityProperty, this.SelectedCityChanged);
         }
     }
 }
@@ -1507,6 +1590,11 @@ public class UnitCardViewBase : UnitViewBase {
     [UFRequireInstanceMethod("UnitCountMaxChanged")]
     public bool _BindUnitCountMax = true;
     
+    [UFToggleGroup("MovePoints")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("MovePointsChanged")]
+    public bool _BindMovePoints = true;
+    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<UnitController>());
     }
@@ -1519,6 +1607,10 @@ public class UnitCardViewBase : UnitViewBase {
     public virtual void UnitCountMaxChanged(Int32 value) {
     }
     
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void MovePointsChanged(Int32 value) {
+    }
+    
     public override void Bind() {
         base.Bind();
         if (this._BindUnitCount) {
@@ -1526,6 +1618,9 @@ public class UnitCardViewBase : UnitViewBase {
         }
         if (this._BindUnitCountMax) {
             this.BindProperty(Unit._UnitCountMaxProperty, this.UnitCountMaxChanged);
+        }
+        if (this._BindMovePoints) {
+            this.BindProperty(Unit._MovePointsProperty, this.MovePointsChanged);
         }
     }
 }
@@ -1600,6 +1695,11 @@ public class UnitStackViewViewBase : UnitStackViewBase {
     [UnityEngine.HideInInspector()]
     public bool _BindDestroyStack = true;
     
+    [UFToggleGroup("HexLocation")]
+    [UnityEngine.HideInInspector()]
+    [UFRequireInstanceMethod("HexLocationChanged")]
+    public bool _BindHexLocation = true;
+    
     public override ViewModel CreateModel() {
         return this.RequestViewModel(GameManager.Container.Resolve<UnitStackController>());
     }
@@ -1640,6 +1740,10 @@ public class UnitStackViewViewBase : UnitStackViewBase {
     public virtual void DestroyStackExecuted() {
     }
     
+    /// Subscribes to the property and is notified anytime the value changes.
+    public virtual void HexLocationChanged(Hex value) {
+    }
+    
     public virtual void ResetWorldPos() {
         if (_WorldPosDisposable != null) _WorldPosDisposable.Dispose();
         _WorldPosDisposable = GetWorldPosObservable().Subscribe(UnitStack._WorldPosProperty).DisposeWith(this);
@@ -1673,6 +1777,9 @@ public class UnitStackViewViewBase : UnitStackViewBase {
         }
         if (this._BindDestroyStack) {
             this.BindCommandExecuted(UnitStack.DestroyStack, DestroyStackExecuted);
+        }
+        if (this._BindHexLocation) {
+            this.BindProperty(UnitStack._HexLocationProperty, this.HexLocationChanged);
         }
     }
 }

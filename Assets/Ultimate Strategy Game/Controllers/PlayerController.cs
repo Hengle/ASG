@@ -35,6 +35,9 @@ public class PlayerController : PlayerControllerBase
 
     public override void SelectUnitStack(PlayerViewModel player, UnitStackViewModel unitStack)
     {
+        player.SelectedCity = null;
+        player.SelectedUnits.Clear();
+        
         if (player.SelectedUnitStack != null)
         {
             player.SelectedUnitStack.Selected = false;
@@ -46,6 +49,14 @@ public class PlayerController : PlayerControllerBase
 
     public override void SelectUnit(PlayerViewModel player, UnitViewModel unit)
     {
+        Debug.Log("Selected");
+        // Remove if selected again
+        if (player.SelectedUnits.Count == 1 && player.SelectedUnits[0] == unit)
+        {
+            player.SelectedUnits.Remove(unit);
+            return;
+        }
+
         player.SelectedUnits.Clear();
         player.SelectedUnits.Add(unit);
     }
@@ -64,22 +75,22 @@ public class PlayerController : PlayerControllerBase
 
     public override void ShiftSelectUnit(PlayerViewModel player, UnitViewModel unit)
     {
-
+        // If no selected
         if (player.SelectedUnits.Count == 0)
         {
-            player.AddBinding(unit);
+            player.SelectedUnits.Add(unit);
             return;
         }
 
 
         ModelCollection<UnitViewModel> unitList = null;
-        if (unit.ParentUnitStack != null)
+        if (player.SelectedUnitStack != null)
         {
-            unitList = unit.ParentUnitStack.Units;
+            unitList = player.SelectedUnitStack.Units;
         }
-        else
+        if (player.SelectedCity != null)
         {
-            unitList = unit.ParentCity.Units;
+            unitList = player.SelectedCity.Units;
         }
 
         UnitViewModel fromUnit = player.SelectedUnits[0];
@@ -94,12 +105,10 @@ public class PlayerController : PlayerControllerBase
         }
 
         player.SelectedUnits.Clear();
-        player.SelectedUnits.Add(fromUnit);
 
         for (int i = start; i < end + 1; i++)
         {
-            if (fromUnit != unitList[i]) ;
-                player.SelectedUnits.Add(unitList[i]);
+            player.SelectedUnits.Add(unitList[i]);
         }
 
  
@@ -108,6 +117,9 @@ public class PlayerController : PlayerControllerBase
 
     public override void SelectCity(PlayerViewModel player, CityViewModel city)
     {
+        player.SelectedUnitStack = null;
+        player.SelectedUnits.Clear();
+
         player.SelectedCity = city;
     }
 

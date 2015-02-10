@@ -8,11 +8,14 @@ using UnityEngine.UI;
 
 
 public partial class UnitCard 
-{
+{ 
+
     public UnitCardsUI unitCardsUI;
 
     public Text unitCount;
     public Text unitCountMax;
+    public Text movementPoints;
+
 
     public Color defaultColor;
     public Color selectedColor;
@@ -25,28 +28,31 @@ public partial class UnitCard
         {
             if (Input.GetKey(KeyCode.LeftControl))
             {
-                ExecuteCommand(Unit.ParentFaction.ParentPlayer.CtrlSelectUnit, Unit);
+                ExecuteCommand(Unit.Owner.CtrlSelectUnit, Unit);
                 return;
             }
 
             if (Input.GetKey(KeyCode.LeftShift))
             {
-                ExecuteCommand(Unit.ParentFaction.ParentPlayer.ShiftSelectUnit, Unit);
+                ExecuteCommand(Unit.Owner.ShiftSelectUnit, Unit);
                 return;
             }
 
-            ExecuteCommand(Unit.ParentFaction.ParentPlayer.SelectUnit, Unit);
+            ExecuteCommand(Unit.Owner.SelectUnit, Unit);
         });
  
     }
 
     /// Subscribes to the property and is notified anytime the value changes.
+    public override void MovePointsChanged(Int32 value)
+    {
+        movementPoints.text = value + "/" + Unit.MovePointsTotal;
+    }
+
+    /// Subscribes to the property and is notified anytime the value changes.
     public override void UnitCountChanged(Int32 value) 
     {
-        base.UnitCountChanged(value);
         unitCount.text = value.ToString();
-
-        
     }
     
     /// Subscribes to the property and is notified anytime the value changes.

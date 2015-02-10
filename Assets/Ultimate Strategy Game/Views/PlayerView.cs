@@ -15,6 +15,17 @@ public partial class PlayerView
 
     private GameObject hoverObject;
 
+    public Texture2D defaultCursor;
+    public Texture2D mergeCursor;
+    public Texture2D enterCityCursor;
+
+
+
+    private UnitStackViewModel selectedUnitStack;
+    private CityViewModel selectedCity;
+
+
+
     public override void Start()
     {
         base.Start();
@@ -36,9 +47,13 @@ public partial class PlayerView
         if (Physics.Raycast(ray, out hit, 500))
         {
             Debug.DrawLine(ray.origin, hit.point);
+
             hoverObject = hit.collider.gameObject;
 
-            //Debug.Log("Htting");
+            selectedUnitStack = Player.SelectedUnitStack;
+            selectedCity = Player.SelectedCity;
+
+            Cursor.SetCursor(defaultCursor, Vector2.zero, CursorMode.Auto);
 
             // Hovering over gameplay objects
             if (hoverObject.CompareTag("Terrain"))
@@ -49,6 +64,12 @@ public partial class PlayerView
             if (hoverObject.CompareTag("City"))
             {
                 ExecuteSetHoverCity(hoverObject.GetComponent<CityView>().City);
+                
+                // Change cursor
+                if (Player.SelectedUnitStack != null && Player.Faction.OwnsCity(Player.HoverCity))
+                {
+                    Cursor.SetCursor(enterCityCursor, Vector2.zero, CursorMode.Auto);
+                }
             }
             else
             {
@@ -58,6 +79,18 @@ public partial class PlayerView
             if (hoverObject.CompareTag("CampainUnit"))
             {
                 ExecuteSetHoverUnitStack(hoverObject.GetComponent<UnitStackView>().UnitStack);
+                
+                // Merge stack with stack
+                if (Player.SelectedUnitStack != null && Player.SelectedUnitStack != Player.HoverUnitStack && Player.Faction.OwnsUnitStack(Player.HoverUnitStack))
+                {
+                    Cursor.SetCursor(mergeCursor, Vector2.zero, CursorMode.Auto);
+                }
+
+                // Merge selected in city with stack
+                if (Player.SelectedCity != null && Player.Faction.OwnsUnitStack(Player.HoverUnitStack))
+                {
+                    Cursor.SetCursor(mergeCursor, Vector2.zero, CursorMode.Auto);
+                }
             }
             else
             {
@@ -122,31 +155,98 @@ public partial class PlayerView
              * */
 
 
-            // Right click
+            // Right click with a selected unit
             if (Input.GetKeyUp(KeyCode.Mouse1) && Player.SelectedUnitStack != null)
             {
-                // On Another stack
+                // Interact with other stacks
                 if (Player.HoverUnitStack != null)
                 {
-                    //ExecuteCommand(Player.SelectedUnitStack.UnitDestiantion);
-                }
-                // On a city
-                if (Player.HoverCity != null)
-                {
-                    //ExecuteCommand(Player.SelectedUnitStack.CityDestination);
+                    // Merge two stack or attack
+                    if (Player.Faction.OwnsUnitStack(Player.HoverUnitStack) && Player.HoverUnitStack != selectedUnitStack)
+                    {
+                        if (Player.SelectedUnits.Count == 0)
+                        {
+                            ExecuteCommand(selectedUnitStack.MergeWithStack, Player.HoverUnitStack);
+                            return;
+                        }
+                        else
+                        {
+                            ExecuteCommand(selectedUnitStack.MergeSelectedUnitsWithStack, Player.HoverUnitStack);
+                            return;
+                        }
+                    }
+                    else  // Attack
+                    {
+                        //ExecuteCommand(Player.SelectedUnitStack.AttackStack, Player.HoverUnitStack);
+                    }
                 }
 
-                // Move the whole unit stack
-                if (Player.SelectedUnits.Count == 0 && Player.SelectedHex != null)
+                // Interact with other stacks
+                if (Player.HoverCity != null)
                 {
-                    ExecuteCommand(Player.SelectedUnitStack.Move, Player.SelectedHex);
-                    return;
+                    // Merge two stack or attack
+                    if (Player.Faction.OwnsCity(Player.HoverCity))
+                    {
+                        if (Player.SelectedUnits.Count == 0)
+                        {
+                            ExecuteCommand(selectedUnitStack.MergeWithCity, Player.HoverCity);
+                            return;
+                        }
+                        else
+                        {
+                            ExecuteCommand(selectedUnitStack.MergeSelectedWithCity, Player.HoverCity);
+                            return;
+                        }
+                    }
+                    else  // Attack
+                    {
+                        //ExecuteCommand(Player.SelectedUnitStack.AttackStack, Player.HoverUnitStack);
+                    }
                 }
+
+                // Move unit stack or selected
+                if (Player.SelectedHex != null)
+                {
+                    if (Player.SelectedUnits.Count == 0)
+                    {
+                        ExecuteCommand(Player.SelectedUnitStack.Move, Player.SelectedHex);
+                        return;
+                    }
+                    else
+                    {
+                        ExecuteCommand(Player.SelectedUnitStack.MoveSelectedUnits, Player.SelectedHex);
+                        return;
+                    }
+
+                }
+            }
+
+            // Right click with city selected
+            if (Input.GetKeyUp(KeyCode.Mouse1) && Player.SelectedCity != null)
+            {
+                // On Another stack
+                if (Player.SelectedUnits.Count > 0 && Player.HoverUnitStack != null)
+                {
+                    ExecuteCommand(Player.SelectedCity.MergeSelectedWithStack, Player.HoverUnitStack);
+                }
+                
+                // On a city
+                //if (Player.HoverCity != null)
+                //{
+                    //ExecuteCommand(Player.SelectedUnitStack.CityDestination);
+                //}
+
+                // Set waypoint
+                //if (Player.SelectedUnits.Count == 0 && Player.SelectedHex != null)
+                //{
+                //    ExecuteCommand(Player.SelectedUnitStack.Move, Player.SelectedHex);
+                //    return;
+                //}
 
                 // Move selected units
                 if (Player.SelectedUnits.Count > 0 && Player.SelectedHex != null)
                 {
-                    ExecuteCommand(Player.SelectedUnitStack.MoveSelectedUnits, Player.SelectedHex);
+                    ExecuteCommand(Player.SelectedCity.MoveSelectedUnits, Player.SelectedHex);
                     return;
                 }
             }

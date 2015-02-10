@@ -42,7 +42,13 @@ public class FogOfWarController : FogOfWarControllerBase
         // Calculate visibility for all unit stacks
         for (int i = 0; i < faction.UnitStacks.Count; i++)
         {
-            Hex.SearchNeighbors(faction.UnitStacks[i].HexLocation, faction.UnitStacks[i].ViewRange, p_hex => p_hex.height <= 6, visibleTiles);
+            Hex.GetViewRange(faction.UnitStacks[i].HexLocation, faction.UnitStacks[i].ViewRange, faction.UnitStacks[i].HexLocation.height, visibleTiles);
+        }
+
+        // Calculate visibility for all unit stacks
+        for (int i = 0; i < faction.Cities.Count; i++)
+        {
+            Hex.GetViewRange(faction.Cities[i].HexLocation, faction.Cities[i].ViewRange, faction.Cities[i].HexLocation.height, visibleTiles);
         }
 
         for (int i = 0; i < visibleTiles.Count; i++)

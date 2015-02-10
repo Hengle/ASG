@@ -35,9 +35,62 @@ public class CityController : CityControllerBase {
         city.Units.Add(unit);
     }
 
-    public override void RemovUnit(CityViewModel city, UnitViewModel unit)
+    public override void AddUnits(CityViewModel city, UnitViewModel[] units)
+    {
+        city.Units.AddRange(units);
+    }
+
+    public override void RemoveUnit(CityViewModel city, UnitViewModel unit)
     {
         city.Units.Remove(unit);
+    }
+
+    public override void RemoveUnits(CityViewModel city, UnitViewModel[] units)
+    {
+        for (int i = 0; i < units.Length; i++)
+        {
+            city.Units.Remove(units[i]);
+        }
+    }
+
+
+    public override void MoveSelectedUnits(CityViewModel city, Hex destination)
+    {
+        PlayerViewModel player = city.Owner;
+        ModelCollection<UnitViewModel> units = player.SelectedUnits;
+
+
+        if (destination == null) return;
+        if (city.CanMove(units) == false) return;
+
+       
+        // Create stack
+        UnitStackViewModel newUnitStack = player.Faction.CreateUnitStack(city.HexLocation);
+        ExecuteCommand(newUnitStack.AddUnits, units.ToList().ToArray());
+        ExecuteCommand(city.RemoveUnits, units.ToList().ToArray());
+
+
+        ExecuteCommand(player.SelectUnitStack, newUnitStack);
+        ExecuteCommand(newUnitStack.Move, destination);
+    }
+
+    public override void MergeSelectedWithStack(CityViewModel city, UnitStackViewModel unitStack)
+    {
+        PlayerViewModel player = city.Owner;
+        ModelCollection<UnitViewModel> units = player.SelectedUnits;
+
+
+        if (city.CanMove(units) == false) return;
+
+
+        // Create stack
+        UnitStackViewModel newUnitStack = player.Faction.CreateUnitStack(city.HexLocation);
+        ExecuteCommand(newUnitStack.AddUnits, units.ToList().ToArray());
+        ExecuteCommand(city.RemoveUnits, units.ToList().ToArray());
+
+
+        ExecuteCommand(player.SelectUnitStack, newUnitStack);
+        ExecuteCommand(newUnitStack.MergeWithStack, unitStack);
     }
 
 }

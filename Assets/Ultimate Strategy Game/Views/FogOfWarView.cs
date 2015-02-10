@@ -11,7 +11,7 @@ public partial class FogOfWarView
 
     public GameObject fow;
 
-    RenderTexture renderTexture;
+    public RenderTexture renderTexture;
     Material material;
 
 
@@ -19,21 +19,24 @@ public partial class FogOfWarView
     {
         base.Start();
 
+        material = new Material(Shader.Find("GUI/Text Shader"));
+        material.hideFlags = HideFlags.HideAndDontSave;
+        material.shader.hideFlags = HideFlags.HideAndDontSave;
+
         FOWHexProperties.SetProperties(FogOfWar.HexBorderLegnth);
     }
 
     /// Invokes UpdateFOWExecuted when the UpdateFOW command is executed.
     public override void UpdateFOWExecuted() 
     {
-        material = new Material(Shader.Find("GUI/Text Shader"));
-        material.hideFlags = HideFlags.HideAndDontSave;
-        material.shader.hideFlags = HideFlags.HideAndDontSave;
+
 
       
         fow.transform.localScale = new Vector3(FogOfWar.TerrainManager.TerrainWidth, -FogOfWar.TerrainManager.TerrainWidth, FogOfWar.TerrainManager.TerrainWidth) * HexProperties.width / FogOfWar.TerrainManager.PixelsPerUnit;
         fow.transform.position = new Vector3(FogOfWar.TerrainManager.TerrainWidth, 2.5f, FogOfWar.TerrainManager.TerrainWidth) * HexProperties.width / FogOfWar.TerrainManager.PixelsPerUnit / 2;
 
-        fow.renderer.material.SetTexture("_FOW", DrawFov());
+        fow.GetComponent<Renderer>().material.SetTexture("_MainTex", DrawFov());
+        //fow.GetComponent<Renderer>().material.SetTexture DrawFov());("_MainTex","texture");
 
     }
     
@@ -45,7 +48,6 @@ public partial class FogOfWarView
 
     public Texture2D DrawFov()
     {
-
         //int chunkSize = FogOfWar.TerrainManager.ChunkSize;
 
         int size = (int)(FogOfWar.TerrainManager.TerrainWidth * FOWHexProperties.width);
@@ -81,7 +83,7 @@ public partial class FogOfWarView
 
                 if (FogOfWar.TerrainManager.hexGrid[x, y].Visible)
                 {
-                    GL.Color(Color.white);
+                    GL.Color(new Color(1, 1, 1, 1));
                 }
                 else if (FogOfWar.TerrainManager.hexGrid[x, y].Explored)
                 {
@@ -121,17 +123,17 @@ public partial class FogOfWarView
 
 
         // read the active RenderTexture into a new Texture2D //
-        Texture2D newTexture = new Texture2D(size, size, TextureFormat.RGB24, false);
-        newTexture.ReadPixels(new Rect(0, 0, size, size), 0, 0);
+        Texture2D newTexture = new Texture2D(size, size);
+        newTexture.ReadPixels(new Rect(0, 0, size, size), 0, 0, false);
 
 
         // apply pixels and compress //
-        newTexture.Apply(false);
+        newTexture.Apply();
         //newTexture.Compress(true); // might not want to compress! check later
 
         // clean up after the party //
-        RenderTexture.active = null;
-        RenderTexture.ReleaseTemporary(renderTexture);
+        //RenderTexture.active = null;
+        //RenderTexture.ReleaseTemporary(renderTexture);
 
 
         // return the goods //

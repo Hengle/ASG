@@ -30,9 +30,9 @@ public class MouseRts : MonoBehaviour
         }
 
         // Start panning camera if zooming in close to the ground or if just zooming out.
-        var pan = camera.transform.eulerAngles.x - zoomDelta * PanSpeed;
+        var pan = GetComponent<Camera>().transform.eulerAngles.x - zoomDelta * PanSpeed;
         pan = Mathf.Clamp(pan, PanAngleMin, PanAngleMax);
-        if (zoomDelta < 0 || camera.transform.position.y < (ZoomMax / 2))
+        if (zoomDelta < 0 || GetComponent<Camera>().transform.position.y < (ZoomMax / 2))
         {
             //camera.transform.eulerAngles = new Vector3(pan, 0, 0);
         }
@@ -72,7 +72,7 @@ public class MouseRts : MonoBehaviour
         }
 
         // Keep camera within level and zoom area
-        var desiredPosition = camera.transform.position + translation;
+        var desiredPosition = GetComponent<Camera>().transform.position + translation;
         if (desiredPosition.x < -LevelArea || LevelArea < desiredPosition.x)
         {
             //translation.x = 0;
@@ -87,6 +87,6 @@ public class MouseRts : MonoBehaviour
         }
 
         // Finally move camera parallel to world axis
-        camera.transform.position += translation;
+        GetComponent<Camera>().transform.position += translation;
     }
 }

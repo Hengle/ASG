@@ -111,12 +111,13 @@ public partial class UnitStackActionsView
 
     private void UpdateMovementPath ()
     {
-        lineRenderer.SetVertexCount(UnitStack.Path.Count);
+        lineRenderer.SetVertexCount(UnitStack.Path.Count + 1);
         lineRenderer.SetColors(Color.green, Color.red);
 
+        lineRenderer.SetPosition(0, UnitStack.HexLocation.worldPos);
         for (int h = 0; h < UnitStack.Path.Count; h++)
         {
-            lineRenderer.SetPosition(h, UnitStack.Path[h].worldPos);
+            lineRenderer.SetPosition(h + 1, UnitStack.Path[h].worldPos);
         }
     }
 

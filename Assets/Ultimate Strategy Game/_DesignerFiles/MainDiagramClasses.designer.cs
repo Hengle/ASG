@@ -53,6 +53,12 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
     
     private Boolean _Explored;
     
+    private UnitStackViewModel _UnitStack;
+    
+    private BuildingViewModel _Building;
+    
+    private CityViewModel _City;
+    
     public event PropertyChangedEventHandler PropertyChanged;
     protected virtual void OnPropertyChanged(string propertyName){ PropertyChangedEventHandler handler = PropertyChanged; if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName)); }
     public virtual Vector2 arrayCoord {
@@ -222,6 +228,36 @@ public partial class Hex : System.ComponentModel.INotifyPropertyChanged {
         set {
             _Explored = value;
             OnPropertyChanged("Explored");
+        }
+    }
+    
+    public virtual UnitStackViewModel UnitStack {
+        get {
+            return this._UnitStack;
+        }
+        set {
+            _UnitStack = value;
+            OnPropertyChanged("UnitStack");
+        }
+    }
+    
+    public virtual BuildingViewModel Building {
+        get {
+            return this._Building;
+        }
+        set {
+            _Building = value;
+            OnPropertyChanged("Building");
+        }
+    }
+    
+    public virtual CityViewModel City {
+        get {
+            return this._City;
+        }
+        set {
+            _City = value;
+            OnPropertyChanged("City");
         }
     }
 }

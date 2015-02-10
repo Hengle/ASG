@@ -42,6 +42,7 @@ public partial class UnitCardsUI {
 
         // Update the unit cards
         UpdateUnitCards(unitStack.Units);
+        UpdateSelectedUnits();
         unitStack._UnitsProperty.Subscribe(units => UpdateUnitCards(unitStack.Units)).DisposeWhenChanged(Player.SelectedUnitStackProperty, true);
         Player._SelectedUnitsProperty.Subscribe(units => UpdateSelectedUnits()).DisposeWhenChanged(Player.SelectedUnitStackProperty, true);    
 
@@ -63,21 +64,6 @@ public partial class UnitCardsUI {
 
     }
 
-    public void UpdateSelectedUnits ()
-    {
-        for (int i = 0; i < unitSlots.Count; i++)
-        {
-            if (Player.SelectedUnits.Contains(unitSlots[i].Unit))
-            {
-                unitSlots[i].Select(true);
-            }
-            else
-            {
-                unitSlots[i].Select(false);
-            }
-        }
-    }
-
     /// Subscribes to the property and is notified anytime the value changes.
     public override void SelectedCityChanged(CityViewModel city)
     {
@@ -89,7 +75,9 @@ public partial class UnitCardsUI {
 
         // Update the unit cards
         UpdateUnitCards(city.Units);
-        city._UnitsProperty.Subscribe(units => UpdateUnitCards(city.Units)).DisposeWhenChanged(Player.SelectedCityProperty, true);     
+        UpdateSelectedUnits();
+        city._UnitsProperty.Subscribe(units => UpdateUnitCards(city.Units)).DisposeWhenChanged(Player.SelectedCityProperty, true);
+        Player._SelectedUnitsProperty.Subscribe(units => UpdateSelectedUnits()).DisposeWhenChanged(Player.SelectedCityProperty, true); 
     }
 
     private void UpdateUnitCards (ModelCollection<UnitViewModel> units)
@@ -105,6 +93,21 @@ public partial class UnitCardsUI {
             else
             {
                 unitSlots[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void UpdateSelectedUnits()
+    {
+        for (int i = 0; i < unitSlots.Count; i++)
+        {
+            if (Player.SelectedUnits.Contains(unitSlots[i].Unit))
+            {
+                unitSlots[i].Select(true);
+            }
+            else
+            {
+                unitSlots[i].Select(false);
             }
         }
     }
@@ -143,7 +146,7 @@ public partial class UnitCardsUI {
         GameObject unitCard;
         for (int i = 0; i < unitSlotCount; i++)
         {
-            unitCard = Instantiate(unitSlotPrefab, Vector3.zero, Camera.main.transform.rotation) as GameObject;
+            unitCard = Instantiate(unitSlotPrefab, Vector3.zero, Quaternion.identity) as GameObject;
 
             unitCard.transform.SetParent(unitSlotsContainer.transform);
 

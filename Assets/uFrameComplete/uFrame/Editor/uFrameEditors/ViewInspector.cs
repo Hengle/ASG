@@ -230,12 +230,10 @@ public class ViewInspector : uFrameInspector
                             property.vector3Value = newValue;
                         }
                     }
-                   
                     else
                     {
                         EditorGUILayout.PropertyField(property);
                     }
-                    //Debug.Log(property.type);
                 }
                 catch (Exception ex)
                 {

@@ -140,8 +140,8 @@ public abstract class PlayerControllerBase : Controller {
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
     [Inject] public FactionController FactionController {get;set;}
-    [Inject] public UnitController UnitController {get;set;}
     [Inject] public CityController CityController {get;set;}
+    [Inject] public UnitController UnitController {get;set;}
     public abstract void InitializePlayer(PlayerViewModel player);
     
     public override ViewModel CreateEmpty() {
@@ -198,9 +198,9 @@ public abstract class UnitStackControllerBase : Controller {
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
     [Inject] public FactionController FactionController {get;set;}
+    [Inject] public CityController CityController {get;set;}
     [Inject] public FogOfWarController FogOfWarController {get;set;}
     [Inject] public UnitController UnitController {get;set;}
-    [Inject] public CityController CityController {get;set;}
     [Inject] public CharacterController CharacterController {get;set;}
     public abstract void InitializeUnitStack(UnitStackViewModel unitStack);
     
@@ -272,6 +272,30 @@ public abstract class UnitStackControllerBase : Controller {
     
     public virtual void PlanSelectedUnitsMovement(UnitStackViewModel unitStack) {
     }
+    
+    public virtual void AttackStack(UnitStackViewModel unitStack, UnitStackViewModel arg) {
+    }
+    
+    public virtual void MergeWithStack(UnitStackViewModel unitStack, UnitStackViewModel arg) {
+    }
+    
+    public virtual void AttackCity(UnitStackViewModel unitStack, CityViewModel arg) {
+    }
+    
+    public virtual void MergeWithCity(UnitStackViewModel unitStack, CityViewModel arg) {
+    }
+    
+    public virtual void MergeSelectedUnitsWithStack(UnitStackViewModel unitStack, UnitStackViewModel arg) {
+    }
+    
+    public virtual void AddUnits(UnitStackViewModel unitStack, UnitViewModel[] arg) {
+    }
+    
+    public virtual void RemoveUnits(UnitStackViewModel unitStack, UnitViewModel[] arg) {
+    }
+    
+    public virtual void MergeSelectedWithCity(UnitStackViewModel unitStack, CityViewModel arg) {
+    }
 }
 
 public abstract class FactionControllerBase : Controller {
@@ -282,7 +306,7 @@ public abstract class FactionControllerBase : Controller {
     [Inject] public GameLogicController GameLogicController {get;set;}
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public FogOfWarController FogOfWarController {get;set;}
-    [Inject] public UnitController UnitController {get;set;}
+    [Inject] public CharacterController CharacterController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
     [Inject] public CityController CityController {get;set;}
     public abstract void InitializeFaction(FactionViewModel faction);
@@ -348,7 +372,22 @@ public abstract class CityControllerBase : Controller {
     public virtual void AddUnit(CityViewModel city, UnitViewModel arg) {
     }
     
-    public virtual void RemovUnit(CityViewModel city, UnitViewModel arg) {
+    public virtual void RemoveUnit(CityViewModel city, UnitViewModel arg) {
+    }
+    
+    public virtual void AddUnits(CityViewModel city, UnitViewModel[] arg) {
+    }
+    
+    public virtual void RemoveUnits(CityViewModel city, UnitViewModel[] arg) {
+    }
+    
+    public virtual void MoveSelectedUnits(CityViewModel city, Hex arg) {
+    }
+    
+    public virtual void MergeSelectedWithStack(CityViewModel city, UnitStackViewModel arg) {
+    }
+    
+    public virtual void AttackWithSelectedUnits(CityViewModel city, UnitStackMovementState arg) {
     }
 }
 
@@ -401,7 +440,6 @@ public abstract class UnitControllerBase : Controller {
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public PlayerController PlayerController {get;set;}
     [Inject] public UnitStackController UnitStackController {get;set;}
-    [Inject] public FactionController FactionController {get;set;}
     [Inject] public CityController CityController {get;set;}
     public abstract void InitializeUnit(UnitViewModel unit);
     
@@ -466,6 +504,7 @@ public abstract class CharacterControllerBase : Controller {
     [Inject("TerrainManager")] public TerrainManagerViewModel TerrainManager { get; set; }
     [Inject("GameLogic")] public GameLogicViewModel GameLogic { get; set; }
     [Inject] public UnitStackController UnitStackController {get;set;}
+    [Inject] public FactionController FactionController {get;set;}
     [Inject] public CharacterController CharacterController {get;set;}
     [Inject] public CharacterUnitController CharacterUnitController {get;set;}
     public abstract void InitializeCharacter(CharacterViewModel character);

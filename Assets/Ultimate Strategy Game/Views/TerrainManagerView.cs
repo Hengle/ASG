@@ -37,7 +37,6 @@ public partial class TerrainManagerView
 
     public ProceduralMaterial substance;
 
-    public Color[] colors;
 
     public Biome[] biomes;
 
@@ -50,7 +49,16 @@ public partial class TerrainManagerView
         public Color color;
     }
 
+
     public GameObject water;
+    public float waterHeight;
+
+
+    public Transform treeContainer;
+    public GameObject tree;
+    public int treeCountMin;
+    public int treeCountMax;
+
 
 
 
@@ -77,6 +85,8 @@ public partial class TerrainManagerView
     /// Invokes GenerateChunksExecuted when the GenerateChunks command is executed.
     public override void GenerateChunksExecuted()
     {
+        ProceduralMaterial.substanceProcessorUsage = ProceduralProcessorUsage.All;
+
         ChunkView.chunkSize = TerrainManager.ChunkSize;
         ChunkView.chunkResolution = TerrainManager.ChunkResolution;
         ChunkView.collisionResolution = TerrainManager.ChunkCollisionResolution;
@@ -86,14 +96,15 @@ public partial class TerrainManagerView
         GenerateChunkTextures();
 
         StartCoroutine(TimedChunkGeneration());
-        Debug.Log(Hex.Distance(TerrainManager.hexGrid[0, 0].worldPos, TerrainManager.hexGrid[0, 1].worldPos));
+        //Debug.Log(Hex.Distance(TerrainManager.hexGrid[0, 0].worldPos, TerrainManager.hexGrid[0, 1].worldPos));
     }
 
     private void GenerateWater ()
     {
+        Debug.Log("Water generated");
         float size = TerrainManager.TerrainWidth * HexProperties.width / TerrainManager.PixelsPerUnit;
 
-        water.transform.position = new Vector3(size / 2, 1.3f, size / 2);
+        water.transform.position = new Vector3(size / 2, waterHeight, size / 2);
         water.transform.localScale = new Vector3(size, size, size);
     }
 
@@ -135,6 +146,7 @@ public partial class TerrainManagerView
         }
 
         StitchChunks();
+        //GenerateVegetation();
         yield return null;
     }
 
@@ -362,6 +374,7 @@ public partial class TerrainManagerView
                         if (TerrainManager.hexGrid[x, y].height == TerrainManager.Altitudes)
                         {
                             GL.Color(Color.white);
+                            TerrainManager.hexGrid[x, y].terrainType = TerrainType.Arctic;
                             break;
                         }
 
@@ -371,7 +384,7 @@ public partial class TerrainManagerView
                             GL.Color(new Color(biomes[i].color.r, biomes[i].color.g, biomes[i].color.b)); //  * (1 - 0.3f * (1 - TerrainManager.hexGrid[x, y].height / 6f))
                             break;
                         }
-                        GL.Color(Color.red);
+                        GL.Color(Color.white);
                     }
                 }
 
@@ -416,6 +429,36 @@ public partial class TerrainManagerView
         // return the goods //
         return newTexture;
     }
+
+
+    private void GenerateVegetation()
+    {
+        GameObject tempTree;
+        Hex hex;
+        for (int x = 0; x < TerrainManager.TerrainWidth; x++)
+        {
+            for (int y = 0; y < TerrainManager.TerrainHeight; y++)
+            {
+                hex = TerrainManager.hexGrid[x, y];
+                if (hex.terrainType == TerrainType.Forest || hex.terrainType == TerrainType.Jungle || hex.terrainType == TerrainType.AlpineTundra)
+                {
+                    int treeCount = UnityEngine.Random.Range(treeCountMin, treeCountMax);
+
+                    for (int i = 0; i < treeCount; i++)
+                    {
+                        Vector3 pos = UnityEngine.Random.insideUnitSphere * HexProperties.unityHeight;
+                        pos += hex.worldPos;
+                        pos.y = hex.worldPos.y;
+
+                        tempTree = Instantiate(tree, pos, Quaternion.identity) as GameObject;
+                        tempTree.transform.parent = treeContainer;
+                    }
+                }
+            }
+        }
+    }
+
+
 
 
     void OnDrawGizmos()

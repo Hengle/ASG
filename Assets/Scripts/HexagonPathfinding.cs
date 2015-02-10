@@ -53,7 +53,7 @@ public class HexagonPathfinding : MonoBehaviour
     {
         int timeStart = System.Environment.TickCount;
 
-        material = renderer.material as ProceduralMaterial;
+        material = GetComponent<Renderer>().material as ProceduralMaterial;
 
         SetHexProperties();
 
@@ -89,7 +89,7 @@ public class HexagonPathfinding : MonoBehaviour
                 chunks[x, y] = new Texture2D(chunkSize, chunkSize);
                 chunks[x, y].wrapMode = TextureWrapMode.Clamp;
                 GenerateChunkHexes(chunks[x, y], x * chunkHexCountX, y * chunkHexCountY);
-                chunk.renderer.material.mainTexture = chunks[x, y];
+                chunk.GetComponent<Renderer>().material.mainTexture = chunks[x, y];
             }
         }
 

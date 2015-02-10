@@ -13,6 +13,16 @@ public partial class ChunkView
     public static int chunkSize, chunkResolution, collisionResolution, pixelsPerUnit;
 
 
+    public ChunkLOD[] chunkLods;
+
+    [System.Serializable] 
+    public class ChunkLOD
+    {
+        public int resolution;
+        public float distance;
+    }
+
+
     public Texture2D hexHeightmap;
     public Texture2D hexBiomeMap;
 
@@ -22,59 +32,26 @@ public partial class ChunkView
 
 
 
-
     private static Vector3[] vertices;
     private static Vector3[] normals;
     private static Vector2[] uv;
 
 
+
+    public override void Start()
+    {
+        base.Start();
+    }
+
     public override void GenerateChunkExecuted()
     {
 
         GenerateTextures();
-        GetComponent<MeshFilter>().mesh = UpdateMesh(chunkResolution);
         UpdateCollisions();
-
-        /*
-        LOD[] lods = new LOD[3];
+        GenerateLODs();
         
-        Renderer[] lodRenderers = new Renderer[1];
-        GetComponent<MeshFilter>().mesh = UpdateMesh(chunkResolution);
-        MeshFilter meshFilter = GetComponent<MeshFilter>();
-        meshFilter.mesh = UpdateMesh(chunkResolution);
-        lodRenderers[0] = renderer;       
-        lods[0].renderers = lodRenderers;
-        lods[0].screenRelativeTransitionHeight = 0.9f;
-
-        Renderer[] lodRenderers2 = new Renderer[1];
-        //new MeshRenderer().
-        GameObject mesh2 = (GameObject)Instantiate(new GameObject(), transform.position, Quaternion.identity);
-        mesh2.AddComponent<MeshFilter>();
-        mesh2.AddComponent<MeshRenderer>();
-        mesh2.GetComponent<MeshRenderer>().material = GetComponent<MeshRenderer>().material;
-        mesh2.transform.parent = this.transform;
-        mesh2.GetComponent<MeshFilter>().mesh = UpdateMesh(chunkResolution / 2);
-        lodRenderers2[0] = mesh2.GetComponent<MeshFilter>().renderer;
-        lods[1].renderers = lodRenderers2;
-        lods[1].screenRelativeTransitionHeight = 0.7f;
-
-        Renderer[] lodRenderers3 = new Renderer[1];
-        //new MeshRenderer().
-        GameObject mesh3 = (GameObject)Instantiate(new GameObject(), transform.position, Quaternion.identity);
-        mesh3.AddComponent<MeshFilter>();
-        mesh3.AddComponent<MeshRenderer>();
-        mesh3.GetComponent<MeshRenderer>().material = GetComponent<MeshRenderer>().material;
-        mesh3.transform.parent = this.transform;
-        mesh3.GetComponent<MeshFilter>().mesh = UpdateMesh(8);
-        lodRenderers3[0] = mesh3.GetComponent<MeshFilter>().renderer;
-        lods[2].renderers = lodRenderers3;
-        lods[2].screenRelativeTransitionHeight = 0.1f;
+       
         
-
-        // Make it live!
-        GetComponent<LODGroup>().SetLODS(lods);
-        GetComponent<LODGroup>().RecalculateBounds();
-        */
 
         vertices = null;
         normals = null;
@@ -85,12 +62,56 @@ public partial class ChunkView
     {
         base.UpdateChunkExecuted();
     }
+    
+    public void GenerateLODs()
+    {
+        GetComponent<MeshFilter>().mesh = UpdateMesh(chunkLods[0].resolution);
 
+        LOD[] lods = new LOD[chunkLods.Length];
+        Renderer[] lodRenderers = new Renderer[1];
+
+        // Heighest detail
+        lodRenderers[0] = GetComponent<Renderer>();
+
+        lods[0].renderers = lodRenderers;
+        lods[0].screenRelativeTransitionHeight = chunkLods[0].distance;
+
+        for (int i = 1; i < chunkLods.Length; i++)
+        {
+            Renderer[] lodRenderers2 = new Renderer[1];
+            lodRenderers2[0] = GenerateLOD(chunkLods[i].resolution);
+            lods[i].renderers = lodRenderers2;
+            lods[i].screenRelativeTransitionHeight = chunkLods[i].distance;
+        }
+
+
+        // Make it live!
+        GetComponent<LODGroup>().SetLODS(lods);
+        GetComponent<LODGroup>().RecalculateBounds();
+    }
+
+    public Renderer GenerateLOD(int res)
+    {
+        GameObject chunk = new GameObject();
+        chunk.transform.position = transform.position;
+        chunk.transform.parent = transform;
+        chunk.name = "Chunk " + res;
+
+
+        MeshFilter meshFilter = chunk.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = chunk.AddComponent<MeshRenderer>();
+
+        meshFilter.mesh = UpdateMesh(res);
+        meshRenderer.sharedMaterial = substance;
+
+        return chunk.GetComponent<Renderer>();
+    }
 
     public void GenerateTextures ()
     {
+        //Timer.Start("Generating texture");
         // Texture generation
-        substance = renderer.material as ProceduralMaterial;
+        substance = GetComponent<Renderer>().material as ProceduralMaterial;
         substance.isReadable = true;
 
         // Set the substance input textures
@@ -111,7 +132,7 @@ public partial class ChunkView
         {
             substance.GetGeneratedTexture(substance.GetGeneratedTextures()[i].name).wrapMode = TextureWrapMode.Clamp;
         }
-
+        //Timer.End();
     }
 
 
@@ -134,9 +155,9 @@ public partial class ChunkView
         {
             for (int x = 0; x <= res; x++, v++)
             {
-                vertices[v] = new Vector3(x * resStep / pixelsPerUnit,
+                vertices[v] = new Vector3(Mathf.Clamp(x * resStep / pixelsPerUnit, 0, res * resStep / pixelsPerUnit),
                                           substanceTexture2D.GetPixel((int)(x * heightmapStep), (int)(z * heightmapStep)).grayscale * Chunk.TerrainManager.PixelToHeight,
-                                          z * resStep / pixelsPerUnit
+                                          Mathf.Clamp(z * resStep / pixelsPerUnit, 0, res * resStep / pixelsPerUnit)
                                           );
 
                 normals[v] = Vector3.up;

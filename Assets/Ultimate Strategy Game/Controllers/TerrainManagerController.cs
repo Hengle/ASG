@@ -21,7 +21,7 @@ public class TerrainManagerController : TerrainManagerControllerBase
         Timer.Start("Generating map");
 
         // Make sure to calculate the Hexagon dimensions before we do any logic
-        HexProperties.SetProperties(terrainManager.HexagonSide);
+        HexProperties.SetProperties(terrainManager.HexagonSide, terrainManager.PixelsPerUnit);
 
 
         GenerateTerrainData        (terrainManager);
